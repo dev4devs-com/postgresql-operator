@@ -76,7 +76,7 @@ func TestReconcilePostgreSQL_UpdateStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs, t)
+			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
 			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
 
@@ -103,7 +103,7 @@ func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Should not find the instance",
+			name: "Should not find the deployment",
 			fields: fields{
 				scheme: scheme.Scheme,
 				objs:   []runtime.Object{&dbInstance},
@@ -120,10 +120,15 @@ func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
 			want:    reflect.TypeOf(&appsv1.Deployment{}),
 		},
 		{
-			name: "Should not find the Deployment",
+			name: "Should find the deployment",
 			fields: fields{
 				scheme: scheme.Scheme,
-				objs:   []runtime.Object{&dbInstance},
+				objs:   []runtime.Object{&dbInstance, &appsv1.Deployment{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "postgresql",
+						Namespace: "postgresql",
+					},
+				}},
 			},
 			args: args{
 				request: reconcile.Request{
@@ -133,14 +138,14 @@ func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 			want:    reflect.TypeOf(&appsv1.Deployment{}),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs, t)
+			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
 			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
 
@@ -155,3 +160,153 @@ func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
 		})
 	}
 }
+
+func TestReconcilePostgreSQL_UpdateServiceStatus(t *testing.T) {
+	type fields struct {
+		scheme *runtime.Scheme
+		objs   []runtime.Object
+	}
+	type args struct {
+		request reconcile.Request
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    reflect.Type
+		wantErr bool
+	}{
+		{
+			name: "Should not find the service",
+			fields: fields{
+				scheme: scheme.Scheme,
+				objs:   []runtime.Object{&dbInstance},
+			},
+			args: args{
+				request: reconcile.Request{
+					NamespacedName: types.NamespacedName{
+						Name:      dbInstance.Name,
+						Namespace: dbInstance.Namespace,
+					},
+				},
+			},
+			wantErr: true,
+			want:    reflect.TypeOf(&corev1.Service{}),
+		},
+		{
+			name: "Should find the service",
+			fields: fields{
+				scheme: scheme.Scheme,
+				objs: []runtime.Object{&dbInstance, &corev1.Service{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "postgresql",
+						Namespace: "postgresql",
+					},
+				}},
+			},
+			args: args{
+				request: reconcile.Request{
+					NamespacedName: types.NamespacedName{
+						Name:      dbInstance.Name,
+						Namespace: dbInstance.Namespace,
+					},
+				},
+			},
+			wantErr: false,
+			want:    reflect.TypeOf(&corev1.Service{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
+
+			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
+
+			got, err := r.updateServiceStatus(reqLogger, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TestReconcilePostgreSQL_UpdateServiceStatus.updateServiceStatus() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
+				t.Errorf("TestReconcilePostgreSQL_UpdateServiceStatus.updateServiceStatus() = %v, want %v", gotType, tt.want)
+			}
+		})
+	}
+}
+
+
+func TestReconcilePostgreSQL_UpdatePVCStatus(t *testing.T) {
+	type fields struct {
+		scheme *runtime.Scheme
+		objs   []runtime.Object
+	}
+	type args struct {
+		request reconcile.Request
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    reflect.Type
+		wantErr bool
+	}{
+		{
+			name: "Should not find the pvc",
+			fields: fields{
+				scheme: scheme.Scheme,
+				objs:   []runtime.Object{&dbInstance},
+			},
+			args: args{
+				request: reconcile.Request{
+					NamespacedName: types.NamespacedName{
+						Name:      dbInstance.Name,
+						Namespace: dbInstance.Namespace,
+					},
+				},
+			},
+			wantErr: true,
+			want:    reflect.TypeOf(&corev1.PersistentVolumeClaim{}),
+		},
+		{
+			name: "Should find the pvc",
+			fields: fields{
+				scheme: scheme.Scheme,
+				objs: []runtime.Object{&dbInstance, &corev1.PersistentVolumeClaim{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "postgresql",
+						Namespace: "postgresql",
+					},
+				}},
+			},
+			args: args{
+				request: reconcile.Request{
+					NamespacedName: types.NamespacedName{
+						Name:      dbInstance.Name,
+						Namespace: dbInstance.Namespace,
+					},
+				},
+			},
+			wantErr: false,
+			want:    reflect.TypeOf(&corev1.PersistentVolumeClaim{}),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
+
+			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
+
+			got, err := r.updatePvcStatus(reqLogger, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TestReconcilePostgreSQL_UpdatePVCStatus.updatePvcStatus() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
+				t.Errorf("TestReconcilePostgreSQL_UpdatePVCStatus.updatePvcStatus() = %v, want %v", gotType, tt.want)
+			}
+		})
+	}
+}
+

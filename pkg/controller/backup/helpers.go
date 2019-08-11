@@ -3,13 +3,16 @@ package backup
 import (
 	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
 
 func getBkpLabels(name string) map[string]string {
 	return map[string]string{"app": "postgresql", "backup_cr": name}
 }
 
-func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup) (map[string][]byte, error) {
+
+
+func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql ) (map[string][]byte, error) {
 	database := ""
 	user := ""
 	pwd := ""
@@ -19,7 +22,7 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup) (map[string][]
 	for i := 0; i < len(r.dbPod.Spec.Containers[0].Env); i++ {
 		value := r.dbPod.Spec.Containers[0].Env[i].Value
 		switch r.dbPod.Spec.Containers[0].Env[i].Name {
-		case "POSTGRESQL_DATABASE":
+		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam):
 			// Get value from ENV VAR
 			database = value
 
@@ -42,7 +45,7 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup) (map[string][]
 				// Set ENV value from ConfigMap
 				database = value
 			}
-		case "POSTGRESQL_USER":
+		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam):
 			// Get value from ENV VAR
 			user = value
 
@@ -65,7 +68,7 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup) (map[string][]
 				// Set ENV value from ConfigMap
 				user = value
 			}
-		case "POSTGRESQL_PASSWORD":
+		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam):
 			// Get value from ENV VAR
 			pwd = value
 
@@ -162,7 +165,7 @@ func getEncSecretNamespace(bkp *v1alpha1.Backup) string {
 func getEncSecretName(bkp *v1alpha1.Backup) string {
 	awsSecretName := ""
 	if hasEncryptionKeySecret(bkp) {
-		awsSecretName = encryptionKeySecret + bkp.Name
+		awsSecretName = encSecretPrefix + bkp.Name
 	}
 	if bkp.Spec.AwsCredentialsSecretName != "" {
 		awsSecretName = bkp.Spec.EncryptionKeySecretName

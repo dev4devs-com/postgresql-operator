@@ -46,8 +46,8 @@ func (r *ReconcileBackup) fetchConfigMap(bkp *v1alpha1.Backup, cfgName string) (
 	return cfg, err
 }
 
-func (r *ReconcileBackup) fetchBDPod(bkp *v1alpha1.Backup, reqLogger logr.Logger, request reconcile.Request) (*corev1.Pod, error) {
-	listOps, err := r.getListOpsToSearchDBObject(bkp, reqLogger)
+func (r *ReconcileBackup) fetchBDPod(bkp *v1alpha1.Backup, db  *v1alpha1.Postgresql, reqLogger logr.Logger) (*corev1.Pod, error) {
+	listOps, err := r.getListOpsToSearchDBObject(bkp, db, reqLogger )
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +71,8 @@ func (r *ReconcileBackup) fetchBDPod(bkp *v1alpha1.Backup, reqLogger logr.Logger
 	return &pod, nil
 }
 
-func (r *ReconcileBackup) fetchServiceDB(bkp *v1alpha1.Backup, reqLogger logr.Logger, request reconcile.Request) (*corev1.Service, error) {
-	listOps, err := r.getListOpsToSearchDBObject(bkp, reqLogger)
+func (r *ReconcileBackup) fetchServiceDB(bkp *v1alpha1.Backup,db *v1alpha1.Postgresql, reqLogger logr.Logger) (*corev1.Service, error) {
+	listOps, err := r.getListOpsToSearchDBObject(bkp,db, reqLogger)
 	if err != nil {
 		return nil, err
 	}
@@ -96,20 +96,21 @@ func (r *ReconcileBackup) fetchServiceDB(bkp *v1alpha1.Backup, reqLogger logr.Lo
 	return &srv, nil
 }
 
-func (r *ReconcileBackup) getListOpsToSearchDBObject(bkp *v1alpha1.Backup, reqLogger logr.Logger) (*client.ListOptions, error) {
+func (r *ReconcileBackup) fetchDBInstance(bkp *v1alpha1.Backup, reqLogger logr.Logger) (*v1alpha1.Postgresql, error) {
+	reqLogger.Info("Checking if the PostgreSQL Custom Resource already exists")
+	db := &v1alpha1.Postgresql{}
+	//Fetch the PostgreSQL db
+	err := r.client.Get(context.TODO(), types.NamespacedName{Name: "postgresql", Namespace: bkp.Namespace}, db)
+	return db, err
+}
+
+func (r *ReconcileBackup) getListOpsToSearchDBObject(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, reqLogger logr.Logger) (*client.ListOptions, error) {
 	reqLogger.Info("Checking if the Database Service exists ...")
 	reqLogger.Info("Checking operator namespace ...")
 
-	// Fetch PostgreSQL Database
-	reqLogger.Info("Checking PostgreSQL exists ...")
-	db := &v1alpha1.Postgresql{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{Name: "postgresql", Namespace: bkp.Namespace}, db)
-	if err != nil {
-		return nil, err
-	}
 	// Create criteria
 	reqLogger.Info("Creating criteria to looking for Service ...")
-	ls := map[string]string{"app": "postgresql", "postgresql_cr": db.Name, "name": "postgresql"}
+	ls := map[string]string{"app": "postgresql", "postgresql_cr": db.Name}
 	labelSelector := labels.SelectorFromSet(ls)
 	listOps := &client.ListOptions{Namespace: bkp.Namespace, LabelSelector: labelSelector}
 	return listOps, nil

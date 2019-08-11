@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	awsSecretPrefix     = "aws-"
-	dbSecretPrefix      = "db-"
-	encryptionKeySecret = "encryption-"
+	awsSecretPrefix = "aws-"
+	dbSecretPrefix  = "db-"
+	encSecretPrefix = "encryption-"
 )
 
 //Returns the buildDatabaseSecret object for the PostgreSQL Backup

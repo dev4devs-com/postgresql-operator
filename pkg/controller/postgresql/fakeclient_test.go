@@ -6,11 +6,10 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"testing"
 )
 
 //buildReconcileWithFakeClientWithMocks return reconcile with fake client, schemes and mock objects
-func buildReconcileWithFakeClientWithMocks(objs []runtime.Object, t *testing.T) *ReconcilePostgresql {
+func buildReconcileWithFakeClientWithMocks(objs []runtime.Object) *ReconcilePostgresql {
 	s := scheme.Scheme
 
 	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Postgresql{})

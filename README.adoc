@@ -27,7 +27,7 @@ toc::[]
 
 == Overview
 
-An https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] based on the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PostgreSQL database. Also, this operator will allow you customize and configure it easily according with your needs.
+A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] in Go developed using the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PostgreSQL database.
 
 == Prerequisites
 
@@ -133,7 +133,7 @@ NOTE: To uninstall you need be logged in as a user with cluster privileges like 
 
 By the specs in link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_cr.yaml[Postgresql CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the PostgreSQL should use in its required env vars.
 
-If just the name of the configMap be informed, `configMapName`,  then it will look for the values stored with the same keys required for each env var of the image used for its database version (`databaseNameParam`, `databasePasswordParam`, `databaseUserParam`). However, you are able to customize the keys as well by using the optinal specs; `configMapDatabaseNameParam`, `configMapDatabasePasswordParam`, `configMapDatabaseUserParam`. In this way, this operator will be able to looking for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
+If just the name of the configMap be informed, `configMapName`,  then it will look for the values stored with the same keys required for each env var of the image used for its database version (`databaseNameParam`, `databasePasswordParam`, `databaseUserParam`). However, you are able to customize the keys too by using the optional specs; `configMapDatabaseNameParam`, `configMapDatabasePasswordParam`, `configMapDatabaseUserParam`. In this way, this operator will be able to looking for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
 === Changing the operator namespace
 

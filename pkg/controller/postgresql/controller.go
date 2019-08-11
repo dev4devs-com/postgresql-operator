@@ -17,9 +17,9 @@ import (
 var log = logf.Log.WithName("controller_postgresql")
 
 const (
-	Deployment = "Deployment"
-	PVC        = "PersistentVolumeClaim"
-	Service    = "Service"
+	deployment = "deployment"
+	pvc        = "pvc"
+	service    = "service"
 )
 
 // Add creates a new PostgreSQL Controller and adds it to the Manager. The Manager will set fields on the Controller
@@ -49,12 +49,12 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 
 	/** Watch for changes to secondary resources and create the owner PostgreSQL **/
 
-	// Deployment
+	// deployment
 	if err := watchDeployment(c); err != nil {
 		return err
 	}
 
-	// Service
+	// service
 	if err := watchService(c); err != nil {
 		return err
 	}
@@ -106,11 +106,11 @@ func (r *ReconcilePostgresql) create(db *v1alpha1.Postgresql, kind string, reqLo
 func (r *ReconcilePostgresql) buildFactory(db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) runtime.Object {
 	reqLogger.Info("Check "+kind, "into the namespace", db.Namespace)
 	switch kind {
-	case PVC:
+	case pvc:
 		return r.buildPVCForDB(db)
-	case Deployment:
+	case deployment:
 		return r.buildDBDeployment(db)
-	case Service:
+	case service:
 		return r.buildDBService(db)
 	default:
 		msg := "Failed to recognize type of object" + kind + " into the Namespace " + db.Namespace
@@ -138,26 +138,26 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	// Add const values for mandatory specs
 	addMandatorySpecsDefinitions(db)
 
-	// Check if Deployment for the app exist, if not create one
-	deployment, err := r.fetchDBDeployment(reqLogger, db)
+	// Check if deployment for the app exist, if not create one
+	dep, err := r.fetchDBDeployment(reqLogger, db)
 	if err != nil {
 		// Create the deployment
-		if err := r.create(db, Deployment, reqLogger); err != nil {
+		if err := r.create(db, deployment, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 		return reconcile.Result{Requeue: true}, nil
 	}
 
-	// Check if Service for the app exist, if not create one
+	// Check if service for the app exist, if not create one
 	if _, err := r.fetchDBService(reqLogger, db); err != nil {
-		if err := r.create(db, Service, reqLogger); err != nil {
+		if err := r.create(db, service, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
 
 	// Check if PersistentVolumeClaim for the app exist, if not create one
 	if _, err := r.fetchDBPersistentVolumeClaim(reqLogger, db); err != nil {
-		if err := r.create(db, PVC, reqLogger); err != nil {
+		if err := r.create(db, pvc, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
@@ -165,11 +165,11 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	// Ensure the deployment size is the same as the spec
 	reqLogger.Info("Ensuring the PostgreSQL Database deployment size is the same as the spec")
 	size := db.Spec.Size
-	if *deployment.Spec.Replicas != size {
+	if *dep.Spec.Replicas != size {
 		// Set the number of Replicas spec in the CR
-		deployment.Spec.Replicas = &size
+		dep.Spec.Replicas = &size
 		// Update
-		if err := r.update(deployment, reqLogger); err != nil {
+		if err := r.update(dep, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
@@ -180,13 +180,13 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 		return reconcile.Result{}, err
 	}
 
-	// Update status for Service
+	// Update status for service
 	serviceStatus, err := r.updateServiceStatus(reqLogger, request)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// Update status for PVC
+	// Update status for pvc
 	pvcStatus, err := r.updatePvcStatus(reqLogger, request)
 	if err != nil {
 		return reconcile.Result{}, err
