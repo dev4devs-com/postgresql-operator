@@ -2,7 +2,7 @@ package backup
 
 import (
 	"fmt"
-	 "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
 )
 
 func getBkpLabels(name string) map[string]string {

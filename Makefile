@@ -31,6 +31,7 @@ install:
 	- kubectl create namespace ${NAMESPACE}
 	@echo ....... Applying CRDS and Operator .......
 	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
 	@echo ....... Applying Rules and Service Account .......
 	- kubectl apply -f deploy/role.yaml -n ${NAMESPACE}
 	- kubectl apply -f deploy/role_binding.yaml  -n ${NAMESPACE}
@@ -43,8 +44,6 @@ install:
 .PHONY: uninstall
 uninstall:
 	@echo ....... Uninstalling .......
-	@echo ....... Deleting the Database .......
-	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_postgresql_cr.yaml -n ${NAMESPACE}
 	@echo ....... Deleting CRDs.......
 	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
 	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
@@ -53,7 +52,7 @@ uninstall:
 	- kubectl delete -f deploy/role_binding.yaml -n ${NAMESPACE}
 	- kubectl delete -f deploy/service_account.yaml -n ${NAMESPACE}
 	@echo ....... Deleting Operator .......
-	- kubectl apply -f deploy/operator.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/operator.yaml -n ${NAMESPACE}
 	@echo ....... Deleting namespace ${NAMESPACE}.......
 	- kubectl delete namespace ${NAMESPACE}
 
@@ -128,12 +127,12 @@ code/run/local:
 .PHONY: code/vet
 code/vet:
 	@echo go vet
-	go vet $$(go list ./... | grep -v /vendor/)
+	go vet $$(go list ./... )
 
 .PHONY: code/fmt
 code/fmt:
 	@echo go fmt
-	go fmt $$(go list ./... | grep -v /vendor/)
+	go fmt $$(go list ./... )
 
 .PHONY: code/dev
 code/dev:

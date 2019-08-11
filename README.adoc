@@ -27,9 +27,7 @@ toc::[]
 
 == Overview
 
-IMPORTANT: Under construction ( it cannot be used yet )
-
-An https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] based on the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PoostgreSQL database on a OpenShift and/or K8S cluster.
+An https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] based on the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PostgreSQL database. Also, this operator will allow you customize and configure it easily according with your needs.
 
 == Prerequisites
 
@@ -42,6 +40,8 @@ An https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] based on 
 |===
 
 == Getting Started
+
+NOTE: The following steps will allow you use this project as standalone.
 
 === Cloning the repository
 
@@ -82,6 +82,40 @@ NOTE: To install you need be logged in as a user with cluster privileges like th
 $ make install
 ----
 
+=== Verifying
+
+To verify that the installation was successful completed you can check the  `Database Status` field of link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[Postgresql CRD] in the cluster. The expected result when all was installed with success is `OK`.
+
+```shell
+$ oc describe Postgresql
+...
+Status:
+  Database Status:  OK
+...
+```
+
+NOTE: Following an example of the fully expect result after run `make install`.
+
+[source,shell]
+----
+$ kubectl get all
+NAME                                       READY     STATUS    RESTARTS   AGE
+pod/postgresql-6cf5f48c78-dp2cw            1/1       Running   0          1m
+pod/postgresql-operator-7dd97d8885-v7rnf   1/1       Running   0          2m
+
+NAME                                  TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+service/postgresql                    ClusterIP   172.30.227.3     <none>        5432/TCP            1m
+service/postgresql-operator-metrics   ClusterIP   172.30.223.235   <none>        8383/TCP,8686/TCP   1m
+
+NAME                                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/postgresql            1         1         1            1           1m
+deployment.apps/postgresql-operator   1         1         1            1           2m
+
+NAME                                             DESIRED   CURRENT   READY     AGE
+replicaset.apps/postgresql-6cf5f48c78            1         1         1         1m
+replicaset.apps/postgresql-operator-7dd97d8885   1         1         1         2m
+----
+
 === Uninstalling
 
 Use the following command to delete the Operator, Database and Backup Service if enabled.
@@ -94,6 +128,12 @@ $ make uninstall
 NOTE: To uninstall you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
 
 == Configuration and Options
+
+=== Using configMap to share required values
+
+By the specs in link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_cr.yaml[Postgresql CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the PostgreSQL should use in its required env vars.
+
+If just the name of the configMap be informed, `configMapName`,  then it will look for the values stored with the same keys required for each env var of the image used for its database version (`databaseNameParam`, `databasePasswordParam`, `databaseUserParam`). However, you are able to customize the keys as well by using the optinal specs; `configMapDatabaseNameParam`, `configMapDatabasePasswordParam`, `configMapDatabaseUserParam`. In this way, this operator will be able to looking for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
 === Changing the operator namespace
 
@@ -137,9 +177,9 @@ To verify that the backup has been successful created you can run the following 
 
 [source,shell]
 ----
-$ oc get cronjob.batch/postgresql-backup
-NAME                 SCHEDULE      SUSPEND   ACTIVE    LAST SCHEDULE   AGE
-postgresql-backup     0 * * * *   False     0         13s             12m
+$ oc get cronjob.batch/backup
+NAME      SCHEDULE      SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+backup     0 * * * *   False     0         13s             12m
 ----
 
 To check the jobs executed you can run the command `oc get jobs` in the namespace where the operator is installed as the following example.
@@ -147,11 +187,11 @@ To check the jobs executed you can run the command `oc get jobs` in the namespac
 [source,shell]
 ----
 $ oc get jobs
-NAME                          DESIRED   SUCCESSFUL   AGE
-postgresql-backup-1561588320   1         0            6m
-postgresql-backup-1561588380   1         0            5m
-postgresql-backup-1561588440   1         0            4m
-postgresql-backup-1561588500   1         0            3m
+NAME               DESIRED   SUCCESSFUL   AGE
+backup-1561588320   1         0            6m
+backup-1561588380   1         0            5m
+backup-1561588440   1         0            4m
+backup-1561588500   1         0            3m
 ----
 
 NOTE: In the above example the schedule was made to run this job each minute (`*/1 * * * *`)
@@ -160,7 +200,7 @@ To check the logs and troubleshooting you can run the command `oc logs $podName 
 
 [source,shell]
 ----
- $ oc logs job.batch/postgresql-backup-1561589040 -f
+ $ oc logs job.batch/backup-1561589040 -f
 dumping postgresql
 dumping postgres
 ==> Component data dump completed
@@ -190,7 +230,7 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 
 |===
 | *CustomResourceDefinition*    | *Description*
-| link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[PostgreSQL]                     | Packages, manages, installs and configures the Database on the cluster.
+| link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[PostgreSQL]     | Packages, manages, installs and configures the Database on the cluster.
 | link:./deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
 |===
 
@@ -227,9 +267,9 @@ The Design Pattern adopted to build the objects in its controllers is http://tmr
 |===
 | *Status*    | *Description*
 | `databaseStatus` | For this status is expected the value `OK` which means that all required objects are created.
-| `deploymentStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/federation/extensions/v1beta1/definitions/#_v1beta1_deploymentstatus[v1beta1.DeploymentStatus]).
-| `serviceStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/federation/v1/definitions/#_v1_servicestatus[v1.ServiceStatus]).
-| `PersistentVolumeClaimStatus` | PersistentVolumeClaim Status from ks8 API (https://kubernetes.io/docs/reference/federation/v1/definitions/#_v1_persistentvolumevlaim[v1.PersistentVolumeClaimStatus])
+| `deploymentStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#deploymentstatus-v1-apps[appsv1.DeploymentStatus]).
+| `serviceStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#servicestatus-v1-core[v1core.ServiceStatus]).
+| `PersistentVolumeClaimStatus` | PersistentVolumeClaim Status from ks8 API (persistentvolumeclaimstatus[v1core.PersistentVolumeClaimStatus])
 |===
 
 
@@ -239,7 +279,7 @@ The Design Pattern adopted to build the objects in its controllers is http://tmr
 | *Status*    | *Description*
 | `backupStatus` | Should show `OK` when everything is created successfully.
 | `cronJobName` | Name of cronJob resource  created by it.
-| `cronJobStatus` | CronJob Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#cronjobstatus-v1beta1-batch[k8s.io/api/batch/v1beta1/CronJobStatus]).
+| `cronJobStatus` | CronJob Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#cronjobstatus-v1beta1-batch[v1beta1.CronJobStatus]).
 | `dbSecretName` | Name of database secret resource created in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to the database .
 | `dbSecretData` | Data used into the secret to connect to the database .
 | `awsSecretName` | Name of AWS S3 bucket secret resource used in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to AWS to send the backup .
