@@ -19,7 +19,7 @@ func watchPersistenceVolumeClaim(c controller.Controller) error {
 	return err
 }
 
-//Watch Service objects created in the project/namespace
+//Watch service objects created in the project/namespace
 func watchService(c controller.Controller) error {
 	err := c.Watch(&source.Kind{Type: &corev1.Service{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,
@@ -29,7 +29,7 @@ func watchService(c controller.Controller) error {
 }
 
 //Watch for changes to secondary resources and create the owner PostgreSQL
-//Watch Deployment objects created in the project/namespace
+//Watch deployment objects created in the project/namespace
 func watchDeployment(c controller.Controller) error {
 	err := c.Watch(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,

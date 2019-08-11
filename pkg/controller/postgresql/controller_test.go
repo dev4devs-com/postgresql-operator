@@ -40,7 +40,7 @@ func TestReconcilePostgreSQL_Update(t *testing.T) {
 
 			objs := []runtime.Object{tt.fields.createdInstance}
 
-			r := buildReconcileWithFakeClientWithMocks(objs, t)
+			r := buildReconcileWithFakeClientWithMocks(objs)
 
 			reqLogger := log.WithValues("Request.Namespace", tt.fields.instanceToUpdate.Namespace, "Request.Name", tt.fields.createdInstance.Name)
 
@@ -75,7 +75,7 @@ func TestReconcilePostgreSQL_Create(t *testing.T) {
 			},
 			args: args{
 				instance: &dbInstance,
-				kind:     Deployment,
+				kind:     deployment,
 			},
 			wantErr: false,
 		},
@@ -97,7 +97,7 @@ func TestReconcilePostgreSQL_Create(t *testing.T) {
 
 			objs := []runtime.Object{tt.args.instance}
 
-			r := buildReconcileWithFakeClientWithMocks(objs, t)
+			r := buildReconcileWithFakeClientWithMocks(objs)
 
 			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
 
@@ -133,13 +133,13 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 		wantPanic bool
 	}{
 		{
-			name: "Should create a Deployment",
+			name: "Should create a deployment",
 			fields: fields{
 				scheme: scheme.Scheme,
 			},
 			args: args{
 				instance: &dbInstance,
-				kind:     Deployment,
+				kind:     deployment,
 			},
 			want: reflect.TypeOf(&appsv1.Deployment{}),
 		},
@@ -150,18 +150,18 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 			},
 			args: args{
 				instance: &dbInstance,
-				kind:     PVC,
+				kind:     pvc,
 			},
 			want: reflect.TypeOf(&corev1.PersistentVolumeClaim{}),
 		},
 		{
-			name: "Should create a Service",
+			name: "Should create a service",
 			fields: fields{
 				scheme: scheme.Scheme,
 			},
 			args: args{
 				instance: &dbInstance,
-				kind:     Service,
+				kind:     service,
 			},
 			want: reflect.TypeOf(&corev1.Service{}),
 		},
@@ -183,7 +183,7 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 
 			objs := []runtime.Object{tt.args.instance}
 
-			r := buildReconcileWithFakeClientWithMocks(objs, t)
+			r := buildReconcileWithFakeClientWithMocks(objs)
 
 			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
 
@@ -211,7 +211,7 @@ func TestReconcilePostgreSQL(t *testing.T) {
 		&dbInstance,
 	}
 
-	r := buildReconcileWithFakeClientWithMocks(objs, t)
+	r := buildReconcileWithFakeClientWithMocks(objs)
 
 	// mock request to simulate Reconcile() being called on an event for a watched resource
 	req := reconcile.Request{
@@ -283,7 +283,7 @@ func TestReconcilePostgreSQL_NotFound(t *testing.T) {
 		&dbInstance,
 	}
 
-	r := buildReconcileWithFakeClientWithMocks(objs, t)
+	r := buildReconcileWithFakeClientWithMocks(objs)
 
 	// mock request to simulate Reconcile() being called on an event for a watched resource
 	req := reconcile.Request{
@@ -311,7 +311,7 @@ func TestReconcilePostgreSQL_UsingConfigMapToCreateEnvVars(t *testing.T) {
 		&configMapSameKeyValues,
 	}
 
-	r := buildReconcileWithFakeClientWithMocks(objs, t)
+	r := buildReconcileWithFakeClientWithMocks(objs)
 
 	// mock request to simulate Reconcile() being called on an event for a watched resource
 	req := reconcile.Request{
@@ -398,7 +398,7 @@ func TestReconcilePostgreSQ_ReplicasSizes(t *testing.T) {
 		&dbInstance,
 	}
 
-	r := buildReconcileWithFakeClientWithMocks(objs, t)
+	r := buildReconcileWithFakeClientWithMocks(objs)
 
 	// mock request to simulate Reconcile() being called on an event for a watched resource
 	req := reconcile.Request{
@@ -456,7 +456,7 @@ func TestReconcilePostgreSQL_Reconcile_InstanceWithoutSpec(t *testing.T) {
 		&dbInstanceWithoutSpec,
 	}
 
-	r := buildReconcileWithFakeClientWithMocks(objs, t)
+	r := buildReconcileWithFakeClientWithMocks(objs)
 
 	// mock request to simulate Reconcile() being called on an event for a watched resource
 	req := reconcile.Request{
