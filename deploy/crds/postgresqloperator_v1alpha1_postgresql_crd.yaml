@@ -1,0 +1,131 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: postgresqls.postgresqloperator.dev4devs.com
+spec:
+  group: postgresqloperator.dev4devs.com
+  names:
+    kind: Postgresql
+    listKind: PostgresqlList
+    plural: postgresqls
+    singular: postgresql
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          properties:
+            configMapDatabaseNameParam:
+              description: Name of the configMap key where the operator should looking
+                for the value for the database name for its env var
+              type: string
+            configMapDatabasePasswordParam:
+              description: Name of the configMap key where the operator should looking
+                for the value for the database user for its env var
+              type: string
+            configMapDatabaseUserParam:
+              description: Name of the configMap key where the operator should looking
+                for the value for the database password for its env var
+              type: string
+            configMapName:
+              description: Name of the ConfigMap where the operator should looking
+                for the EnvVars keys and/or values only
+              type: string
+            containerImagePullPolicy:
+              description: 'Policy definition to pull the Database Image More info:
+                https://kubernetes.io/docs/concepts/containers/images/'
+              type: string
+            containerName:
+              description: Name to create the Database container
+              type: string
+            databaseMemoryLimit:
+              description: Limit of Memory which will be available for the database
+                container
+              type: string
+            databaseMemoryRequest:
+              description: Limit of Memory Request which will be available for the
+                database container
+              type: string
+            databaseName:
+              description: Value for the Database Environment Variable (Spec.DatabaseNameParam).
+              type: string
+            databaseNameParam:
+              description: Key Value for the Database Environment Variable in order
+                to inform the database mame Note that each database version/image
+                can expected a different value for it.
+              type: string
+            databasePassword:
+              description: Value for the Database Environment Variable (Spec.DatabasePasswordParam).
+              type: string
+            databasePasswordParam:
+              description: Key Value for the Database Environment Variable in order
+                to inform the database password Note that each database version/image
+                can expected a different value for it.
+              type: string
+            databasePort:
+              description: Value for the Database Environment Variable in order to
+                define the port which it should use. It will be used in its container
+                as well
+              format: int32
+              type: integer
+            databaseStorageRequest:
+              description: Limit of Storage Request which will be available for the
+                database container
+              type: string
+            databaseUser:
+              description: Value for the Database Environment Variable (Spec.DatabaseUser).
+              type: string
+            databaseUserParam:
+              description: Key Value for the Database Environment Variable in order
+                to inform the database user Note that each database version/image
+                can expected a different value for it.
+              type: string
+            image:
+              description: Database image:tag E.g "centos/postgresql-96-centos7"
+              type: string
+            size:
+              description: Quantity of instances
+              format: int32
+              type: integer
+          type: object
+        status:
+          properties:
+            databaseStatus:
+              description: It will be as "OK when all objects are created successfully
+              type: string
+            deploymentStatus:
+              description: Status of the Database Deployment created and managed by
+                it
+              type: object
+            pvcStatus:
+              description: Name of the PersistentVolumeClaim created and managed by
+                it
+              type: object
+            serviceStatus:
+              description: Status of the Database Service created and managed by it
+              type: object
+          required:
+          - pvcStatus
+          - deploymentStatus
+          - serviceStatus
+          - databaseStatus
+          type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

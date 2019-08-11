@@ -1,0 +1,70 @@
+apiVersion: postgresql-operator.dev4devs.com/v1alpha1
+kind: Backup
+metadata:
+  name: backup
+spec:
+
+  # ---------------------------------
+  # Backup Container
+  # ----------------------------
+  # See https://github.com/integr8ly/backup-container-image
+  # ---------------------------------
+
+  # NOTE: Default values are applied by the operator if values are not specified below.
+
+  schedule: "0 0 * * *" # daily at 00:00
+  image: "quay.io/integreatly/backup-container:1.0.8"
+
+  # Following the steps to get the databaseVersion
+  # 1. Go to the database pod terminal
+  # 2. Run the command psql as follows.
+  # //sh-4.2$ psql
+  # //psql (9.6.10)
+  # IMPORTANT: Just the first 2 digits should be used.
+  databaseVersion: "9.6"
+
+  # The following information is optional and will be used to tag the data in the AWS bucket
+  productName: "postgresql"
+
+  # ---------------------------------
+  # Stored Host - AWS
+  # ----------------------------
+
+  # NOTE: The following values are mandatory in order to allow the backup be stored outside if the cluster
+
+  # Add in the following attribute the secret name created in the cluster with the AWS credentials
+  # awsCredentialsSecretName: "example-awsCredentialsSecretName"
+
+  # Add the namespace where the awsCredentialsSecretName is applied
+  # NOTE: Just valid when the awsCredentialsSecretName is used
+  # awsCredentialsSecretNamespace: "example-awsCredentialsSecretNamespace"
+
+  # OR
+
+  # Add the AWS S3 bucket details in order to allow the operator build it
+  awsS3BucketName: "example-awsS3BucketName"
+  awsAccessKeyId: "example-awsAccessKeyId"
+  awsSecretAccessKey: "example-awsSecretAccessKey"
+  # ---------------------------------
+  # Encryption Key (Optional)
+  # ----------------------------
+
+  # NOTE: The following values are optional.
+
+  # Add in the following attribute the secret name created in the cluster with the encryption details
+  # encryptionKeySecretName: "example-encryptionKeySecretName"
+
+  # Add the namespace where the encryptionKeySecretName is applied
+  # NOTE: Just valid when the encryptionKeySecretName is used
+  # encryptionKeySecretNamespace: "example-encryptionKeySecretNamespace"
+
+  # OR
+
+  # Add the encryption details in order to allow the operator build it
+  # See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
+
+  # base64 encoded public opengpg cert
+  #gpgPublicKey: "example-gpgPublicKey"
+  #gpgEmail: "email@gmai.com"
+  #gpgTrustModel: "always"
+

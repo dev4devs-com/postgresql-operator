@@ -1,0 +1,427 @@
+ifdef::env-github[]
+:status:
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:table-caption!:
+:namespace: postgresql
+endif::[]
+
+:toc:
+:toc-placement!:
+
+= PostgreSQL Operator
+
+ifdef::status[]
+.*Project health*
+image:https://circleci.com/gh/dev4devs-com/postgresql-operator.svg?style=svg[Build Status (CircleCI), link=https://circleci.com/gh/dev4devs-com/postgresql-operator]
+image:https://img.shields.io/:license-Apache2-blue.svg[License (License), link=http://www.apache.org/licenses/LICENSE-2.0]
+image:https://coveralls.io/repos/github/dev4devs-com/postgresql-operator/badge.svg?branch=master[Coverage Status (Coveralls), link=https://coveralls.io/github/dev4devs-com/postgresql-operator?branch=master]
+image:https://goreportcard.com/badge/github.com/dev4devs-com/postgresql-operator[Go Report Card (Go Report Card), link=https://goreportcard.com/report/github.com/dev4devs-com/postgresql-operator]
+endif::[]
+
+:toc:
+toc::[]
+
+== Overview
+
+IMPORTANT: Under construction ( it cannot be used yet )
+
+An https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] based on the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PoostgreSQL database on a OpenShift and/or K8S cluster.
+
+== Prerequisites
+
+|===
+|https://golang.org/doc/install[Install Golang]
+|https://github.com/golang/go/wiki/SettingGOPATH[Ensure the $GOPATH environment variable is set]
+|https://golang.github.io/dep/docs/installation.html[Install the dep package manager]
+|https://github.com/operator-framework/operator-sdk#quick-start[Install Operator-SDK]
+|https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl[Install kubectl]
+|===
+
+== Getting Started
+
+=== Cloning the repository
+
+By the following commands you will create a local directory and clone this project.
+
+[source,shell]
+----
+$ git clone git@github.com:dev4devs-com/postgresql-operator.git $GOPATH/src/github.com/dev4devs-com/postgresql-operator
+----
+
+=== Minishift installation and setup
+
+https://docs.okd.io/latest/minishift/getting-started/installing.html[Install Minishift] then enable Operators on it by running the following commands.
+
+[source,shell]
+----
+# create a new profile to test the operator
+$ minishift profile set postgresql-operator
+
+# enable the admin-user add-on
+$ minishift addon enable admin-user
+
+# add insecure registry to download the images from docker
+$ minishift config set insecure-registry 172.30.0.0/16
+
+# start the instance
+$ minishift start
+----
+
+=== Installing
+
+Use the following command to install the Operator and Database
+
+NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+
+[source,shell]
+----
+$ make install
+----
+
+=== Uninstalling
+
+Use the following command to delete the Operator, Database and Backup Service if enabled.
+
+[source,shell]
+----
+$ make uninstall
+----
+
+NOTE: To uninstall you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+
+== Configuration and Options
+
+=== Changing the operator namespace
+
+By using the command `make install` the default namespace `postgresql`,  defined in the link:./Makefile[Makefile] will be created and the operator will be installed in this namespace. You are able to install the operator in another namespace if you wish, however, you need to set up its roles (RBAC) in order to apply them on the namespace where the operator will be installed. The namespace name needs to be changed in the link:./deploy/role_binding.yaml[Cluster Role Binding] file. Note, that you also need to change the namespace in the link:./Makefile[Makefile] in order to use the command `make install` for another namespace.
+
+[source,yaml]
+----
+  # Replace this with the namespace where the operator will be deployed.
+  namespace: postgresql
+----
+
+=== Configuring the Backup Service
+
+==== Backup
+
+===== Install
+The backup service is implemented by using  https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image]. It will do the backup of the database to be restore in the case of failures. Following the steps to enable it.
+
+. Setup the AWS in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresqloperator_v1alpha1_backup_cr.yaml[Backup CR] as follows or add the name of the secret which has already this data in the cluster.
++
+[source,yaml]
+----
+  # ---------------------------------
+  # Stored Host - AWS
+  # ----------------------------
+
+  awsS3BucketName: "example-awsS3BucketName"
+  awsAccessKeyId: "example-awsAccessKeyId"
+  awsSecretAccessKey: "example-awsSecretAccessKey"
+----
++
+IMPORTANT: Also, you can add the name of the secret which is created already in the cluster.
++
+. Run the command `make backup/install` in the same namespace where the  Database is installed in order to apply the CronJob which will do this process.
+
+NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+
+===== Verifying
+
+To verify that the backup has been successful created you can run the following command in the namespace where the operator is installed.
+
+[source,shell]
+----
+$ oc get cronjob.batch/postgresql-backup
+NAME                 SCHEDULE      SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+postgresql-backup     0 * * * *   False     0         13s             12m
+----
+
+To check the jobs executed you can run the command `oc get jobs` in the namespace where the operator is installed as the following example.
+
+[source,shell]
+----
+$ oc get jobs
+NAME                          DESIRED   SUCCESSFUL   AGE
+postgresql-backup-1561588320   1         0            6m
+postgresql-backup-1561588380   1         0            5m
+postgresql-backup-1561588440   1         0            4m
+postgresql-backup-1561588500   1         0            3m
+----
+
+NOTE: In the above example the schedule was made to run this job each minute (`*/1 * * * *`)
+
+To check the logs and troubleshooting you can run the command `oc logs $podName -f` in the namespace where the operator is installed as the following example.
+
+[source,shell]
+----
+ $ oc logs job.batch/postgresql-backup-1561589040 -f
+dumping postgresql
+dumping postgres
+==> Component data dump completed
+/tmp/intly/archives/postgresql.postgresql-22_46_06.pg_dump.gz
+WARNING: postgresql.postgresql-22_46_06.pg_dump.gz: Owner username not known. Storing UID=1001 instead.
+upload: '/tmp/intly/archives/postgresql.postgresql-22_46_06.pg_dump.gz' -> 's3://camilabkp/backups/postgresql/postgres/2019/06/26/postgresql.postgresql-22_46_06.pg_dump.gz'  [1 of 1]
+ 1213 of 1213   100% in    1s   955.54 B/s  done
+ERROR: S3 error: 403 (RequestTimeTooSkewed): The difference between the request time and the current time is too large.
+----
+
+==== Restore
+
+Following the steps required to be performed in case of be required do the restore based in the backup service.
+
+. Install the PostgreSQL by following the steps in <<Installing>>.
+. Restore the database with the dump which was stored in the AWS S3 bucket.
++
+NOTE: To restore we should run `gunzip -c filename.gz | psql dbname`
+
+== Architecture
+
+This operator is `cluster-scoped`. For further information see the https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md#operator-scope[Operator Scope] section in the Operator Framework documentation. Also, check its roles in link:./deploy/[Deploy] directory.
+
+NOTE: The operator and database will be installed in the namespace `{namespace}` which will be created by this project.
+
+=== CRD Definitions
+
+|===
+| *CustomResourceDefinition*    | *Description*
+| link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[PostgreSQL]                     | Packages, manages, installs and configures the Database on the cluster.
+| link:./deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
+|===
+
+=== Resources managed by each CRD Controller
+
+* *link:./pkg/controller/postgresql/controller.go[Postgresql Database]*
++
+|===
+| *Resource*    | *Description*
+| link:./pkg/controller/postgresql/deployments.go[deployments.go]           | Define the Deployment resource of Database. (E.g container and resources definitions)
+| link:./pkg/controller/postgresql/pvs.go[pvs.go]                           | Define the PersistentVolumeClaim resource used by its Database.
+| link:./pkg/controller/postgresql/services.go[services.go]                 | Define the Service resource of Database.
+|===
+
+* *link:./pkg/controller/backup/controller.go[Backup]*
++
+|===
+| *Resource*    | *Description*
+| link:./pkg/controller/backup/cronjobs.go[cronjobs.go]         | Define the CronJob resources in order to do the Backup.
+| link:./pkg/controller/backup/secrets.go[secrets.go]           | Define the database and AWS secrets resources created.
+|===
+
+=== Design Pattern
+
+The Design Pattern adopted to build the objects in its controllers is http://tmrts.com/go-patterns/creational/factory.html[Factory Method Pattern].
+
+== Administration
+
+=== Status Definition per Types
+
+
+* link:./pkg/apis/postgresqloperator/v1alpha1/postgresql_types.go[PostgreSQL]
++
+|===
+| *Status*    | *Description*
+| `databaseStatus` | For this status is expected the value `OK` which means that all required objects are created.
+| `deploymentStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/federation/extensions/v1beta1/definitions/#_v1beta1_deploymentstatus[v1beta1.DeploymentStatus]).
+| `serviceStatus` | Deployment Status from ks8 API (https://kubernetes.io/docs/reference/federation/v1/definitions/#_v1_servicestatus[v1.ServiceStatus]).
+| `PersistentVolumeClaimStatus` | PersistentVolumeClaim Status from ks8 API (https://kubernetes.io/docs/reference/federation/v1/definitions/#_v1_persistentvolumevlaim[v1.PersistentVolumeClaimStatus])
+|===
+
+
+* link:./pkg/apis/postgresqloperator/v1alpha1/backup_types.go[Backup]
++
+|===
+| *Status*    | *Description*
+| `backupStatus` | Should show `OK` when everything is created successfully.
+| `cronJobName` | Name of cronJob resource  created by it.
+| `cronJobStatus` | CronJob Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.10/#cronjobstatus-v1beta1-batch[k8s.io/api/batch/v1beta1/CronJobStatus]).
+| `dbSecretName` | Name of database secret resource created in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to the database .
+| `dbSecretData` | Data used into the secret to connect to the database .
+| `awsSecretName` | Name of AWS S3 bucket secret resource used in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to AWS to send the backup .
+| `awsSecretData` | Data used to in the secret to send the backup files to the AWS S3.
+| `awsSecretDataNamespace` | Namespace where the backup image will looking for the of the Aws Secret  used.
+| `encryptionKeySecretName` | Name of the EncryptionKey used.
+| `encryptionKeySecretNamespace` | Namespace where the backup image will looking for the of the EncryptionKey used.
+| `encryptionKeySecretData` | Data used into the EncryptionKey.
+| `hasEncryptionKey` | Expected true when it was configured to use an EncryptionKey secret
+| `databasePodFound` | The value expected here is true which shows that the database pod was found.
+| `servicePodFound` | The value expected here is true which shows that the database service was found.
+|===
+
+== Development
+
+=== Local Setup
+
+Run the following command to setup this project locally.
+
+[source,yaml]
+----
+$ make setup
+----
+
+=== Running the operator locally
+
+The following command will install the operator in the cluster and run the changes performed locally without the need to publish a `dev` tag. In this way, you can verify your code in the development environment.
+
+[source,yaml]
+----
+$ make code/run/local
+----
+
+IMPORTANT: The local changes are applied when the command `operator-sdk up local --namespace={namespace}` is executed then it is not a hot deploy and to get the latest changes you need re-run the command.
+
+=== Checking Database
+
+By the following commands you are able to connect in the Database. You can check it by OpenShift UI in the Database's pod terminal.
+
+[source,shell]
+----
+# Login into the the Postgres
+psql -U postgres
+
+# To connect into the default database
+\c <database-name>
+
+# To list the tables
+\dt
+
+----
+
+=== Debugging
+
+Follow the below steps to debug the project in some IDEs.
+
+NOTE: The code needs to be compiled/built first.
+
+==== IntelliJ IDEA / GoLand
+
+[source,shell]
+----
+$ make setup/debug
+$ cd cmd/manager/
+$ dlv debug --headless --listen=:2345 --api-version=2
+----
+
+Then, debug the project from the IDE by using the default setup of `Go Remote` option.
+
+==== Visual Code
+
+[source,shell]
+----
+$ make setup/debug
+$ dlv --listen=:2345 --headless=true --api-version=2 exec ./build/_output/bin/postgresql-operator-local  --
+----
+
+debug the project using the following Visual Code launch config.
+
+[source,yaml]
+----
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "test",
+            "type": "go",
+            "request": "launch",
+            "mode": "remote",
+            "remotePath": "${workspaceFolder}/cmd/manager/main.go",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceFolder}",
+            "env": {},
+            "args": []
+        }
+    ]
+}
+----
+
+== Makefile command reference
+
+=== Application Commands
+
+|===
+| *Command*                        | *Description*
+| `make install`                   | Creates the `{namespace}` namespace, application CRDS, cluster role and service account. Installs the operator and DB
+| `make uninstall`                 | Uninstalls the operator and DB. Deletes the `{namespace}`` namespace, application CRDS, cluster role and service account. i.e. all configuration applied by `make install`
+| `make backup/install`            | Installs the backup Service in the operator's namespace
+| `make backup/uninstall`          | Uninstalls the backup Service from the operator's namespace.
+|===
+
+=== Local Development
+
+|===
+| `make code/run-local`                 | Runs the operator locally for development purposes.
+| `make setup/debug`                    | Sets up environment for debugging proposes.
+| `make code/vet`                       | Examines source code and reports suspicious constructs using https://golang.org/cmd/vet/[vet].
+| `make code/fmt`                       | Formats code using https://golang.org/cmd/gofmt/[gofmt].
+| `make code/gen`                       | It will automatically generated/update the files by using the operator-sdk based on the CR status and spec definitions.
+| `make code/dev`                       | It will tun the dev commands to check, fix and generated/update the files.
+|===
+
+=== CI
+
+|===
+| `make image/build/master`              | Used by CI to build operator image from `master` branch and add `:master` tag.
+| `make image/push/master`               | Used by CI to push the `master` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
+| `make image/build/release`             | Used by CI to build operator image from a tagged commit and add `:<version>` and `latest` tag.
+| `make image/push/release`              | Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
+|===
+
+=== Tests
+
+|===
+| `make test/run`                      | Runs test suite
+| `make test/integration-cover`        | Run coverage check
+|===
+
+NOTE: The link:./Makefile[Makefile] is implemented with tasks which you should use to work with.
+
+== Publishing images
+
+Images are automatically built and pushed to our https://quay.io/repository/dev4devs-com/postgresql-operator[image repository] in the following cases:
+
+- For every change merged to master a new image with the `master` tag is published.
+- For every change merged that has a git tag a new image with the `<operator-version>` and `latest` tags are published.
+
+If the image does not get built and pushed automatically the job may be re-run manually via the https://circleci.com/gh/dev4devs-com/postgresql-operator[CI dashboard].
+
+== Tags Release
+
+Following the steps
+
+* Create a new version tag following the http://semver.org/spec/v2.0.0.html[semver], for example `0.1.0`
+* Bump the version in the link:./version/version.go[version.go] file.
+* Update the the link:./CHANGELOG.MD[CHANGELOG.MD] with the new release.
+* Create a git tag with the version value, for example:
+
+[source,shell]
+----
+$ git tag -a 0.1.0 -m "version 0.1.0"
+----
+
+* Push the new tag to the upstream repository, this will trigger an automated release by the CI, for example:
+
+[source,shell]
+----
+$ git push upstream 0.1.0
+----
+
+NOTE: The image with the tag will be created and pushed to the https://quay.io/repository/dev4devs-com/postgresql-operator[postgresql-operator image hosting repository] by the CI.
+
+WARNING: Do not use letters in the tag such as `v`. It will not work.
+
+== Supportability
+
+This operator was developed using the Kubernetes APIs in order to be compatible with OpenShift and Kubernetes.
+
+== Contributing
+
+All contributions are hugely appreciated. Please see our link:./guidelines/CONTRIBUTION.adoc[Contribution Guide] for guidelines on how to open issues and pull requests. Please check out our link:./guidelines/CODE_OF_CONDUCT.adoc[Code of Conduct] too.
