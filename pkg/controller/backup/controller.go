@@ -18,10 +18,10 @@ import (
 )
 
 const (
-	CronJob   = "CronJob"
-	DBSecret  = "DBSecret"
-	AwsSecret = "AwsSecret"
-	EncSecret = "EncSecret"
+	cronJob   = "cronJob"
+	dbSecret  = "dbSecret"
+	swsSecret = "swsSecret"
+	encSecret = "encSecret"
 )
 
 var log = logf.Log.WithName("controller_backup")
@@ -56,7 +56,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch CronJob
+	// Watch cronJob
 	if err := watchCronJob(c); err != nil {
 		return err
 	}
@@ -105,8 +105,8 @@ type ReconcileBackup struct {
 }
 
 // Create the object and reconcile it
-func (r *ReconcileBackup) create(bkp *v1alpha1.Backup, kind string, reqLogger logr.Logger) error {
-	obj, err := r.buildFactory(bkp, kind, reqLogger)
+func (r *ReconcileBackup) create(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) error {
+	obj, err := r.buildFactory(bkp,db, kind, reqLogger)
 	if err != nil {
 		reqLogger.Error(err, "Failed to build object ", "kind", kind, "Namespace", bkp.Namespace)
 		return err
@@ -122,25 +122,25 @@ func (r *ReconcileBackup) create(bkp *v1alpha1.Backup, kind string, reqLogger lo
 }
 
 // buildFactory will return the resource according to the kind defined
-func (r *ReconcileBackup) buildFactory(bkp *v1alpha1.Backup, kind string, reqLogger logr.Logger) (runtime.Object, error) {
+func (r *ReconcileBackup) buildFactory(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) (runtime.Object, error) {
 	reqLogger.Info("Check "+kind, "into the namespace", bkp.Namespace)
 	switch kind {
-	case CronJob:
+	case cronJob:
 		return r.buildCronJob(bkp), nil
-	case DBSecret:
+	case dbSecret:
 		// build Database secret data
-		secretData, err := r.buildDBSecretData(bkp)
+		secretData, err := r.buildDBSecretData(bkp, db)
 		if err != nil {
 			reqLogger.Error(err, "Unable to create DB Data secret")
 			return nil, err
 		}
 		return r.buildSecret(bkp, dbSecretPrefix, secretData, nil), nil
-	case AwsSecret:
+	case swsSecret:
 		secretData := buildAwsSecretData(bkp)
 		return r.buildSecret(bkp, awsSecretPrefix, secretData, nil), nil
-	case EncSecret:
+	case encSecret:
 		secretData, secretStringData := buildEncSecretData(bkp)
-		return r.buildSecret(bkp, encryptionKeySecret, secretData, secretStringData), nil
+		return r.buildSecret(bkp, encSecretPrefix, secretData, secretStringData), nil
 	default:
 		msg := "Failed to recognize type of object" + kind + " into the Namespace " + bkp.Namespace
 		panic(msg)
@@ -167,8 +167,14 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	// Add const values for mandatory specs
 	addMandatorySpecsDefinitions(bkp)
 
+	// Check if the database instance was created
+	db, err := r.fetchDBInstance( bkp,reqLogger);
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
 	// Get database pod
-	dbPod, err := r.fetchBDPod(bkp, reqLogger, request)
+	dbPod, err := r.fetchBDPod(bkp, db, reqLogger)
 	if err != nil || dbPod == nil {
 		reqLogger.Error(err, "Unable to find the database pod", "request.namespace", request.Namespace)
 		return reconcile.Result{RequeueAfter: time.Second * 10}, err
@@ -178,7 +184,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	r.dbPod = dbPod
 
 	// Get database service
-	dbService, err := r.fetchServiceDB(bkp, reqLogger, request)
+	dbService, err := r.fetchServiceDB(bkp, db, reqLogger)
 	if err != nil || dbService == nil {
 		reqLogger.Error(err, "Unable to find the database service", "request.namespace", request.Namespace)
 		return reconcile.Result{RequeueAfter: time.Second * 10}, err
@@ -189,7 +195,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 
 	// Check if the secret for the database is created, if not create one
 	if _, err := r.fetchSecret(reqLogger, bkp.Namespace, dbSecretPrefix+bkp.Name); err != nil {
-		if err := r.create(bkp, DBSecret, reqLogger); err != nil {
+		if err := r.create(bkp, db, dbSecret, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
@@ -200,7 +206,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 			reqLogger.Error(err, "Unable to find AWS secret informed and will not be created by the operator", "SecretName", bkp.Spec.AwsCredentialsSecretName)
 			return reconcile.Result{}, err
 		}
-		if err := r.create(bkp, AwsSecret, reqLogger); err != nil {
+		if err := r.create(bkp, db, swsSecret, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}
@@ -212,15 +218,15 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 				reqLogger.Error(err, "Unable to find EncryptionKey secret informed and will not be created by the operator", "SecretName", bkp.Spec.EncryptionKeySecretName)
 				return reconcile.Result{}, err
 			}
-			if err := r.create(bkp, EncSecret, reqLogger); err != nil {
+			if err := r.create(bkp, db, encSecret, reqLogger); err != nil {
 				return reconcile.Result{}, err
 			}
 		}
 	}
 
-	// Check if the CronJob is created, if not create one
+	// Check if the cronJob is created, if not create one
 	if _, err := r.fetchCronJob(reqLogger, bkp); err != nil {
-		if err := r.create(bkp, CronJob, reqLogger); err != nil {
+		if err := r.create(bkp, db, cronJob, reqLogger); err != nil {
 			return reconcile.Result{}, err
 		}
 	}

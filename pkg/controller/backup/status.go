@@ -21,7 +21,7 @@ func (r *ReconcileBackup) updateBackupStatus(reqLogger logr.Logger, cronJobStatu
 		return err
 	}
 
-	// Check just encryptionKeySecret which is Optional
+	// Check just encSecretPrefix which is Optional
 	hasErrorWithEncKey, err := r.hasErrorWithEncKey(instance, reqLogger)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (r *ReconcileBackup) hasErrorWithEncKey(instance *v1alpha1.Backup, reqLogge
 }
 
 func (r *ReconcileBackup) updateCronJobStatus(reqLogger logr.Logger, request reconcile.Request) (*v1beta1.CronJob, error) {
-	reqLogger.Info("Updating CronJob Status and Name for the Backup")
+	reqLogger.Info("Updating cronJob Status and Name for the Backup")
 	// Get the latest version of the CR
 	instance, err := r.fetchBkpInstance(reqLogger, request)
 	if err != nil {
@@ -110,7 +110,7 @@ func (r *ReconcileBackup) updateCronJobStatus(reqLogger logr.Logger, request rec
 }
 
 func (r *ReconcileBackup) updateAWSSecretStatus(reqLogger logr.Logger, request reconcile.Request) (*corev1.Secret, error) {
-	reqLogger.Info("Updating AwsSecret Name and Data Status for the Backup")
+	reqLogger.Info("Updating swsSecret Name and Data Status for the Backup")
 	// Get the latest version of the CR
 	instance, err := r.fetchBkpInstance(reqLogger, request)
 	if err != nil {
@@ -120,7 +120,7 @@ func (r *ReconcileBackup) updateAWSSecretStatus(reqLogger logr.Logger, request r
 	// Get Object
 	awsSecretStatus, err := r.fetchSecret(reqLogger, getAwsSecretNamespace(instance), getAWSSecretName(instance))
 	if err != nil {
-		reqLogger.Error(err, "Failed to get AwsSecret for Status", "Backup.Namespace", instance.Namespace, "Backup.Name", instance.Name)
+		reqLogger.Error(err, "Failed to get swsSecret for Status", "Backup.Namespace", instance.Namespace, "Backup.Name", instance.Name)
 		return awsSecretStatus, err
 	}
 
@@ -151,7 +151,7 @@ func (r *ReconcileBackup) updateAWSSecretStatus(reqLogger logr.Logger, request r
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update AwsSecret Name and Data Status for the Backup")
+			reqLogger.Error(err, "Failed to update swsSecret Name and Data Status for the Backup")
 			return awsSecretStatus, err
 		}
 	}
@@ -231,7 +231,7 @@ func (r *ReconcileBackup) updateEncSecretStatus(reqLogger logr.Logger, request r
 }
 
 func (r *ReconcileBackup) updateDBSecretStatus(reqLogger logr.Logger, request reconcile.Request) (*corev1.Secret, error) {
-	reqLogger.Info("Updating DBSecret Name Status for the Backup")
+	reqLogger.Info("Updating dbSecret Name Status for the Backup")
 	// Get the latest version of the CR
 	instance, err := r.fetchBkpInstance(reqLogger, request)
 	if err != nil {
@@ -241,7 +241,7 @@ func (r *ReconcileBackup) updateDBSecretStatus(reqLogger logr.Logger, request re
 	// Get Object
 	dbSecretStatus, err := r.fetchSecret(reqLogger, instance.Namespace, dbSecretPrefix+instance.Name)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get DBSecret for Status", "Backup.Namespace", instance.Namespace, "Backup.Name", instance.Name)
+		reqLogger.Error(err, "Failed to get dbSecret for Status", "Backup.Namespace", instance.Namespace, "Backup.Name", instance.Name)
 		return dbSecretStatus, err
 	}
 
@@ -270,7 +270,7 @@ func (r *ReconcileBackup) updateDBSecretStatus(reqLogger logr.Logger, request re
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update DBSecret Name Status for the Backup")
+			reqLogger.Error(err, "Failed to update dbSecret Name Status for the Backup")
 			return dbSecretStatus, err
 		}
 	}

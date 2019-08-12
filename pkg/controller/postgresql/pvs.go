@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//Returns the Deployment object for the PostgreSQL
+//Returns the deployment object for the PostgreSQL
 func (r *ReconcilePostgresql) buildPVCForDB(db *v1alpha1.Postgresql) *corev1.PersistentVolumeClaim {
 	ls := getDBLabels(db.Name)
 	pv := &corev1.PersistentVolumeClaim{

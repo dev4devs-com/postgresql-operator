@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//buildDBDeployment returns the Deployment object for the PostgreSQL
+//buildDBDeployment returns the deployment object for the PostgreSQL
 func (r *ReconcilePostgresql) buildDBDeployment(db *v1alpha1.Postgresql) *appsv1.Deployment {
 	ls := getDBLabels(db.Name)
 	auto := true

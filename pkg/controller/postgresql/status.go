@@ -42,28 +42,28 @@ func (r *ReconcilePostgresql) updateDBStatus(reqLogger logr.Logger, deploymentSt
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update Deployment Status for the PostgreSQL Database")
+			reqLogger.Error(err, "Failed to update deployment Status for the PostgreSQL Database")
 			return err
 		}
 	}
 	return nil
 }
 
-//updateDeploymentStatus returns error when status regards the Deployment resource could not be updated
+//updateDeploymentStatus returns error when status regards the deployment resource could not be updated
 func (r *ReconcilePostgresql) updateDeploymentStatus(reqLogger logr.Logger, request reconcile.Request) (*appsv1.Deployment, error) {
-	reqLogger.Info("Updating Deployment Status for the PostgreSQL")
+	reqLogger.Info("Updating deployment Status for the PostgreSQL")
 	// Get the latest version of the instance CR
 	instance, err := r.fetchDBInstance(reqLogger, request)
 	if err != nil {
 		return nil, err
 	}
-	// Get the Deployment Object
+	// Get the deployment Object
 	deploymentStatus, err := r.fetchDBDeployment(reqLogger, instance)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get Deployment for Status", "PostgreSQL.Namespace", instance.Namespace, "PostgreSQL.Name", instance.Name)
+		reqLogger.Error(err, "Failed to get deployment for Status", "PostgreSQL.Namespace", instance.Namespace, "PostgreSQL.Name", instance.Name)
 		return deploymentStatus, err
 	}
-	// Update the Deployment  and Status
+	// Update the deployment  and Status
 	if !reflect.DeepEqual(deploymentStatus.Status, instance.Status.DeploymentStatus) {
 		// Get the latest version of the CR in order to try to avoid errors when try to update the CR
 		instance, err := r.fetchDBInstance(reqLogger, request)
@@ -77,7 +77,7 @@ func (r *ReconcilePostgresql) updateDeploymentStatus(reqLogger logr.Logger, requ
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update Deployment Status for the PostgreSQL")
+			reqLogger.Error(err, "Failed to update deployment Status for the PostgreSQL")
 			return deploymentStatus, err
 		}
 	}
@@ -85,18 +85,18 @@ func (r *ReconcilePostgresql) updateDeploymentStatus(reqLogger logr.Logger, requ
 	return deploymentStatus, nil
 }
 
-//updateServiceStatus returns error when status regards the Service resource could not be updated
+//updateServiceStatus returns error when status regards the service resource could not be updated
 func (r *ReconcilePostgresql) updateServiceStatus(reqLogger logr.Logger, request reconcile.Request) (*corev1.Service, error) {
-	reqLogger.Info("Updating Service Status for the PostgreSQL")
+	reqLogger.Info("Updating service Status for the PostgreSQL")
 	// Get the latest version of the instance CR
 	instance, err := r.fetchDBInstance(reqLogger, request)
 	if err != nil {
 		return nil, err
 	}
-	// Get the Service Object
+	// Get the service Object
 	serviceStatus, err := r.fetchDBService(reqLogger, instance)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get Service for Status", "PostgreSQL.Namespace", instance.Namespace, "PostgreSQL.Name", instance.Name)
+		reqLogger.Error(err, "Failed to get service for Status", "PostgreSQL.Namespace", instance.Namespace, "PostgreSQL.Name", instance.Name)
 		return serviceStatus, err
 	}
 
@@ -112,7 +112,7 @@ func (r *ReconcilePostgresql) updateServiceStatus(reqLogger logr.Logger, request
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			reqLogger.Error(err, "Failed to update Service Status for the PostgreSQL")
+			reqLogger.Error(err, "Failed to update service Status for the PostgreSQL")
 			return serviceStatus, err
 		}
 	}
@@ -129,14 +129,14 @@ func (r *ReconcilePostgresql) updatePvcStatus(reqLogger logr.Logger, request rec
 		return nil, err
 	}
 
-	// Get PVC Object
+	// Get pvc Object
 	pvcStatus, err := r.fetchDBPersistentVolumeClaim(reqLogger, instance)
 	if err != nil {
 		reqLogger.Error(err, "Failed to get PersistentVolumeClaim for Status", "PostgreSQL.Namespace", instance.Namespace, "PostgreSQL.Name", instance.Name)
 		return pvcStatus, err
 	}
 
-	// Update CR with PVC name
+	// Update CR with pvc name
 	if !reflect.DeepEqual(pvcStatus.Status, instance.Status.PVCStatus) {
 		// Get the latest version of the CR in order to try to avoid errors when try to update the CR
 		instance, err := r.fetchDBInstance(reqLogger, request)

@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// Returns the Service object for the PostgreSQL
+// Returns the service object for the PostgreSQL
 func (r *ReconcilePostgresql) buildDBService(db *v1alpha1.Postgresql) *corev1.Service {
 	ls := getDBLabels(db.Name)
 	ser := &corev1.Service{
