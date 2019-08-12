@@ -27,7 +27,7 @@ toc::[]
 
 == Overview
 
-A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] in Go developed using the https://github.com/operator-framework/operator-sdk[Operator SDK] to package, install, configure and manage an PostgreSQL database.
+A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] in Go developed using the https://github.com/operator-framework[ Operator Framework] to package, install, configure and manage a PostgreSQL database.
 
 == Prerequisites
 
