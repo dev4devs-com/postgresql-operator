@@ -433,7 +433,7 @@ Images are automatically built and pushed to our https://quay.io/repository/dev4
 
 If the image does not get built and pushed automatically the job may be re-run manually via the https://circleci.com/gh/dev4devs-com/postgresql-operator[CI dashboard].
 
-== Tags Release
+== Release Tags
 
 Following the steps
 
