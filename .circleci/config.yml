@@ -25,35 +25,34 @@ jobs:
   image_push_master:
     working_directory: /go/src/github.com/dev4devs-com/postgresql-operator
     docker:
-    - image: circleci/golang:1.10
+    - image: circleci/golang:1.12
+      environment:
+        GO111MODULE=on
     steps:
     - checkout
     - run:
-        name: Install dep
-        command: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - run:
-        name: Install operator-sdk to build image
-        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin/
-    - run: make setup
+        name: Install operator-sdk to run make setup
+        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+    - run: go mod tidy
+    - run: make code/build/linux
     # circle ci key required for docker builds
     - setup_remote_docker
-    - run: make code/build/linux
     - run: make image/build/master
     - run: make image/push/master
 
   image_release:
     working_directory: /go/src/github.com/dev4devs-com/postgresql-operator
     docker:
-    - image: circleci/golang:1.10
+    - image: circleci/golang:1.12
+      environment:
+        GO111MODULE=on
     steps:
     - checkout
     - run:
-        name: Install dep
-        command: curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-    - run:
-        name: Install operator-sdk to build image
-        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin/
-    - run: make setup
+        name: Install operator-sdk to run make setup
+        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+    - run: go mod tidy
+    - run: make code/build/linux
     # circle ci key required for docker builds
     - setup_remote_docker
     - run: make image/build/release
