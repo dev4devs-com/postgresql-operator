@@ -15,12 +15,13 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
-    - run: go mod tidy
+    - run: make setup
     - run: make code/build/linux
     - run: GO111MODULE=off go get github.com/mattn/goveralls
     - run: make test/run
     - run: make test/integration-cover
-    - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
+    # fixme: Temporally commented because it is down
+    # - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
 
   image_push_master:
     working_directory: /go/src/github.com/dev4devs-com/postgresql-operator
@@ -33,7 +34,7 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
-    - run: go mod tidy
+    - run: make setup
     - run: make code/build/linux
     # circle ci key required for docker builds
     - setup_remote_docker
@@ -51,7 +52,7 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.9.0/operator-sdk-v0.9.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
-    - run: go mod tidy
+    - run: make setup
     - run: make code/build/linux
     # circle ci key required for docker builds
     - setup_remote_docker

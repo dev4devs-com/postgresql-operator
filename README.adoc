@@ -464,4 +464,4 @@ This operator was developed using the Kubernetes APIs in order to be compatible 
 
 == Contributing
 
-All contributions are hugely appreciated. Please see our link:./guidelines/CONTRIBUTION.adoc[Contribution Guide] for guidelines on how to open issues and pull requests. Please check out our link:./guidelines/CODE_OF_CONDUCT.adoc[Code of Conduct] too.
+All contributions are hugely appreciated. Please see our link:./CONTRIBUTING.md[Contribution Guide] for guidelines on how to open issues and pull requests. Please check out our link:./CODE_OF_CONDUCT.md[Code of Conduct] too.

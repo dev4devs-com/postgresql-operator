@@ -2,8 +2,47 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[{"apiVersion":"postgresql-operator.dev4devs.com/v1alpha1","kind":"Backup","metadata":{"name":"backup"},"spec":{"awsAccessKeyId":"example-awsAccessKeyId","awsS3BucketName":"example-awsS3BucketName","awsSecretAccessKey":"example-awsSecretAccessKey","databaseVersion":"9.6","image":"quay.io/integreatly/backup-container:1.0.8","productName":"postgresql","schedule":"0
-      0 * * *"}},{"apiVersion":"postgresql-operator.dev4devs.com/v1alpha1","kind":"Postgresql","metadata":{"name":"postgresql"},"spec":{"containerName":"database","databaseMemoryLimit":"512Mi","databaseMemoryRequest":"512Mi","databaseName":"solution-database-name","databaseNameParam":"POSTGRESQL_DATABASE","databasePassword":"postgres","databasePasswordParam":"POSTGRESQL_PASSWORD","databasePort":5432,"databaseStorageRequest":"1Gi","databaseUser":"postgresql","databaseUserParam":"POSTGRESQL_USER","image":"centos/postgresql-96-centos7","size":1}}]'
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
+          "kind": "Postgresql",
+          "metadata": {
+            "name": "postgresql"
+          },
+          "spec": {
+            "containerName": "database",
+            "databaseMemoryLimit": "512Mi",
+            "databaseMemoryRequest": "512Mi",
+            "databaseName": "solution-database-name",
+            "databaseNameParam": "POSTGRESQL_DATABASE",
+            "databasePassword": "postgres",
+            "databasePasswordParam": "POSTGRESQL_PASSWORD",
+            "databasePort": 5432,
+            "databaseStorageRequest": "1Gi",
+            "databaseUser": "postgresql",
+            "databaseUserParam": "POSTGRESQL_USER",
+            "image": "centos/postgresql-96-centos7",
+            "size": 1
+          }
+        },
+        {
+          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup"
+          },
+          "spec": {
+            "awsAccessKeyId": "example-awsAccessKeyId",
+            "awsS3BucketName": "example-awsS3BucketName",
+            "awsSecretAccessKey": "example-awsSecretAccessKey",
+            "databaseVersion": "9.6",
+            "image": "quay.io/integreatly/backup-container:1.0.8",
+            "productName": "postgresql",
+            "schedule": "0 0 * * *"
+          }
+        }
+      ]
     capabilities: Basic Install
   name: postgresql-operator.v0.0.1
   namespace: placeholder
