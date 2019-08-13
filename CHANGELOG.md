@@ -7,4 +7,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ## [0.0.1] - 2019-08-13
-- Initial release of operator which allow work with as standalone (without OLM integration)
+- Initial development release which allows work with as standalone (without OLM)
