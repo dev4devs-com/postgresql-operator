@@ -232,8 +232,8 @@ var (
 		},
 		Data: map[string]string{
 			"PGDATABASE": "dbname",
-			"PGPASSWORD": "root",
-			"PGUSER":     "root",
+			"DBPASSWORD": "root",
+			"DBUSER":     "root",
 		},
 	}
 
