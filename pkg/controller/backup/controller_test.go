@@ -50,9 +50,7 @@ func TestReconcileBackup_Update(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.fields.instanceToUpdate.Namespace, "Request.Name", tt.fields.createdInstance.Name)
-
-			err := r.update(tt.fields.instanceToUpdate, reqLogger)
+			err := r.update(tt.fields.instanceToUpdate)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestReconcileBackup_Update.update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -132,9 +130,6 @@ func TestReconcileBackup_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
-			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
-
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -142,7 +137,7 @@ func TestReconcileBackup_Create(t *testing.T) {
 				}
 			}()
 
-			err := r.create(tt.args.instance, &dbInstanceWithoutSpec, tt.args.kind, reqLogger)
+			err := r.create(tt.args.instance, &dbInstanceWithoutSpec, tt.args.kind)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestReconcileBackup_Create.create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -236,8 +231,6 @@ func TestReconcileBackup_BuildFactory(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
-
 			// testing if the panic() function is executed
 			defer func() {
 				r := recover()
@@ -246,7 +239,7 @@ func TestReconcileBackup_BuildFactory(t *testing.T) {
 				}
 			}()
 
-			got, _ := r.buildFactory(tt.args.instance, &dbInstanceWithoutSpec, tt.args.kind, reqLogger)
+			got, _ := r.buildFactory(tt.args.instance, &dbInstanceWithoutSpec, tt.args.kind)
 
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
 				t.Errorf("TestReconcileBackup_BuildFactory.buildFactory() = %v, want %v", gotType, tt.want)
@@ -283,7 +276,7 @@ func TestReconcileBackup_NotFound(t *testing.T) {
 	}
 }
 
-func TestReconcileBackup_WithoutFoundPod(t *testing.T) {
+func TestReconcileBackup_WithoutPodAndServiceDatabase(t *testing.T) {
 
 	// objects to track in the fake client
 	objs := []runtime.Object{
@@ -302,8 +295,8 @@ func TestReconcileBackup_WithoutFoundPod(t *testing.T) {
 	}
 
 	res, err := r.Reconcile(req)
-	if err.Error() != "Unable to find database pod. Maybe, it was not create yet" {
-		t.Fatalf("reconcile: (%v)", err)
+	if err == nil {
+		t.Fatalf("should ono create the cronjob because the db pod and service was not found")
 	}
 
 	if res.Requeue {
@@ -338,7 +331,7 @@ func TestReconcileBackup_WithoutDBInstance(t *testing.T) {
 	}
 }
 
-func TestReconcileBackup(t *testing.T) {
+func TestReconcileBackup_Success(t *testing.T) {
 
 	// objects to track in the fake client
 	objs := []runtime.Object{
@@ -412,10 +405,9 @@ func TestReconcileBackup_MissingPodDatabase(t *testing.T) {
 	}
 
 	res, err := r.Reconcile(req)
-	if err.Error() != "Unable to find database pod. Maybe, it was not create yet" {
-		t.Fatalf("reconcile: (%v)", err)
+	if err == nil {
+		t.Fatalf("should not create the cronjob because the db pod was not found")
 	}
-
 
 	if res.Requeue {
 		t.Error("did not expect request to requeue")
@@ -442,10 +434,9 @@ func TestReconcileBackup_MissingServiceDatabase(t *testing.T) {
 	}
 
 	res, err := r.Reconcile(req)
-	if err.Error() != "Unable to find database service. Maybe, it was not create yet" {
-		t.Fatalf("reconcile: (%v)", err)
+	if err == nil {
+		t.Fatalf("should not create the cronjob because the service pod was not found")
 	}
-
 
 	if res.Requeue {
 		t.Error("did not expect request to requeue")
