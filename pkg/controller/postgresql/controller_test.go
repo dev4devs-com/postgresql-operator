@@ -198,7 +198,7 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 	}
 }
 
-func TestReconcilePostgreSQL(t *testing.T) {
+func TestReconcilePostgreSQL_Success(t *testing.T) {
 
 	// objects to track in the fake client
 	objs := []runtime.Object{

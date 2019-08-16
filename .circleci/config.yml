@@ -20,8 +20,7 @@ jobs:
     - run: GO111MODULE=off go get github.com/mattn/goveralls
     - run: make test/run
     - run: make test/integration-cover
-    # fixme: Temporally commented because it is down
-    # - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
+    - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
 
   image_push_master:
     working_directory: /go/src/github.com/dev4devs-com/postgresql-operator
