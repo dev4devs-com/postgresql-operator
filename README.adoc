@@ -253,10 +253,6 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 | link:./pkg/controller/backup/secrets.go[secrets.go]           | Define the database and AWS secrets resources created.
 |===
 
-=== Design Pattern
-
-The Design Pattern adopted to build the objects in its controllers is http://tmrts.com/go-patterns/creational/factory.html[Factory Method Pattern].
-
 == Administration
 
 === Status Definition per Types

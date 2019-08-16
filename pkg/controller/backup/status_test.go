@@ -451,7 +451,7 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 	}
 	type args struct {
 		request reconcile.Request
-		pod corev1.Pod
+		pod     corev1.Pod
 	}
 	tests := []struct {
 		name    string
@@ -514,7 +514,6 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 		})
 	}
 }
-
 
 func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 	type fields struct {

@@ -6,11 +6,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 //buildDBDeployment returns the deployment object for the PostgreSQL
-func (r *ReconcilePostgresql) buildDBDeployment(db *v1alpha1.Postgresql) *appsv1.Deployment {
+func buildDBDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.Deployment {
 	ls := getDBLabels(db.Name)
 	auto := true
 	replicas := db.Spec.Size
@@ -113,6 +114,6 @@ func (r *ReconcilePostgresql) buildDBDeployment(db *v1alpha1.Postgresql) *appsv1
 		},
 	}
 	// Set PostgreSQL db as the owner and controller
-	controllerutil.SetControllerReference(db, dep, r.scheme)
+	controllerutil.SetControllerReference(db, dep, scheme)
 	return dep
 }

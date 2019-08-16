@@ -5,11 +5,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 //Returns the deployment object for the PostgreSQL
-func (r *ReconcilePostgresql) buildPVCForDB(db *v1alpha1.Postgresql) *corev1.PersistentVolumeClaim {
+func buildPVCForDB(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.PersistentVolumeClaim {
 	ls := getDBLabels(db.Name)
 	pv := &corev1.PersistentVolumeClaim{
 		ObjectMeta: v1.ObjectMeta{
@@ -29,6 +30,6 @@ func (r *ReconcilePostgresql) buildPVCForDB(db *v1alpha1.Postgresql) *corev1.Per
 		},
 	}
 	// Set PostgreSQL db as the owner and controller
-	controllerutil.SetControllerReference(db, pv, r.scheme)
+	controllerutil.SetControllerReference(db, pv, scheme)
 	return pv
 }

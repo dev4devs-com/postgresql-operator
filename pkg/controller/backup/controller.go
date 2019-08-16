@@ -16,13 +16,6 @@ import (
 	"time"
 )
 
-const (
-	cronJob   = "cronJob"
-	dbSecret  = "dbSecret"
-	swsSecret = "swsSecret"
-	encSecret = "encSecret"
-)
-
 var log = logf.Log.WithName("controller_backup")
 
 /**
@@ -97,42 +90,6 @@ type ReconcileBackup struct {
 	dbService *v1.Service
 }
 
-// Create the object and reconcile it
-func (r *ReconcileBackup) create(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string) error {
-	obj, err := r.buildFactory(bkp,db, kind)
-	if err != nil {
-		return err
-	}
-	err = r.client.Create(context.TODO(), obj)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// buildFactory will return the resource according to the kind defined
-func (r *ReconcileBackup) buildFactory(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string) (runtime.Object, error) {
-	switch kind {
-	case cronJob:
-		return r.buildCronJob(bkp), nil
-	case dbSecret:
-		secretData, err := r.buildDBSecretData(bkp, db)
-		if err != nil {
-			return nil, err
-		}
-		return r.buildSecret(bkp, dbSecretPrefix, secretData, nil), nil
-	case swsSecret:
-		secretData := buildAwsSecretData(bkp)
-		return r.buildSecret(bkp, awsSecretPrefix, secretData, nil), nil
-	case encSecret:
-		secretData, secretStringData := buildEncSecretData(bkp)
-		return r.buildSecret(bkp, encSecretPrefix, secretData, secretStringData), nil
-	default:
-		msg := "Failed to recognize type of object" + kind + " into the Namespace " + bkp.Namespace
-		panic(msg)
-	}
-}
-
 // Reconcile reads that state of the cluster for a Backup object and makes changes based on the state read
 // and what is in the Backup.Spec
 // Note:
@@ -152,13 +109,13 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	addMandatorySpecsDefinitions(bkp)
 
 	// Create mandatory objects for the Backup
-	if err := r.createUpdateSecondaryResources(bkp,request) ; err != nil{
+	if err := r.createUpdateSecondaryResources(bkp, request); err != nil {
 		reqLogger.Error(err, "Failed to create and update the secondary resources required for the Backup CR")
 		return reconcile.Result{}, err
 	}
 
 	// Update the CR status for the primary resource
-	if err := r.createUpdateCRStatus(request) ; err != nil{
+	if err := r.createUpdateCRStatus(request); err != nil {
 		reqLogger.Error(err, "Failed to create and update the status in the Backup CR")
 		return reconcile.Result{}, err
 	}
@@ -196,7 +153,6 @@ func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error 
 		return err
 	}
 
-
 	// Update status for Backup
 	if err := r.updateBackupStatus(cronJob, dbSecret, awsSecret, r.dbPod, r.dbService, request); err != nil {
 		return err
@@ -213,7 +169,7 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 	}
 
 	// Get database pod
-	dbPod, err := r.fetchPostgreSQLPod(bkp,db)
+	dbPod, err := r.fetchPostgreSQLPod(bkp, db)
 	if err != nil || dbPod == nil {
 		time.Sleep(2 * time.Second)
 		return err
@@ -223,7 +179,7 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 	r.dbPod = dbPod
 
 	// Get database service
-	dbService, err := r.fetchPostgreSQLService(bkp,db)
+	dbService, err := r.fetchPostgreSQLService(bkp, db)
 	if err != nil || dbService == nil {
 		return err
 	}
@@ -233,7 +189,12 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 
 	// Check if the secret for the database is created, if not create one
 	if _, err := r.fetchSecret(bkp.Namespace, dbSecretPrefix+bkp.Name); err != nil {
-		if err := r.create(bkp, db, dbSecret); err != nil {
+		secretData, err := r.buildDBSecretData(bkp, db)
+		if err != nil {
+			return err
+		}
+		dbSecret := buildSecret(bkp, dbSecretPrefix, secretData, nil, r.scheme)
+		if err := r.client.Create(context.TODO(), dbSecret); err != nil {
 			return err
 		}
 	}
@@ -243,7 +204,9 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 		if bkp.Spec.AwsCredentialsSecretName != "" {
 			return err
 		}
-		if err := r.create(bkp, db, swsSecret); err != nil {
+		secretData := buildAwsSecretData(bkp)
+		awsSecret := buildSecret(bkp, awsSecretPrefix, secretData, nil, r.scheme)
+		if err := r.client.Create(context.TODO(), awsSecret); err != nil {
 			return err
 		}
 	}
@@ -254,7 +217,9 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 			if bkp.Spec.EncryptionKeySecretName != "" {
 				return err
 			}
-			if err := r.create(bkp, db, encSecret); err != nil {
+			secretData, secretStringData := buildEncSecretData(bkp)
+			encSecret := buildSecret(bkp, encSecretPrefix, secretData, secretStringData, r.scheme)
+			if err := r.client.Create(context.TODO(), encSecret); err != nil {
 				return err
 			}
 		}
@@ -262,7 +227,7 @@ func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, r
 
 	// Check if the cronJob is created, if not create one
 	if _, err := r.fetchCronJob(bkp); err != nil {
-		if err := r.create(bkp, db, cronJob); err != nil {
+		if err := r.client.Create(context.TODO(), buildCronJob(bkp, r.scheme)); err != nil {
 			return err
 		}
 	}

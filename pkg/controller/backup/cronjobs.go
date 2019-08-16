@@ -6,11 +6,12 @@ import (
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//Returns the buildCronJob object for the PostgreSQL Backup
-func (r *ReconcileBackup) buildCronJob(bkp *v1alpha1.Backup) *v1beta1.CronJob {
+//Returns the NewCronJob object for the PostgreSQL Backup
+func buildCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob {
 	cron := &v1beta1.CronJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      bkp.Name,
@@ -69,6 +70,6 @@ func (r *ReconcileBackup) buildCronJob(bkp *v1alpha1.Backup) *v1beta1.CronJob {
 		},
 	}
 	// Set PostgreSQL db as the owner and controller
-	controllerutil.SetControllerReference(bkp, cron, r.scheme)
+	controllerutil.SetControllerReference(bkp, cron, scheme)
 	return cron
 }
