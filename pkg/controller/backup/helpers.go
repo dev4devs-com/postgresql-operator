@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 func getBkpLabels(name string) map[string]string {
 	return map[string]string{"app": "postgresql", "backup_cr": name}
 }
-
-
 
 func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql ) (map[string][]byte, error) {
 	database := ""
@@ -176,4 +176,12 @@ func getEncSecretName(bkp *v1alpha1.Backup) string {
 func hasEncryptionKeySecret(bkp *v1alpha1.Backup) bool {
 	return bkp.Spec.AwsCredentialsSecretName != "" ||
 		(bkp.Spec.GpgTrustModel != "" && bkp.Spec.GpgEmail != "" && bkp.Spec.GpgPublicKey != "")
+}
+
+//buildPostgreSQLCreteria returns client.ListOptions required to fetch the secondary resources created by
+func (r *ReconcileBackup) buildPostgreSQLCriteria(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (*client.ListOptions, error) {
+	ls := map[string]string{"app": "postgresql", "postgresql_cr": db.Name}
+	labelSelector := labels.SelectorFromSet(ls)
+	listOps := &client.ListOptions{Namespace: bkp.Namespace, LabelSelector: labelSelector}
+	return listOps, nil
 }

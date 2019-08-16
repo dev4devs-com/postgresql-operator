@@ -42,9 +42,7 @@ func TestReconcilePostgreSQL_Update(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.fields.instanceToUpdate.Namespace, "Request.Name", tt.fields.createdInstance.Name)
-
-			err := r.update(tt.fields.instanceToUpdate, reqLogger)
+			err := r.update(tt.fields.instanceToUpdate)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestReconcilePostgreSQL_Update.update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -99,7 +97,6 @@ func TestReconcilePostgreSQL_Create(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
 
 			defer func() {
 				r := recover()
@@ -108,7 +105,7 @@ func TestReconcilePostgreSQL_Create(t *testing.T) {
 				}
 			}()
 
-			err := r.create(tt.args.instance, tt.args.kind, reqLogger)
+			err := r.create(tt.args.instance, tt.args.kind)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestReconcilePostgreSQL_Create.create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -182,10 +179,7 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			objs := []runtime.Object{tt.args.instance}
-
 			r := buildReconcileWithFakeClientWithMocks(objs)
-
-			reqLogger := log.WithValues("Request.Namespace", tt.args.instance.Namespace, "Request.Name", tt.args.instance.Name)
 
 			// testing if the panic() function is executed
 			defer func() {
@@ -195,7 +189,7 @@ func TestReconcilePostgreSQL_BuildFactory(t *testing.T) {
 				}
 			}()
 
-			got := r.buildFactory(tt.args.instance, tt.args.kind, reqLogger)
+			got := r.buildFactory(tt.args.instance, tt.args.kind)
 
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
 				t.Errorf("TestReconcilePostgreSQL_BuildFactory.buildFactory() = %v, want %v", gotType, tt.want)
@@ -232,7 +226,7 @@ func TestReconcilePostgreSQL(t *testing.T) {
 		t.Fatalf("get deployment: (%v)", err)
 	}
 
-	if !res.Requeue {
+	if res.Requeue {
 		t.Error("did not expect request to requeue")
 	}
 
@@ -419,7 +413,7 @@ func TestReconcilePostgreSQ_ReplicasSizes(t *testing.T) {
 		t.Fatalf("get deployment: (%v)", err)
 	}
 
-	if !res.Requeue {
+	if res.Requeue {
 		t.Error("did not expect request to requeue")
 	}
 
@@ -482,7 +476,7 @@ func TestReconcilePostgreSQL_Reconcile_InstanceWithoutSpec(t *testing.T) {
 		t.Errorf("dep size (%d) is not the expected size (%d)", deployment.Spec.Replicas, config.NewPostgreSQLConfig().Size)
 	}
 
-	if !res.Requeue {
+	if res.Requeue {
 		t.Error("did not expect request to requeue")
 	}
 

@@ -10,6 +10,7 @@ import (
 )
 
 //Watch for changes to secondary resources and create the owner Backup
+
 func watchCronJob(c controller.Controller) error {
 	err := c.Watch(&source.Kind{Type: &v1beta1.CronJob{}}, &handler.EnqueueRequestForOwner{
 		IsController: true,

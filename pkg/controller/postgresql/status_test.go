@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-func TestReconcilePostgreSQL_UpdateStatus(t *testing.T) {
+func TestUpdateDBStatus(t *testing.T) {
 	type fields struct {
 		objs   []runtime.Object
 		scheme *runtime.Scheme
@@ -78,16 +78,14 @@ func TestReconcilePostgreSQL_UpdateStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			if err := r.updateDBStatus(reqLogger, tt.args.deploymentStatus, tt.args.serviceStatus, tt.args.pvcStatus, tt.args.request); (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateStatus.updateDBStatus() error = %v, wantErr %v", err, tt.wantErr)
+			if err := r.updateDBStatus(tt.args.deploymentStatus, tt.args.serviceStatus, tt.args.pvcStatus, tt.args.request); (err != nil) != tt.wantErr {
+				t.Errorf("TestUpdateDBStatus error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
+func TestUpdateDeploymentStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -147,21 +145,19 @@ func TestReconcilePostgreSQL_UpdateDeploymentStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updateDeploymentStatus(reqLogger, tt.args.request)
+			got, err := r.updateDeploymentStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateDeploymentStatus.updateDeploymentStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateDeploymentStatus) error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdateDeploymentStatus.updateDeploymentStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdateDeploymentStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateServiceStatus(t *testing.T) {
+func TestUpdateServiceStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -221,22 +217,20 @@ func TestReconcilePostgreSQL_UpdateServiceStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updateServiceStatus(reqLogger, tt.args.request)
+			got, err := r.updateServiceStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateServiceStatus.updateServiceStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateServiceStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdateServiceStatus.updateServiceStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdateServiceStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
 }
 
 
-func TestReconcilePostgreSQL_UpdatePVCStatus(t *testing.T) {
+func TestUpdatePVCStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -296,15 +290,13 @@ func TestReconcilePostgreSQL_UpdatePVCStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updatePvcStatus(reqLogger, tt.args.request)
+			got, err := r.updatePvcStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdatePVCStatus.updatePvcStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdatePVCStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdatePVCStatus.updatePvcStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdatePVCStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
