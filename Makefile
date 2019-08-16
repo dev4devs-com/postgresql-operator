@@ -13,6 +13,7 @@ IMAGE_LATEST_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):latest
 IMAGE_MASTER_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):master
 IMAGE_RELEASE_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):$(CIRCLE_TAG)
 NAMESPACE=postgresql
+TEST_COMPILE_OUTPUT ?= build/_output/bin/$(APP_NAME)-test
 
 # This follows the output format for goreleaser
 BINARY_LINUX_64 = ./dist/linux_amd64/$(BINARY)
@@ -159,4 +160,7 @@ test/integration-cover:
 		go test -failfast -tags=integration -coverprofile=coverage.out -covermode=count $(addprefix $(PKG)/,$(pkg)) || exit 1;\
 		tail -n +2 coverage.out >> coverage-all.out;)
 
+.PHONY: test/e2e
+test/e2e:
+	 @GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o=$(TEST_COMPILE_OUTPUT) ./test/e2e/...
 
