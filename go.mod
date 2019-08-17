@@ -2,8 +2,6 @@ module github.com/dev4devs-com/postgresql-operator
 
 require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
-	github.com/aerogear/unifiedpush-operator v0.0.0-20190813172417-3b1c6f82ea7d
-	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.0
 	github.com/operator-framework/operator-sdk v0.10.1-0.20190809191117-c1e2eae6580e
 	github.com/spf13/pflag v1.0.3

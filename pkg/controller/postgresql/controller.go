@@ -15,12 +15,6 @@ import (
 
 var log = logf.Log.WithName("controller_postgresql")
 
-const (
-	deployment = "deployment"
-	pvc        = "pvc"
-	service    = "service"
-)
-
 // Add creates a new PostgreSQL Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
@@ -55,7 +49,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	if err := watchService(c); err != nil {
 		return err
 	}
-	
+
 	if err := watchPersistenceVolumeClaim(c); err != nil {
 		return err
 	}
@@ -72,40 +66,6 @@ type ReconcilePostgresql struct {
 	// that reads objects from the cache and writes to the apiserver
 	client client.Client
 	scheme *runtime.Scheme
-}
-
-// Update the object and reconcile it
-func (r *ReconcilePostgresql) update(obj runtime.Object) error {
-	err := r.client.Update(context.TODO(), obj)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Create the object and reconcile it
-func (r *ReconcilePostgresql) create(db *v1alpha1.Postgresql, kind string) error {
-	obj := r.buildFactory(db, kind)
-	err := r.client.Create(context.TODO(), obj)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// buildFactory will return the resource according to the kind defined
-func (r *ReconcilePostgresql) buildFactory(db *v1alpha1.Postgresql, kind string) runtime.Object {
-	switch kind {
-	case pvc:
-		return r.buildPVCForDB(db)
-	case deployment:
-		return r.buildDBDeployment(db)
-	case service:
-		return r.buildDBService(db)
-	default:
-		msg := "Failed to recognize type of object" + kind + " into the Namespace " + db.Namespace
-		panic(msg)
-	}
 }
 
 // Reconcile reads that state of the cluster for a Postgresql object and makes changes based on the state read
@@ -127,13 +87,13 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	addMandatorySpecsDefinitions(db)
 
 	// Create mandatory objects for the Backup
-	if err := r.createUpdateSecondaryResources(db) ; err != nil{
+	if err := r.createUpdateSecondaryResources(db); err != nil {
 		reqLogger.Error(err, "Failed to create and update the secondary resources required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
 	// Update the CR status for the primary resource
-	if err := r.createUpdateCRStatus(request) ; err != nil{
+	if err := r.createUpdateCRStatus(request); err != nil {
 		reqLogger.Error(err, "Failed to create and update the status in the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
@@ -169,21 +129,21 @@ func (r *ReconcilePostgresql) createUpdateSecondaryResources(db *v1alpha1.Postgr
 	// Check if deployment for the app exist, if not create one
 	dep, err := r.fetchDBDeployment(db)
 	if err != nil {
-		if err := r.create(db, deployment); err != nil {
+		if err := r.client.Create(context.TODO(), buildDBDeployment(db, r.scheme)); err != nil {
 			return err
 		}
 	}
 
 	// Check if service for the app exist, if not create one
 	if _, err := r.fetchDBService(db); err != nil {
-		if err := r.create(db, service); err != nil {
+		if err := r.client.Create(context.TODO(), buildDBService(db, r.scheme)); err != nil {
 			return err
 		}
 	}
 
 	// Check if PersistentVolumeClaim for the app exist, if not create one
 	if _, err := r.fetchDBPersistentVolumeClaim(db); err != nil {
-		if err := r.create(db, pvc); err != nil {
+		if err := r.client.Create(context.TODO(), buildPVCForDB(db, r.scheme)); err != nil {
 			return err
 		}
 	}
@@ -199,8 +159,7 @@ func (r *ReconcilePostgresql) createUpdateSecondaryResources(db *v1alpha1.Postgr
 	if *dep.Spec.Replicas != size {
 		// Set the number of Replicas spec in the CR
 		dep.Spec.Replicas = &size
-		// Update
-		if err := r.update(dep); err != nil {
+		if err := r.client.Update(context.TODO(), dep); err != nil {
 			return err
 		}
 	}

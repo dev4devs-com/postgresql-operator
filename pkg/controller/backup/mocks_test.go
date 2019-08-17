@@ -28,9 +28,9 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.BackupSpec{
-			EncryptionKeySecretName:  "enc-secret-test",
+			EncryptionKeySecretName:       "enc-secret-test",
 			EncryptionKeySecretNamespace:  "postgresql",
-			AwsCredentialsSecretName: "aws-secret-test",
+			AwsCredentialsSecretName:      "aws-secret-test",
 			AwsCredentialsSecretNamespace: "postgresql",
 		},
 	}
@@ -41,8 +41,8 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.BackupSpec{
-			GpgPublicKey: "example-gpgPublicKey",
-			GpgEmail: "email@gmai.com",
+			GpgPublicKey:  "example-gpgPublicKey",
+			GpgEmail:      "email@gmai.com",
 			GpgTrustModel: "always",
 		},
 	}
@@ -138,7 +138,7 @@ var (
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name:configMapOtherKeyValues.Name,
+									Name: configMapOtherKeyValues.Name,
 								},
 							},
 						},
@@ -148,7 +148,7 @@ var (
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name:configMapOtherKeyValues.Name,
+									Name: configMapOtherKeyValues.Name,
 								},
 							},
 						},
@@ -158,7 +158,7 @@ var (
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name:configMapOtherKeyValues.Name,
+									Name: configMapOtherKeyValues.Name,
 								},
 							},
 						},
@@ -209,7 +209,7 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName :  "config-otherkeys",
+			ConfigMapName: "config-otherkeys",
 		},
 	}
 
@@ -219,7 +219,7 @@ var (
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseNameParam:     "dbname",
 			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
 			dbInstanceWithConfigMap.Spec.DatabaseUserParam:     "root",
 		},
@@ -243,12 +243,10 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName :  "config-otherkeys",
-			ConfigMapDatabaseNameParam: "PGDATABASE",
+			ConfigMapName:                  "config-otherkeys",
+			ConfigMapDatabaseNameParam:     "PGDATABASE",
 			ConfigMapDatabasePasswordParam: "PGPASSWORD",
-			ConfigMapDatabaseUserParam: "PGUSER",
+			ConfigMapDatabaseUserParam:     "PGUSER",
 		},
 	}
-
 )
-

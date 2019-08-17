@@ -10,7 +10,7 @@ import (
 )
 
 //updateDBStatus returns error when status regards the all required resources could not be updated
-func (r *ReconcilePostgresql) updateDBStatus( deploymentStatus *appsv1.Deployment, serviceStatus *corev1.Service, pvcStatus *corev1.PersistentVolumeClaim, request reconcile.Request) error {
+func (r *ReconcilePostgresql) updateDBStatus(deploymentStatus *appsv1.Deployment, serviceStatus *corev1.Service, pvcStatus *corev1.PersistentVolumeClaim, request reconcile.Request) error {
 	//Get the latest version of the CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
@@ -45,7 +45,7 @@ func (r *ReconcilePostgresql) updateDBStatus( deploymentStatus *appsv1.Deploymen
 }
 
 //updateDeploymentStatus returns error when status regards the deployment resource could not be updated
-func (r *ReconcilePostgresql) updateDeploymentStatus( request reconcile.Request) (*appsv1.Deployment, error) {
+func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) (*appsv1.Deployment, error) {
 	// Get the latest version of the instance CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
@@ -78,7 +78,7 @@ func (r *ReconcilePostgresql) updateDeploymentStatus( request reconcile.Request)
 }
 
 //updateServiceStatus returns error when status regards the service resource could not be updated
-func (r *ReconcilePostgresql) updateServiceStatus( request reconcile.Request) (*corev1.Service, error) {
+func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) (*corev1.Service, error) {
 	// Get the latest version of the instance CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
@@ -110,7 +110,7 @@ func (r *ReconcilePostgresql) updateServiceStatus( request reconcile.Request) (*
 }
 
 //updatePvcStatus returns error when status regards the PersistentVolumeClaim resource could not be updated
-func (r *ReconcilePostgresql) updatePvcStatus( request reconcile.Request) (*corev1.PersistentVolumeClaim, error) {
+func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) (*corev1.PersistentVolumeClaim, error) {
 	// Get the latest version of the CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {

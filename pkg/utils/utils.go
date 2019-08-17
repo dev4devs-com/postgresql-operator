@@ -7,4 +7,3 @@ func GetConfigMapEnvVarKey(cgfKey, defaultKey string) string {
 	}
 	return defaultKey
 }
-

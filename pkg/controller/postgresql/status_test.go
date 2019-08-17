@@ -121,9 +121,9 @@ func TestUpdateDeploymentStatus(t *testing.T) {
 			name: "Should find the deployment",
 			fields: fields{
 				scheme: scheme.Scheme,
-				objs:   []runtime.Object{&dbInstance, &appsv1.Deployment{
+				objs: []runtime.Object{&dbInstance, &appsv1.Deployment{
 					ObjectMeta: metav1.ObjectMeta{
-						Name: "postgresql",
+						Name:      "postgresql",
 						Namespace: "postgresql",
 					},
 				}},
@@ -229,7 +229,6 @@ func TestUpdateServiceStatus(t *testing.T) {
 	}
 }
 
-
 func TestUpdatePVCStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
@@ -301,4 +300,3 @@ func TestUpdatePVCStatus(t *testing.T) {
 		})
 	}
 }
-

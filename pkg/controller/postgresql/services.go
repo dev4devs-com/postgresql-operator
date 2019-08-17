@@ -6,11 +6,12 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 // Returns the service object for the PostgreSQL
-func (r *ReconcilePostgresql) buildDBService(db *v1alpha1.Postgresql) *corev1.Service {
+func buildDBService(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.Service {
 	ls := getDBLabels(db.Name)
 	ser := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -35,6 +36,6 @@ func (r *ReconcilePostgresql) buildDBService(db *v1alpha1.Postgresql) *corev1.Se
 		},
 	}
 	// Set PostgreSQL db as the owner and controller
-	controllerutil.SetControllerReference(db, ser, r.scheme)
+	controllerutil.SetControllerReference(db, ser, scheme)
 	return ser
 }
