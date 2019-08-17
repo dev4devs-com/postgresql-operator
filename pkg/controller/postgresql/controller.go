@@ -86,13 +86,16 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	// Add const values for mandatory specs
 	addMandatorySpecsDefinitions(db)
 
-	// Create mandatory objects for the Backup
-	if err := r.createUpdateSecondaryResources(db); err != nil {
-		reqLogger.Error(err, "Failed to create and update the secondary resources required for the PostgreSQL CR")
+	if err := r.createSecondaryResources(db); err != nil {
+		reqLogger.Error(err, "Failed to create the secondary resources required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
-	// Update the CR status for the primary resource
+	if err := r.manageResources(db); err != nil {
+		reqLogger.Error(err, "Failed to manage resources required for the PostgreSQL CR")
+		return reconcile.Result{}, err
+	}
+
 	if err := r.createUpdateCRStatus(request); err != nil {
 		reqLogger.Error(err, "Failed to create and update the status in the PostgreSQL CR")
 		return reconcile.Result{}, err
@@ -103,31 +106,29 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 
 //createUpdateCRStatus will create and update the status in the CR applied in the cluster
 func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) error {
-	dep, err := r.updateDeploymentStatus(request)
-	if err != nil {
+
+	if err := r.updateDeploymentStatus(request); err != nil {
 		return err
 	}
 
-	service, err := r.updateServiceStatus(request)
-	if err != nil {
+	if err := r.updateServiceStatus(request); err != nil {
 		return err
 	}
 
-	pvc, err := r.updatePvcStatus(request)
-	if err != nil {
+	if err := r.updatePvcStatus(request); err != nil {
 		return err
 	}
 
-	if err := r.updateDBStatus(dep, service, pvc, request); err != nil {
+	if err := r.updateDBStatus(request); err != nil {
 		return err
 	}
 	return nil
 }
 
-//createUpdateSecondaryResources will create and update the secondary resources which are required in order to make works successfully the primary resource(CR)
-func (r *ReconcilePostgresql) createUpdateSecondaryResources(db *v1alpha1.Postgresql) error {
+//createSecondaryResources will create the secondary resources which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcilePostgresql) createSecondaryResources(db *v1alpha1.Postgresql) error {
 	// Check if deployment for the app exist, if not create one
-	dep, err := r.fetchDBDeployment(db)
+	_, err := r.fetchDBDeployment(db)
 	if err != nil {
 		if err := r.client.Create(context.TODO(), buildDBDeployment(db, r.scheme)); err != nil {
 			return err
@@ -148,8 +149,13 @@ func (r *ReconcilePostgresql) createUpdateSecondaryResources(db *v1alpha1.Postgr
 		}
 	}
 
+	return nil
+}
+
+//manageResources will ensure that the resources are with the expected values in the cluster
+func (r *ReconcilePostgresql) manageResources(db *v1alpha1.Postgresql) error {
 	// get the latest version of db deployment
-	dep, err = r.fetchDBDeployment(db)
+	dep, err := r.fetchDBDeployment(db)
 	if err != nil {
 		return err
 	}

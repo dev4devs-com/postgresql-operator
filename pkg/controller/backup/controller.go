@@ -67,15 +67,6 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
-// Update the object and reconcile it
-func (r *ReconcileBackup) update(obj runtime.Object) error {
-	err := r.client.Update(context.TODO(), obj)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // blank assignment to verify that ReconcileBackup implements reconcile.Reconciler
 var _ reconcile.Reconciler = &ReconcileBackup{}
 
@@ -109,7 +100,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	addMandatorySpecsDefinitions(bkp)
 
 	// Create mandatory objects for the Backup
-	if err := r.createUpdateSecondaryResources(bkp, request); err != nil {
+	if err := r.createSecondaryResources(bkp, request); err != nil {
 		reqLogger.Error(err, "Failed to create and update the secondary resources required for the Backup CR")
 		return reconcile.Result{}, err
 	}
@@ -130,22 +121,19 @@ func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error 
 		return err
 	}
 
-	if err := r.updateServiceDatabaseFoundStatus(request, r.dbService); err != nil {
+	if err := r.updateServiceDatabaseFoundStatus(request); err != nil {
 		return err
 	}
 
-	cronJob, err := r.updateCronJobStatus(request)
-	if err != nil {
+	if err := r.updateCronJobStatus(request); err != nil {
 		return err
 	}
 
-	dbSecret, err := r.updateDBSecretStatus(request)
-	if err != nil {
+	if err := r.updateDBSecretStatus(request); err != nil {
 		return err
 	}
 
-	awsSecret, err := r.updateAWSSecretStatus(request)
-	if err != nil {
+	if err := r.updateAWSSecretStatus(request); err != nil {
 		return err
 	}
 
@@ -154,14 +142,14 @@ func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error 
 	}
 
 	// Update status for Backup
-	if err := r.updateBackupStatus(cronJob, dbSecret, awsSecret, r.dbPod, r.dbService, request); err != nil {
+	if err := r.updateBackupStatus(request); err != nil {
 		return err
 	}
 	return nil
 }
 
-//createUpdateSecondaryResources will create and update the secondary resources which are required in order to make works successfully the primary resource(CR)
-func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
+//createSecondaryResources will create and update the secondary resources which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcileBackup) createSecondaryResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
 	// Check if the database instance was created
 	db, err := r.fetchPostgreSQLInstance(bkp)
 	if err != nil {

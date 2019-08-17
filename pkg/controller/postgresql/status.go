@@ -3,25 +3,23 @@ package postgresql
 import (
 	"context"
 	"fmt"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
 	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 //updateDBStatus returns error when status regards the all required resources could not be updated
-func (r *ReconcilePostgresql) updateDBStatus(deploymentStatus *appsv1.Deployment, serviceStatus *corev1.Service, pvcStatus *corev1.PersistentVolumeClaim, request reconcile.Request) error {
+func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
 	//Get the latest version of the CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
 		return err
 	}
 
-	// Check if ALL required objects are created
-	if len(deploymentStatus.Name) < 1 && len(serviceStatus.Name) < 1 && len(pvcStatus.Name) < 1 {
-		err := fmt.Errorf("Failed to get OK Status for PostgreSQL Database")
+	if err := r.validateDatabaseRequirements(instance); err != nil {
 		return err
 	}
+
 	status := "OK"
 
 	// Update Database Status == OK
@@ -45,23 +43,24 @@ func (r *ReconcilePostgresql) updateDBStatus(deploymentStatus *appsv1.Deployment
 }
 
 //updateDeploymentStatus returns error when status regards the deployment resource could not be updated
-func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) (*appsv1.Deployment, error) {
+func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) error {
 	// Get the latest version of the instance CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	// Get the deployment Object
+
 	deploymentStatus, err := r.fetchDBDeployment(instance)
 	if err != nil {
-		return deploymentStatus, err
+		return err
 	}
+
 	// Update the deployment  and Status
 	if !reflect.DeepEqual(deploymentStatus.Status, instance.Status.DeploymentStatus) {
 		// Get the latest version of the CR in order to try to avoid errors when try to update the CR
 		instance, err := r.fetchPostgreSQLCR(request)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		// Set the data
@@ -70,31 +69,31 @@ func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) 
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			return deploymentStatus, err
+			return err
 		}
 	}
 
-	return deploymentStatus, nil
+	return nil
 }
 
 //updateServiceStatus returns error when status regards the service resource could not be updated
-func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) (*corev1.Service, error) {
+func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) error {
 	// Get the latest version of the instance CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	// Get the service Object
+
 	serviceStatus, err := r.fetchDBService(instance)
 	if err != nil {
-		return serviceStatus, err
+		return err
 	}
 
 	if !reflect.DeepEqual(serviceStatus.Status, instance.Status.ServiceStatus) {
 		// Get the latest version of the CR in order to try to avoid errors when try to update the CR
 		instance, err := r.fetchPostgreSQLCR(request)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		instance.Status.ServiceStatus = serviceStatus.Status
@@ -102,25 +101,24 @@ func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) (*c
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			return serviceStatus, err
+			return err
 		}
 	}
 
-	return serviceStatus, nil
+	return nil
 }
 
 //updatePvcStatus returns error when status regards the PersistentVolumeClaim resource could not be updated
-func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) (*corev1.PersistentVolumeClaim, error) {
+func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) error {
 	// Get the latest version of the CR
 	instance, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	// Get pvc Object
 	pvcStatus, err := r.fetchDBPersistentVolumeClaim(instance)
 	if err != nil {
-		return pvcStatus, err
+		return err
 	}
 
 	// Update CR with pvc name
@@ -128,7 +126,7 @@ func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) (*corev
 		// Get the latest version of the CR in order to try to avoid errors when try to update the CR
 		instance, err := r.fetchPostgreSQLCR(request)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		// Set the data
@@ -137,8 +135,29 @@ func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) (*corev
 		// Update the CR
 		err = r.client.Status().Update(context.TODO(), instance)
 		if err != nil {
-			return pvcStatus, err
+			return err
 		}
 	}
-	return pvcStatus, nil
+	return nil
+}
+
+//validateBackup returns error when some requirement is missing
+func (r *ReconcilePostgresql) validateDatabaseRequirements(db *v1alpha1.Postgresql) error {
+
+	_, err := r.fetchDBPersistentVolumeClaim(db)
+	if err != nil {
+		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The PVC was not found")
+	}
+
+	_, err = r.fetchDBDeployment(db)
+	if err != nil {
+		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The Deployment was not found")
+	}
+
+	_, err = r.fetchDBService(db)
+	if err != nil {
+		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The Service was not found")
+	}
+
+	return nil
 }
