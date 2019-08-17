@@ -18,8 +18,6 @@ var (
 	cleanupTimeout       = time.Second * 5
 )
 
-
-
 func TestPostgreSQL(t *testing.T) {
 	ctx := framework.NewTestCtx(t)
 	defer ctx.Cleanup()
@@ -42,7 +40,7 @@ func TestPostgreSQL(t *testing.T) {
 
 	postgresql := &v1alpha1.Postgresql{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:     "test-postgresql",
+			Name:      "test-postgresql",
 			Namespace: namespace,
 		},
 	}

@@ -2,7 +2,7 @@ package postgresql
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/config"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
 	"testing"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -12,252 +12,105 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-func TestReconcilePostgreSQL_Success(t *testing.T) {
-
-	// objects to track in the fake client
-	objs := []runtime.Object{
-		&dbInstance,
+func TestReconcilePostgresql(t *testing.T) {
+	type fields struct {
+		scheme *runtime.Scheme
+		objs   []runtime.Object
 	}
-
-	r := buildReconcileWithFakeClientWithMocks(objs)
-
-	// mock request to simulate Reconcile() being called on an event for a watched resource
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      dbInstance.Name,
-			Namespace: dbInstance.Namespace,
+	type args struct {
+		dbInstance v1alpha1.Postgresql
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		args           args
+		wantRequeue    bool
+		wantDeployment bool
+		wantService    bool
+		wantPVC        bool
+		wantErr        bool
+	}{
+		{
+			name: "Should work with default values",
+			fields: fields{
+				objs: []runtime.Object{&dbInstanceWithoutSpec},
+			},
+			args: args{
+				dbInstance: dbInstanceWithoutSpec,
+			},
+			wantErr:        false,
+			wantRequeue:    false,
+			wantDeployment: true,
+			wantService:    true,
+			wantPVC:        true,
+		},
+		{
+			name: "Should work when is using config map to create env vars",
+			fields: fields{
+				objs: []runtime.Object{
+					&dbInstanceConfigMapSameKeys,
+					&configMapSameKeyValues,
+				},
+			},
+			args: args{
+				dbInstance: dbInstanceConfigMapSameKeys,
+			},
+			wantErr:        false,
+			wantRequeue:    false,
+			wantDeployment: true,
+			wantService:    true,
+			wantPVC:        true,
 		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 
-	res, err := r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
+			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-	deployment := &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, deployment)
-	if err != nil {
-		t.Fatalf("get deployment: (%v)", err)
-	}
+			// mock request to simulate Reconcile() being called on an event for a watched resource
+			req := reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      tt.args.dbInstance.Name,
+					Namespace: tt.args.dbInstance.Namespace,
+				},
+			}
 
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
+			res, err := r.Reconcile(req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TestReconcilePostgresql reconcile: error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
+			deployment := &appsv1.Deployment{}
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, deployment)
+			if (err == nil) != tt.wantDeployment {
+				t.Errorf("TestReconcilePostgresql to get deployment error = %v, wantDeployment %v", err, tt.wantDeployment)
+				return
+			}
 
-	service := &corev1.Service{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, service)
-	if err != nil {
-		t.Fatalf("get service: (%v)", err)
-	}
+			service := &corev1.Service{}
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, service)
+			if (err == nil) != tt.wantService {
+				t.Errorf("TestReconcilePostgresql to get service error = %v, wantService %v", err, tt.wantService)
+				return
+			}
 
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
+			pvc := &corev1.PersistentVolumeClaim{}
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, pvc)
+			if (err == nil) != tt.wantPVC {
+				t.Errorf("TestReconcilePostgresql to get service error = %v, wantPVC %v", err, tt.wantPVC)
+				return
+			}
 
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	pvc := &corev1.PersistentVolumeClaim{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, pvc)
-	if err != nil {
-		t.Fatalf("get pvc: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
+			if (res.Requeue) != tt.wantRequeue {
+				t.Errorf("TestReconcileBackup expect request to requeue res.Requeue = %v, wantRequeue %v", res.Requeue, tt.wantRequeue)
+				return
+			}
+		})
 	}
 }
 
-func TestReconcilePostgreSQL_NotFound(t *testing.T) {
-
-	// objects to track in the fake client
-	objs := []runtime.Object{
-		&dbInstance,
-	}
-
-	r := buildReconcileWithFakeClientWithMocks(objs)
-
-	// mock request to simulate Reconcile() being called on an event for a watched resource
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      dbInstance.Name,
-			Namespace: "unknown",
-		},
-	}
-
-	res, err := r.Reconcile(req)
-	if err == nil {
-		t.Error("should fail since the instance do not exist in the <unknown> nammespace")
-	}
-
-	if res.Requeue {
-		t.Fatalf("did not expected reconcile to requeue.")
-	}
-}
-
-func TestReconcilePostgreSQL_UsingConfigMapToCreateEnvVars(t *testing.T) {
-
-	// objects to track in the fake client
-	objs := []runtime.Object{
-		&dbInstanceConfigMapSameKeys,
-		&configMapSameKeyValues,
-	}
-
-	r := buildReconcileWithFakeClientWithMocks(objs)
-
-	// mock request to simulate Reconcile() being called on an event for a watched resource
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      dbInstance.Name,
-			Namespace: dbInstance.Namespace,
-		},
-	}
-
-	_ = r.client.Create(context.TODO(), &configMapSameKeyValues)
-
-	res, err := r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	deployment := &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, deployment)
-	if err != nil {
-		t.Fatalf("get deployment: (%v)", err)
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	if deployment.Spec.Template.Spec.Containers[0].Env[0].ValueFrom == nil {
-		t.Error("deployment envvar did not came from service instance config map")
-	}
-
-	if deployment.Spec.Template.Spec.Containers[0].Env[0].ValueFrom.ConfigMapKeyRef.Name != configMapSameKeyValues.Name {
-		t.Fatalf("deployment envvar did not came from service instance config map: (%v,%v)", deployment.Spec.Template.Spec.Containers[0].Env[0].ValueFrom.ConfigMapKeyRef.Name, configMapSameKeyValues.Name)
-	}
-
-	if res.Requeue {
-		t.Error("reconcile did not requeue request as expected")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	service := &corev1.Service{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, service)
-	if err != nil {
-		t.Fatalf("get service: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	pvc := &corev1.PersistentVolumeClaim{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, pvc)
-	if err != nil {
-		t.Fatalf("get pvc: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-}
-
-func TestReconcilePostgreSQ_ReplicasSizes(t *testing.T) {
-
-	// objects to track in the fake client
-	objs := []runtime.Object{
-		&dbInstance,
-	}
-
-	r := buildReconcileWithFakeClientWithMocks(objs)
-
-	// mock request to simulate Reconcile() being called on an event for a watched resource
-	req := reconcile.Request{
-		NamespacedName: types.NamespacedName{
-			Name:      dbInstance.Name,
-			Namespace: dbInstance.Namespace,
-		},
-	}
-
-	res, err := r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	deployment := &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, deployment)
-	if err != nil {
-		t.Fatalf("get deployment: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	//Mock Replicas wrong size
-	size := int32(3)
-	deployment.Spec.Replicas = &size
-
-	// Update
-	err = r.client.Update(context.TODO(), deployment)
-	if err != nil {
-		t.Fatalf("fails when ttry to update deployment replicas: (%v)", err)
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	deployment = &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, deployment)
-	if err != nil {
-		t.Fatalf("get deployment: (%v)", err)
-	}
-
-	if *deployment.Spec.Replicas != dbInstance.Spec.Size {
-		t.Error("Replicas size was not respected")
-	}
-}
-
-func TestReconcilePostgreSQL_Reconcile_InstanceWithoutSpec(t *testing.T) {
+func TestReconcilePostgresql_EnsureReplicasSizeInstance(t *testing.T) {
 
 	// objects to track in the fake client
 	objs := []runtime.Object{
@@ -285,13 +138,14 @@ func TestReconcilePostgreSQL_Reconcile_InstanceWithoutSpec(t *testing.T) {
 		t.Fatalf("get deployment: (%v)", err)
 	}
 
-	// Check if the quantity of Replicas for this deployment is equals the specification
-	if *deployment.Spec.Replicas != config.NewPostgreSQLConfig().Size {
-		t.Errorf("dep size (%d) is not the expected size (%d)", deployment.Spec.Replicas, config.NewPostgreSQLConfig().Size)
-	}
+	//Mock Replicas wrong size
+	size := int32(3)
+	deployment.Spec.Replicas = &size
 
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
+	// Update
+	err = r.client.Update(context.TODO(), deployment)
+	if err != nil {
+		t.Fatalf("fails when try to update deployment replicas: (%v)", err)
 	}
 
 	res, err = r.Reconcile(req)
@@ -299,34 +153,13 @@ func TestReconcilePostgreSQL_Reconcile_InstanceWithoutSpec(t *testing.T) {
 		t.Fatalf("reconcile: (%v)", err)
 	}
 
-	service := &corev1.Service{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, service)
+	dep, err := r.fetchDBDeployment(&dbInstanceWithoutSpec)
 	if err != nil {
-		t.Fatalf("get service: (%v)", err)
+		t.Fatalf("get deployment: (%v)", err)
 	}
 
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
-	}
-
-	pvc := &corev1.PersistentVolumeClaim{}
-	err = r.client.Get(context.TODO(), req.NamespacedName, pvc)
-	if err != nil {
-		t.Fatalf("get pvc: (%v)", err)
-	}
-
-	if res.Requeue {
-		t.Error("did not expect request to requeue")
-	}
-
-	res, err = r.Reconcile(req)
-	if err != nil {
-		t.Fatalf("reconcile: (%v)", err)
+	if *dep.Spec.Replicas != 1 {
+		t.Errorf("Replicas size was not respected got (%v), when is expected (%v)", *dep.Spec.Replicas, 1)
 	}
 
 	if res.Requeue {

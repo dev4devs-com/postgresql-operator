@@ -42,13 +42,9 @@ func (r *ReconcileBackup) fetchConfigMap(name, namespace string) (*corev1.Config
 
 //fetchPostgreSQLPod search in the cluster for 1 Pod managed by the Postgresql Controller
 func (r *ReconcileBackup) fetchPostgreSQLPod(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (*corev1.Pod, error) {
-	listOps, err := buildPostgreSQLCriteria(bkp, db)
-	if err != nil {
-		return nil, err
-	}
-
+	listOps := buildPostgreSQLCriteria(bkp, db)
 	dbPodList := &corev1.PodList{}
-	err = r.client.List(context.TODO(), listOps, dbPodList)
+	err := r.client.List(context.TODO(), listOps, dbPodList)
 	if err != nil {
 		return nil, err
 	}
@@ -63,13 +59,9 @@ func (r *ReconcileBackup) fetchPostgreSQLPod(bkp *v1alpha1.Backup, db *v1alpha1.
 
 //fetchPostgreSQLService search in the cluster for 1 Service managed by the Postgresql Controller
 func (r *ReconcileBackup) fetchPostgreSQLService(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (*corev1.Service, error) {
-	listOps, err := buildPostgreSQLCriteria(bkp, db)
-	if err != nil {
-		return nil, err
-	}
-
+	listOps := buildPostgreSQLCriteria(bkp, db)
 	dbServiceList := &corev1.ServiceList{}
-	err = r.client.List(context.TODO(), listOps, dbServiceList)
+	err := r.client.List(context.TODO(), listOps, dbServiceList)
 	if err != nil {
 		return nil, err
 	}
@@ -90,9 +82,9 @@ func (r *ReconcileBackup) fetchPostgreSQLInstance(bkp *v1alpha1.Backup) (*v1alph
 }
 
 //buildPostgreSQLCreteria returns client.ListOptions required to fetch the secondary resources created by
-func buildPostgreSQLCriteria(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (*client.ListOptions, error) {
+func buildPostgreSQLCriteria(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) *client.ListOptions {
 	ls := map[string]string{"app": "postgresql", "postgresql_cr": db.Name}
 	labelSelector := labels.SelectorFromSet(ls)
 	listOps := &client.ListOptions{Namespace: bkp.Namespace, LabelSelector: labelSelector}
-	return listOps, nil
+	return listOps
 }
