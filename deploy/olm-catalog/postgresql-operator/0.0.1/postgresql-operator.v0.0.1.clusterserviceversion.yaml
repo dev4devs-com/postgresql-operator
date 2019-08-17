@@ -6,6 +6,29 @@ metadata:
       [
         {
           "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup"
+          },
+          "spec": {
+            "awsAccessKeyId": "example-awsAccessKeyId",
+            "awsCredentialsSecretName": "example-awsCredentialsSecretName",
+            "awsCredentialsSecretNamespace": "example-awsCredentialsSecretNamespace",
+            "awsS3BucketName": "example-awsS3BucketName",
+            "awsSecretAccessKey": "example-awsSecretAccessKey",
+            "databaseVersion": "9.6",
+            "encryptionKeySecretName": "example-encryptionKeySecretName",
+            "encryptionKeySecretNamespace": "example-encryptionKeySecretNamespace",
+            "gpgEmail": "email@gmai.com",
+            "gpgPublicKey": "example-gpgPublicKey",
+            "gpgTrustModel": "always",
+            "image": "quay.io/integreatly/backup-container:1.0.8",
+            "productName": "postgresql",
+            "schedule": "0 0 * * *"
+          }
+        },
+        {
+          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
           "kind": "Postgresql",
           "metadata": {
             "name": "postgresql"
@@ -24,22 +47,6 @@ metadata:
             "databaseUserParam": "POSTGRESQL_USER",
             "image": "centos/postgresql-96-centos7",
             "size": 1
-          }
-        },
-        {
-          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
-          "kind": "Backup",
-          "metadata": {
-            "name": "backup"
-          },
-          "spec": {
-            "awsAccessKeyId": "example-awsAccessKeyId",
-            "awsS3BucketName": "example-awsS3BucketName",
-            "awsSecretAccessKey": "example-awsSecretAccessKey",
-            "databaseVersion": "9.6",
-            "image": "quay.io/integreatly/backup-container:1.0.8",
-            "productName": "postgresql",
-            "schedule": "0 0 * * *"
           }
         }
       ]
@@ -187,6 +194,21 @@ spec:
     type: MultiNamespace
   - supported: true
     type: AllNamespaces
+  keywords:
+  - postgresql
+  - postgre
+  - database
+  - backup
+  - PostgreSQL
+  links:
+  - name: GitHub Repository
+    url: https://github.com/dev4devs-com/postgresql-operator
+  - name: Docs
+    url: https://github.com/dev4devs-com/postgresql-operator/blob/master/README.adoc
+  maintainers:
+  - email: dev4devs.com@gmail.com
+    name: Dev4Devs.com
   maturity: alpha
-  provider: {}
+  provider:
+    name: Dev4Devs.com
   version: 0.0.1
