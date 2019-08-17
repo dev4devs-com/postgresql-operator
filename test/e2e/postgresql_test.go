@@ -27,6 +27,13 @@ func TestPostgreSQL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to add custom resource scheme to framework: %v", err)
 	}
+
+	backupList := &v1alpha1.BackupList{}
+	err = framework.AddToFrameworkScheme(apis.AddToScheme, backupList)
+	if err != nil {
+		t.Fatalf("failed to add custom resource scheme to framework: %v", err)
+	}
+
 	// run subtests
 	t.Run("postgresql-group", func(t *testing.T) {
 		t.Run("Cluster", PostgreSQLCluster)
