@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func TestBackup_UpdateBackupStatus(t *testing.T) {
+func TestUpdateBackupStatus(t *testing.T) {
 	type fields struct {
 		objs   []runtime.Object
 		scheme *runtime.Scheme
@@ -118,16 +118,14 @@ func TestBackup_UpdateBackupStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			if err := r.updateBackupStatus(reqLogger, tt.args.cronJobStatus, tt.args.dbSecret, tt.args.awsSecret, tt.args.dbPod, tt.args.dbService, tt.args.request); (err != nil) != tt.wantErr {
-				t.Errorf("TestBackup_UpdateBackupStatus.updateStatus() error = %v, wantErr %v", err, tt.wantErr)
+			if err := r.updateBackupStatus(tt.args.cronJobStatus, tt.args.dbSecret, tt.args.awsSecret, tt.args.dbPod, tt.args.dbService, tt.args.request); (err != nil) != tt.wantErr {
+				t.Errorf("TestUpdateBackupStatus error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateCronJobStatus(t *testing.T) {
+func TestUpdateCronJobStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -187,21 +185,19 @@ func TestReconcilePostgreSQL_UpdateCronJobStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updateCronJobStatus(reqLogger, tt.args.request)
+			got, err := r.updateCronJobStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateCronJobStatus.updateCronJobStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateCronJobStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdateCronJobStatus.updateCronJobStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdateCronJobStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateAWSSecretStatus(t *testing.T) {
+func TestUpdateAWSSecretStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -278,21 +274,19 @@ func TestReconcilePostgreSQL_UpdateAWSSecretStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updateAWSSecretStatus(reqLogger, tt.args.request)
+			got, err := r.updateAWSSecretStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateCronJobStatus.updateAWSSecretStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateAWSSecretStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdateCronJobStatus.updateAWSSecretStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdateAWSSecretStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateEncSecretStatus(t *testing.T) {
+func TestUpdateEncSecretStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -369,18 +363,16 @@ func TestReconcilePostgreSQL_UpdateEncSecretStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			err := r.updateEncSecretStatus(reqLogger, tt.args.request)
+			err := r.updateEncSecretStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateEncSecretStatus.UpdateEncSecretStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateEncSecretStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdateDBSecretStatus(t *testing.T) {
+func TestUpdateDBSecretStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -418,7 +410,7 @@ func TestReconcilePostgreSQL_UpdateDBSecretStatus(t *testing.T) {
 				scheme: scheme.Scheme,
 				objs: []runtime.Object{&bkpInstance, &corev1.Secret{
 					ObjectMeta: v1.ObjectMeta{
-						Name:      "aws-postgresql-backup",
+						Name:      "db-postgresql-backup",
 						Namespace: bkpInstance.Namespace,
 					},
 				}},
@@ -440,28 +432,26 @@ func TestReconcilePostgreSQL_UpdateDBSecretStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			got, err := r.updateAWSSecretStatus(reqLogger, tt.args.request)
+			got, err := r.updateDBSecretStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateDBSecretStatus.UpdateDBSecretStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateDBSecretStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestReconcilePostgreSQL_UpdateDBSecretStatus.UpdateDBSecretStatus() = %v, want %v", gotType, tt.want)
+				t.Errorf("TestUpdateDBSecretStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
 }
 
-func TestReconcilePostgreSQL_UpdatePodDatabaseFoundStatus(t *testing.T) {
+func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
 	}
 	type args struct {
 		request reconcile.Request
-		pod corev1.Pod
+		pod     corev1.Pod
 	}
 	tests := []struct {
 		name    string
@@ -515,11 +505,9 @@ func TestReconcilePostgreSQL_UpdatePodDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			err := r.updatePodDatabaseFoundStatus(reqLogger, tt.args.request, &tt.args.pod)
+			err := r.updatePodDatabaseFoundStatus(tt.args.request, &tt.args.pod)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdatePodDabaseFoundStatus.updatePodDatabaseFoundStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdatePodDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -527,8 +515,7 @@ func TestReconcilePostgreSQL_UpdatePodDatabaseFoundStatus(t *testing.T) {
 	}
 }
 
-
-func TestReconcilePostgreSQL_UpdateServiceDatabaseFoundStatus(t *testing.T) {
+func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
@@ -589,11 +576,9 @@ func TestReconcilePostgreSQL_UpdateServiceDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			reqLogger := log.WithValues("Request.Namespace", tt.args.request.Namespace, "Request.Name", tt.args.request.Name)
-
-			err := r.updateServiceDatabaseFoundStatus(reqLogger, tt.args.request, &tt.args.service)
+			err := r.updateServiceDatabaseFoundStatus(tt.args.request, &tt.args.service)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgreSQL_UpdateServiceDatabaseFoundStatus.updateServiceDatabaseFoundStatus() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestUpdateServiceDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 

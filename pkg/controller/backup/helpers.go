@@ -6,13 +6,17 @@ import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
 
+const (
+	awsSecretPrefix = "aws-"
+	dbSecretPrefix  = "db-"
+	encSecretPrefix = "encryption-"
+)
+
 func getBkpLabels(name string) map[string]string {
 	return map[string]string{"app": "postgresql", "backup_cr": name}
 }
 
-
-
-func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql ) (map[string][]byte, error) {
+func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (map[string][]byte, error) {
 	database := ""
 	user := ""
 	pwd := ""
@@ -20,81 +24,51 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 	superuser := "false"
 
 	for i := 0; i < len(r.dbPod.Spec.Containers[0].Env); i++ {
-		value := r.dbPod.Spec.Containers[0].Env[i].Value
-		switch r.dbPod.Spec.Containers[0].Env[i].Name {
+
+		envVarName := r.dbPod.Spec.Containers[0].Env[i].Name
+		envVarValue := r.dbPod.Spec.Containers[0].Env[i].Value
+
+		var cfgName, cfgKey string
+		if r.dbPod.Spec.Containers[0].Env[i].ValueFrom != nil {
+			cfgName = r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Name
+			cfgKey = r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Key
+		}
+
+		switch envVarName {
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam):
-			// Get value from ENV VAR
-			database = value
-
-			// Get value from ConfigMap used in the ENV VAR
+			database = envVarValue
 			if database == "" {
-				// get configMap name and key
-				cfgName := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Name
-				cfgKey := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Key
-				value, err := r.getValueFromConfigMap(cfgName, cfgKey, bkp)
-
-				// validations
-				if err != nil {
-					return nil, err
-				}
-				if value == "" {
+				database, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+				if database == "" || err != nil {
 					err := fmt.Errorf("Unable to get the database name to add in the secret")
 					return nil, err
 				}
-
-				// Set ENV value from ConfigMap
-				database = value
 			}
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam):
-			// Get value from ENV VAR
-			user = value
-
-			// Get value from ConfigMap used in the ENV VAR
+			user = envVarValue
 			if user == "" {
-				// get configMap name and key
-				cfgName := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Name
-				cfgKey := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Key
-				value, err := r.getValueFromConfigMap(cfgName, cfgKey, bkp)
-
-				// validations
-				if err != nil {
-					return nil, err
-				}
-				if value == "" {
+				user, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+				if user == "" || err != nil {
 					err := fmt.Errorf("Unable to get the database user to add in the secret")
 					return nil, err
 				}
-
-				// Set ENV value from ConfigMap
-				user = value
 			}
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam):
-			// Get value from ENV VAR
-			pwd = value
-
-			// Get value from ConfigMap used in the ENV VAR
+			pwd = envVarValue
 			if pwd == "" {
-				// get configMap name and key
-				cfgName := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Name
-				cfgKey := r.dbPod.Spec.Containers[0].Env[i].ValueFrom.ConfigMapKeyRef.Key
-				value, err := r.getValueFromConfigMap(cfgName, cfgKey, bkp)
-
-				// validations
-				if err != nil {
+				pwd, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+				if pwd == "" || err != nil {
+					err := fmt.Errorf("Unable to get the pwd user to add in the secret")
 					return nil, err
 				}
-				if value == "" {
-					err := fmt.Errorf("Unable to get the database pwd to add in the secret")
-					return nil, err
-				}
-
-				// Set ENV value from ConfigMap
-				pwd = value
 			}
 		}
 	}
+	return getDDBSecretData(user, pwd, database, host, superuser, bkp), nil
+}
 
-	dataByte := map[string][]byte{
+func getDDBSecretData(user string, pwd string, database string, host string, superuser string, bkp *v1alpha1.Backup) map[string][]byte {
+	return map[string][]byte{
 		"POSTGRES_USERNAME":  []byte(user),
 		"POSTGRES_PASSWORD":  []byte(pwd),
 		"POSTGRES_DATABASE":  []byte(database),
@@ -102,13 +76,11 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 		"POSTGRES_SUPERUSER": []byte(superuser),
 		"VERSION":            []byte(bkp.Spec.DatabaseVersion),
 	}
-
-	return dataByte, nil
 }
 
-func (r *ReconcileBackup) getValueFromConfigMap(configMapName, configMapKey string, bkp *v1alpha1.Backup) (string, error) {
+func (r *ReconcileBackup) getValueFromConfigMap(configMapName, configMapNamespace, configMapKey string) (string, error) {
 	// search for ConfigMap
-	cfg, err := r.fetchConfigMap(bkp, configMapName)
+	cfg, err := r.fetchConfigMap(configMapName, configMapNamespace)
 	if err != nil {
 		return "", err
 	}

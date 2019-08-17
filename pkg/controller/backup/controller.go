@@ -3,7 +3,6 @@ package backup
 import (
 	"context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
-	"github.com/go-logr/logr"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
@@ -15,13 +14,6 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 	"time"
-)
-
-const (
-	cronJob   = "cronJob"
-	dbSecret  = "dbSecret"
-	swsSecret = "swsSecret"
-	encSecret = "encSecret"
 )
 
 var log = logf.Log.WithName("controller_backup")
@@ -56,22 +48,18 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch cronJob
 	if err := watchCronJob(c); err != nil {
 		return err
 	}
 
-	// Watch watchSecret
 	if err := watchSecret(c); err != nil {
 		return err
 	}
 
-	// Watch Pod
 	if err := watchPod(c); err != nil {
 		return err
 	}
 
-	// Watch Service
 	if err := watchService(c); err != nil {
 		return err
 	}
@@ -80,13 +68,11 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 }
 
 // Update the object and reconcile it
-func (r *ReconcileBackup) update(obj runtime.Object, reqLogger logr.Logger) error {
+func (r *ReconcileBackup) update(obj runtime.Object) error {
 	err := r.client.Update(context.TODO(), obj)
 	if err != nil {
-		reqLogger.Error(err, "Failed to update Object", "obj:", obj)
 		return err
 	}
-	reqLogger.Info("Object updated", "obj:", obj)
 	return nil
 }
 
@@ -104,49 +90,6 @@ type ReconcileBackup struct {
 	dbService *v1.Service
 }
 
-// Create the object and reconcile it
-func (r *ReconcileBackup) create(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) error {
-	obj, err := r.buildFactory(bkp,db, kind, reqLogger)
-	if err != nil {
-		reqLogger.Error(err, "Failed to build object ", "kind", kind, "Namespace", bkp.Namespace)
-		return err
-	}
-	reqLogger.Info("Creating a new ", "kind", kind, "Namespace", bkp.Namespace)
-	err = r.client.Create(context.TODO(), obj)
-	if err != nil {
-		reqLogger.Error(err, "Failed to create new ", "kind", kind, "Namespace", bkp.Namespace)
-		return err
-	}
-	reqLogger.Info("Created successfully", "kind", kind, "Namespace", bkp.Namespace)
-	return nil
-}
-
-// buildFactory will return the resource according to the kind defined
-func (r *ReconcileBackup) buildFactory(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) (runtime.Object, error) {
-	reqLogger.Info("Check "+kind, "into the namespace", bkp.Namespace)
-	switch kind {
-	case cronJob:
-		return r.buildCronJob(bkp), nil
-	case dbSecret:
-		// build Database secret data
-		secretData, err := r.buildDBSecretData(bkp, db)
-		if err != nil {
-			reqLogger.Error(err, "Unable to create DB Data secret")
-			return nil, err
-		}
-		return r.buildSecret(bkp, dbSecretPrefix, secretData, nil), nil
-	case swsSecret:
-		secretData := buildAwsSecretData(bkp)
-		return r.buildSecret(bkp, awsSecretPrefix, secretData, nil), nil
-	case encSecret:
-		secretData, secretStringData := buildEncSecretData(bkp)
-		return r.buildSecret(bkp, encSecretPrefix, secretData, secretStringData), nil
-	default:
-		msg := "Failed to recognize type of object" + kind + " into the Namespace " + bkp.Namespace
-		panic(msg)
-	}
-}
-
 // Reconcile reads that state of the cluster for a Backup object and makes changes based on the state read
 // and what is in the Backup.Spec
 // Note:
@@ -154,120 +97,139 @@ func (r *ReconcileBackup) buildFactory(bkp *v1alpha1.Backup, db *v1alpha1.Postgr
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling Backup")
+	reqLogger.Info("Reconciling Backup ...")
 
-	// Fetch the PostgreSQL DB Backup
-	bkp := &v1alpha1.Backup{}
-	bkp, err := r.fetchBkpInstance(reqLogger, request)
+	bkp, err := r.fetchBackupCR(request)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get PostgreSQL Backup")
+		reqLogger.Error(err, "Failed to get the Backup Custom Resource. Check if the Backup CR is applied in the cluster")
 		return reconcile.Result{}, err
 	}
 
 	// Add const values for mandatory specs
 	addMandatorySpecsDefinitions(bkp)
 
-	// Check if the database instance was created
-	db, err := r.fetchDBInstance( bkp,reqLogger);
-	if err != nil {
+	// Create mandatory objects for the Backup
+	if err := r.createUpdateSecondaryResources(bkp, request); err != nil {
+		reqLogger.Error(err, "Failed to create and update the secondary resources required for the Backup CR")
 		return reconcile.Result{}, err
 	}
 
+	// Update the CR status for the primary resource
+	if err := r.createUpdateCRStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create and update the status in the Backup CR")
+		return reconcile.Result{}, err
+	}
+
+	// stop reconciliation
+	return reconcile.Result{}, nil
+}
+
+//createUpdateCRStatus will create and update the status in the CR applied in the cluster
+func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error {
+	if err := r.updatePodDatabaseFoundStatus(request, r.dbPod); err != nil {
+		return err
+	}
+
+	if err := r.updateServiceDatabaseFoundStatus(request, r.dbService); err != nil {
+		return err
+	}
+
+	cronJob, err := r.updateCronJobStatus(request)
+	if err != nil {
+		return err
+	}
+
+	dbSecret, err := r.updateDBSecretStatus(request)
+	if err != nil {
+		return err
+	}
+
+	awsSecret, err := r.updateAWSSecretStatus(request)
+	if err != nil {
+		return err
+	}
+
+	if err := r.updateEncSecretStatus(request); err != nil {
+		return err
+	}
+
+	// Update status for Backup
+	if err := r.updateBackupStatus(cronJob, dbSecret, awsSecret, r.dbPod, r.dbService, request); err != nil {
+		return err
+	}
+	return nil
+}
+
+//createUpdateSecondaryResources will create and update the secondary resources which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcileBackup) createUpdateSecondaryResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
+	// Check if the database instance was created
+	db, err := r.fetchPostgreSQLInstance(bkp)
+	if err != nil {
+		return err
+	}
+
 	// Get database pod
-	dbPod, err := r.fetchBDPod(bkp, db, reqLogger)
+	dbPod, err := r.fetchPostgreSQLPod(bkp, db)
 	if err != nil || dbPod == nil {
-		reqLogger.Error(err, "Unable to find the database pod", "request.namespace", request.Namespace)
-		return reconcile.Result{RequeueAfter: time.Second * 10}, err
+		time.Sleep(2 * time.Second)
+		return err
 	}
 
 	// set in the reconcile
 	r.dbPod = dbPod
 
 	// Get database service
-	dbService, err := r.fetchServiceDB(bkp, db, reqLogger)
+	dbService, err := r.fetchPostgreSQLService(bkp, db)
 	if err != nil || dbService == nil {
-		reqLogger.Error(err, "Unable to find the database service", "request.namespace", request.Namespace)
-		return reconcile.Result{RequeueAfter: time.Second * 10}, err
+		return err
 	}
 
 	// set in the reconcile
 	r.dbService = dbService
 
 	// Check if the secret for the database is created, if not create one
-	if _, err := r.fetchSecret(reqLogger, bkp.Namespace, dbSecretPrefix+bkp.Name); err != nil {
-		if err := r.create(bkp, db, dbSecret, reqLogger); err != nil {
-			return reconcile.Result{}, err
+	if _, err := r.fetchSecret(bkp.Namespace, dbSecretPrefix+bkp.Name); err != nil {
+		secretData, err := r.buildDBSecretData(bkp, db)
+		if err != nil {
+			return err
+		}
+		dbSecret := buildSecret(bkp, dbSecretPrefix, secretData, nil, r.scheme)
+		if err := r.client.Create(context.TODO(), dbSecret); err != nil {
+			return err
 		}
 	}
 
 	// Check if the secret for the s3 is created, if not create one
-	if _, err := r.fetchSecret(reqLogger, getAwsSecretNamespace(bkp), getAWSSecretName(bkp)); err != nil {
+	if _, err := r.fetchSecret(getAwsSecretNamespace(bkp), getAWSSecretName(bkp)); err != nil {
 		if bkp.Spec.AwsCredentialsSecretName != "" {
-			reqLogger.Error(err, "Unable to find AWS secret informed and will not be created by the operator", "SecretName", bkp.Spec.AwsCredentialsSecretName)
-			return reconcile.Result{}, err
+			return err
 		}
-		if err := r.create(bkp, db, swsSecret, reqLogger); err != nil {
-			return reconcile.Result{}, err
+		secretData := buildAwsSecretData(bkp)
+		awsSecret := buildSecret(bkp, awsSecretPrefix, secretData, nil, r.scheme)
+		if err := r.client.Create(context.TODO(), awsSecret); err != nil {
+			return err
 		}
 	}
 
 	// Check if the secret for the encryptionKey is created, if not create one just when the data is informed
 	if hasEncryptionKeySecret(bkp) {
-		if _, err := r.fetchSecret(reqLogger, getEncSecretNamespace(bkp), getEncSecretName(bkp)); err != nil {
+		if _, err := r.fetchSecret(getEncSecretNamespace(bkp), getEncSecretName(bkp)); err != nil {
 			if bkp.Spec.EncryptionKeySecretName != "" {
-				reqLogger.Error(err, "Unable to find EncryptionKey secret informed and will not be created by the operator", "SecretName", bkp.Spec.EncryptionKeySecretName)
-				return reconcile.Result{}, err
+				return err
 			}
-			if err := r.create(bkp, db, encSecret, reqLogger); err != nil {
-				return reconcile.Result{}, err
+			secretData, secretStringData := buildEncSecretData(bkp)
+			encSecret := buildSecret(bkp, encSecretPrefix, secretData, secretStringData, r.scheme)
+			if err := r.client.Create(context.TODO(), encSecret); err != nil {
+				return err
 			}
 		}
 	}
 
 	// Check if the cronJob is created, if not create one
-	if _, err := r.fetchCronJob(reqLogger, bkp); err != nil {
-		if err := r.create(bkp, db, cronJob, reqLogger); err != nil {
-			return reconcile.Result{}, err
+	if _, err := r.fetchCronJob(bkp); err != nil {
+		if err := r.client.Create(context.TODO(), buildCronJob(bkp, r.scheme)); err != nil {
+			return err
 		}
 	}
-
-	// Update status for pod database found
-	if err := r.updatePodDatabaseFoundStatus(reqLogger, request, dbPod); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for service database found
-	if err := r.updateServiceDatabaseFoundStatus(reqLogger, request, dbService); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for CronJobStatus
-	cronJobStatus, err := r.updateCronJobStatus(reqLogger, request)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for database secret
-	dbSecretStatus, err := r.updateDBSecretStatus(reqLogger, request)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for aws secret
-	awsSecretStatus, err := r.updateAWSSecretStatus(reqLogger, request)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for pod database found
-	if err := r.updateEncSecretStatus(reqLogger, request); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for Backup
-	if err := r.updateBackupStatus(reqLogger, cronJobStatus, dbSecretStatus, awsSecretStatus, dbPod, dbService, request); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	return reconcile.Result{}, nil
+	return nil
 }

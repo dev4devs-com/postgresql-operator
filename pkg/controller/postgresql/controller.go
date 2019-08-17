@@ -3,7 +3,6 @@ package postgresql
 import (
 	"context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
-	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -15,12 +14,6 @@ import (
 )
 
 var log = logf.Log.WithName("controller_postgresql")
-
-const (
-	deployment = "deployment"
-	pvc        = "pvc"
-	service    = "service"
-)
 
 // Add creates a new PostgreSQL Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -49,17 +42,14 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 
 	/** Watch for changes to secondary resources and create the owner PostgreSQL **/
 
-	// deployment
 	if err := watchDeployment(c); err != nil {
 		return err
 	}
 
-	// service
 	if err := watchService(c); err != nil {
 		return err
 	}
 
-	// PersistenceVolume
 	if err := watchPersistenceVolumeClaim(c); err != nil {
 		return err
 	}
@@ -78,46 +68,6 @@ type ReconcilePostgresql struct {
 	scheme *runtime.Scheme
 }
 
-// Update the object and reconcile it
-func (r *ReconcilePostgresql) update(obj runtime.Object, reqLogger logr.Logger) error {
-	err := r.client.Update(context.TODO(), obj)
-	if err != nil {
-		reqLogger.Error(err, "Failed to update Object", "obj:", obj)
-		return err
-	}
-	reqLogger.Info("Object updated", "obj:", obj)
-	return nil
-}
-
-// Create the object and reconcile it
-func (r *ReconcilePostgresql) create(db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) error {
-	obj := r.buildFactory(db, kind, reqLogger)
-	reqLogger.Info("Creating a new ", "kind", kind, "Namespace", db.Namespace)
-	err := r.client.Create(context.TODO(), obj)
-	if err != nil {
-		reqLogger.Error(err, "Failed to create new ", "kind", kind, "Namespace", db.Namespace)
-		return err
-	}
-	reqLogger.Info("Created successfully", "kind", kind, "Namespace", db.Namespace)
-	return nil
-}
-
-// buildFactory will return the resource according to the kind defined
-func (r *ReconcilePostgresql) buildFactory(db *v1alpha1.Postgresql, kind string, reqLogger logr.Logger) runtime.Object {
-	reqLogger.Info("Check "+kind, "into the namespace", db.Namespace)
-	switch kind {
-	case pvc:
-		return r.buildPVCForDB(db)
-	case deployment:
-		return r.buildDBDeployment(db)
-	case service:
-		return r.buildDBService(db)
-	default:
-		msg := "Failed to recognize type of object" + kind + " into the Namespace " + db.Namespace
-		panic(msg)
-	}
-}
-
 // Reconcile reads that state of the cluster for a Postgresql object and makes changes based on the state read
 // and what is in the Postgresql.Spec
 // Note:
@@ -125,77 +75,93 @@ func (r *ReconcilePostgresql) buildFactory(db *v1alpha1.Postgresql, kind string,
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling PostgreSQL Database")
+	reqLogger.Info("Reconciling Postgresql ...")
 
-	// Fetch the PostgreSQL DB
-	db := &v1alpha1.Postgresql{}
-	db, err := r.fetchDBInstance(reqLogger, request)
+	db, err := r.fetchPostgreSQLCR(request)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get PostgreSQL Custom Resource")
+		reqLogger.Error(err, "Failed to get the Postgresql Custom Resource. Check if the Backup CR is applied in the cluster")
 		return reconcile.Result{}, err
 	}
 
 	// Add const values for mandatory specs
 	addMandatorySpecsDefinitions(db)
 
-	// Check if deployment for the app exist, if not create one
-	dep, err := r.fetchDBDeployment(reqLogger, db)
-	if err != nil {
-		// Create the deployment
-		if err := r.create(db, deployment, reqLogger); err != nil {
-			return reconcile.Result{}, err
-		}
-		return reconcile.Result{Requeue: true}, nil
-	}
-
-	// Check if service for the app exist, if not create one
-	if _, err := r.fetchDBService(reqLogger, db); err != nil {
-		if err := r.create(db, service, reqLogger); err != nil {
-			return reconcile.Result{}, err
-		}
-	}
-
-	// Check if PersistentVolumeClaim for the app exist, if not create one
-	if _, err := r.fetchDBPersistentVolumeClaim(reqLogger, db); err != nil {
-		if err := r.create(db, pvc, reqLogger); err != nil {
-			return reconcile.Result{}, err
-		}
-	}
-
-	// Ensure the deployment size is the same as the spec
-	reqLogger.Info("Ensuring the PostgreSQL Database deployment size is the same as the spec")
-	size := db.Spec.Size
-	if *dep.Spec.Replicas != size {
-		// Set the number of Replicas spec in the CR
-		dep.Spec.Replicas = &size
-		// Update
-		if err := r.update(dep, reqLogger); err != nil {
-			return reconcile.Result{}, err
-		}
-	}
-
-	// Update status for deployment
-	deploymentStatus, err := r.updateDeploymentStatus(reqLogger, request)
-	if err != nil {
+	// Create mandatory objects for the Backup
+	if err := r.createUpdateSecondaryResources(db); err != nil {
+		reqLogger.Error(err, "Failed to create and update the secondary resources required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
-	// Update status for service
-	serviceStatus, err := r.updateServiceStatus(reqLogger, request)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for pvc
-	pvcStatus, err := r.updatePvcStatus(reqLogger, request)
-	if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Update status for DB
-	if err := r.updateDBStatus(reqLogger, deploymentStatus, serviceStatus, pvcStatus, request); err != nil {
+	// Update the CR status for the primary resource
+	if err := r.createUpdateCRStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create and update the status in the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
 	return reconcile.Result{}, nil
+}
+
+//createUpdateCRStatus will create and update the status in the CR applied in the cluster
+func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) error {
+	dep, err := r.updateDeploymentStatus(request)
+	if err != nil {
+		return err
+	}
+
+	service, err := r.updateServiceStatus(request)
+	if err != nil {
+		return err
+	}
+
+	pvc, err := r.updatePvcStatus(request)
+	if err != nil {
+		return err
+	}
+
+	if err := r.updateDBStatus(dep, service, pvc, request); err != nil {
+		return err
+	}
+	return nil
+}
+
+//createUpdateSecondaryResources will create and update the secondary resources which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcilePostgresql) createUpdateSecondaryResources(db *v1alpha1.Postgresql) error {
+	// Check if deployment for the app exist, if not create one
+	dep, err := r.fetchDBDeployment(db)
+	if err != nil {
+		if err := r.client.Create(context.TODO(), buildDBDeployment(db, r.scheme)); err != nil {
+			return err
+		}
+	}
+
+	// Check if service for the app exist, if not create one
+	if _, err := r.fetchDBService(db); err != nil {
+		if err := r.client.Create(context.TODO(), buildDBService(db, r.scheme)); err != nil {
+			return err
+		}
+	}
+
+	// Check if PersistentVolumeClaim for the app exist, if not create one
+	if _, err := r.fetchDBPersistentVolumeClaim(db); err != nil {
+		if err := r.client.Create(context.TODO(), buildPVCForDB(db, r.scheme)); err != nil {
+			return err
+		}
+	}
+
+	// get the latest version of db deployment
+	dep, err = r.fetchDBDeployment(db)
+	if err != nil {
+		return err
+	}
+
+	// Ensure the deployment size is the same as the spec
+	size := db.Spec.Size
+	if *dep.Spec.Replicas != size {
+		// Set the number of Replicas spec in the CR
+		dep.Spec.Replicas = &size
+		if err := r.client.Update(context.TODO(), dep); err != nil {
+			return err
+		}
+	}
+	return nil
 }
