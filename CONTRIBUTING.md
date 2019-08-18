@@ -32,7 +32,7 @@ not already exist.
 * Push your changes to a topic branch in your fork of the repository.
 * Submit a pull request to the repository of this project and choose branch you want to patch
  (usually master).
-* Advanced users may want to install the https://hub.github.com/[GitHub CLI]
+* Advanced users may want to install the [GitHub CLI]( https://hub.github.com/)
 and use the `hub pull-request` command.
 * Update your ISSUE ticket to mark that you have submitted code and are ready
 for it to be reviewed (Link the PR on it).
