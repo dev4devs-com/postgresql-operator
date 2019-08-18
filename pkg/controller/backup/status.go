@@ -19,21 +19,22 @@ func (r *ReconcileBackup) updateBackupStatus(request reconcile.Request) error {
 		return err
 	}
 
+	statusMsgUpdate := statusOk
 	// Check if all required resources were created and found
 	if err := r.isAllCreated(bkp); err != nil {
-		return err
+		statusMsgUpdate = err.Error()
 	}
 
 	// Check if BackupStatus was changed, if yes update it
-	if err := r.insertUpdateBackupStatus(bkp); err != nil {
+	if err := r.insertUpdateBackupStatus(bkp, statusMsgUpdate); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Check if BackupStatus was changed, if yes update it
-func (r *ReconcileBackup) insertUpdateBackupStatus(bkp *v1alpha1.Backup) error {
-	if !reflect.DeepEqual(statusOk, bkp.Status.BackupStatus) {
+func (r *ReconcileBackup) insertUpdateBackupStatus(bkp *v1alpha1.Backup, statusMsgUpdate string) error {
+	if !reflect.DeepEqual(statusMsgUpdate, bkp.Status.BackupStatus) {
 		bkp.Status.BackupStatus = statusOk
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
@@ -286,13 +287,13 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 
 	// Check if was possible found the DB Pod
 	if !r.isDbPodFound() {
-		err := fmt.Errorf("Unable to set OK Status for Backup. The postgresql pod was not found")
+		err := fmt.Errorf("Error: PostgreSQL Pod is missing")
 		return err
 	}
 
 	// Check if was possible found the DB Service
 	if !r.isDbServiceFound() {
-		err := fmt.Errorf("Unable to set OK Status for Backup. The postgresql database service was not found")
+		err := fmt.Errorf("Error: PostgreSQL Service is missing")
 		return err
 	}
 
@@ -300,22 +301,26 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	dbSecretName := dbSecretPrefix + bkp.Name
 	_, err := r.fetchSecret(bkp.Namespace, dbSecretName)
 	if err != nil {
-		err = fmt.Errorf("Unable to set OK Status for Backup. The DB Secret name %v was not found", dbSecretName)
+		err = fmt.Errorf("Error: DB Secret is missing. (%v)", dbSecretName)
 		return err
 	}
 
 	// Check if AWS secret was created
-	_, err = r.fetchSecret(getAwsSecretNamespace(bkp), getAWSSecretName(bkp))
+	awsSecretName:= getAwsSecretNamespace(bkp)
+	awsSecretNamespace:= getAWSSecretName(bkp)
+	_, err = r.fetchSecret(awsSecretNamespace, awsSecretName)
 	if err != nil {
-		err := fmt.Errorf("Unable to set OK Status for Backup. The AWS Secret name %v in the namespace %v was not found", getAWSSecretName(bkp), getAwsSecretNamespace(bkp))
+		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)",awsSecretName, awsSecretNamespace)
 		return err
 	}
 
 	// Check if Enc secret was created (if was configured to be used)
 	if isEncryptionKeyOptionConfig(bkp) {
-		_, err := r.fetchSecret(getEncSecretNamespace(bkp), getEncSecretName(bkp))
+		encSecretName := getEncSecretName(bkp)
+		encSecretNamespace := getEncSecretNamespace(bkp)
+		_, err := r.fetchSecret(encSecretNamespace, encSecretName)
 		if err != nil {
-			err := fmt.Errorf("Unable to set OK Status for Backup. The Encript Key configured was not found")
+			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace )
 			return err
 		}
 	}
@@ -323,7 +328,7 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	//check if the cronJob was created
 	_, err = r.fetchCronJob(bkp)
 	if err != nil {
-		err := fmt.Errorf("Unable to set OK Status for Backup. The CronJob was not found")
+		err := fmt.Errorf("Error: CronJob is missing")
 		return err
 	}
 

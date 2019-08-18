@@ -19,21 +19,22 @@ func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
 		return err
 	}
 
+	statusMsgUpdate := statusOk
 	// Check if all required resources were created and found
 	if err := r.isAllCreated(db); err != nil {
-		return err
+		statusMsgUpdate = err.Error()
 	}
 
 	// Check if BackupStatus was changed, if yes update it
-	if err := r.insertUpdateDatabaseStatus(db); err != nil {
+	if err := r.insertUpdateDatabaseStatus(db, statusMsgUpdate); err != nil {
 		return err
 	}
 	return nil
 }
 
 // Check if DatabaseStatus was changed, if yes update it
-func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql) error {
-	if !reflect.DeepEqual(statusOk, db.Status.DatabaseStatus) {
+func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql, statusMsgUpdate string) error {
+	if !reflect.DeepEqual(statusMsgUpdate, db.Status.DatabaseStatus) {
 		db.Status.DatabaseStatus = statusOk
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
 			return err
@@ -137,19 +138,19 @@ func (r *ReconcilePostgresql) isAllCreated(db *v1alpha1.Postgresql) error {
 	// Check if the PersistentVolumeClaim was created
 	_, err := r.fetchDBPvc(db)
 	if err != nil {
-		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The PVC was not found")
+		err = fmt.Errorf("Error: PersistentVolumeClaim is missing.")
 	}
 
 	// Check if the Deployment was created
 	_, err = r.fetchDBDeployment(db)
 	if err != nil {
-		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The Deployment was not found")
+		err = fmt.Errorf("Error: Deployment is missing.")
 	}
 
 	// Check if the Service was created
 	_, err = r.fetchDBService(db)
 	if err != nil {
-		err = fmt.Errorf("Unable to set OK Status for PostgreSQL Database. The Service was not found")
+		err = fmt.Errorf("Error: Service is missing.")
 	}
 
 	return nil

@@ -71,7 +71,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Should return error when not found aws secret",
+			name: "Should update status when the was was not found",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
@@ -87,10 +87,10 @@ func TestUpdateBackupStatus(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
-			name: "Should return error when not found the cronjob",
+			name: "Should update status when the cronjob was not found",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
@@ -106,7 +106,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
