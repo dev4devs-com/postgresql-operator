@@ -306,11 +306,11 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	}
 
 	// Check if AWS secret was created
-	awsSecretName:= getAwsSecretNamespace(bkp)
-	awsSecretNamespace:= getAWSSecretName(bkp)
+	awsSecretName := getAwsSecretNamespace(bkp)
+	awsSecretNamespace := getAWSSecretName(bkp)
 	_, err = r.fetchSecret(awsSecretNamespace, awsSecretName)
 	if err != nil {
-		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)",awsSecretName, awsSecretNamespace)
+		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)", awsSecretName, awsSecretNamespace)
 		return err
 	}
 
@@ -320,7 +320,7 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 		encSecretNamespace := getEncSecretNamespace(bkp)
 		_, err := r.fetchSecret(encSecretNamespace, encSecretName)
 		if err != nil {
-			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace )
+			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace)
 			return err
 		}
 	}

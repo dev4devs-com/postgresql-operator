@@ -20,7 +20,7 @@ func buildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam),
+					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam),
 				},
 			},
 		}
@@ -42,7 +42,7 @@ func buildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam),
+					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam),
 				},
 			},
 		}
@@ -64,7 +64,7 @@ func buildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam),
+					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam),
 				},
 			},
 		}
