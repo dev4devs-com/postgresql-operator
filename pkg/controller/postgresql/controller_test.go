@@ -2,7 +2,8 @@ package postgresql
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"testing"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -60,6 +61,14 @@ func TestReconcilePostgresql(t *testing.T) {
 			wantDeployment: true,
 			wantService:    true,
 			wantPVC:        true,
+		},
+		{
+			name:           "Should fail because is missing the instance",
+			wantErr:        true,
+			wantRequeue:    false,
+			wantDeployment: false,
+			wantService:    false,
+			wantPVC:        false,
 		},
 	}
 	for _, tt := range tests {
@@ -153,7 +162,7 @@ func TestReconcilePostgresql_EnsureReplicasSizeInstance(t *testing.T) {
 		t.Fatalf("reconcile: (%v)", err)
 	}
 
-	dep, err := r.fetchDBDeployment(&dbInstanceWithoutSpec)
+	dep, err := service.FetchDeployment(dbInstanceWithoutSpec.Name, dbInstanceWithoutSpec.Namespace, r.client)
 	if err != nil {
 		t.Fatalf("get deployment: (%v)", err)
 	}

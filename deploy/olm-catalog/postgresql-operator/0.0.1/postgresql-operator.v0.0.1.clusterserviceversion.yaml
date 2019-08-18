@@ -2,11 +2,6 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    categories: "Database"
-    containerImage: quay.io/dev4devs-com/postgresql-operator:0.0.2
-    support: Dev4Devs, Inc.
-    repository: https://github.com/dev4devs-com/postgresql-operator
-    createdAt: 2019-08-18T08:00:00Z
     alm-examples: |-
       [
         {
@@ -17,16 +12,9 @@ metadata:
           },
           "spec": {
             "awsAccessKeyId": "example-awsAccessKeyId",
-            "awsCredentialsSecretName": "example-awsCredentialsSecretName",
-            "awsCredentialsSecretNamespace": "example-awsCredentialsSecretNamespace",
             "awsS3BucketName": "example-awsS3BucketName",
             "awsSecretAccessKey": "example-awsSecretAccessKey",
             "databaseVersion": "9.6",
-            "encryptionKeySecretName": "example-encryptionKeySecretName",
-            "encryptionKeySecretNamespace": "example-encryptionKeySecretNamespace",
-            "gpgEmail": "email@gmai.com",
-            "gpgPublicKey": "example-gpgPublicKey",
-            "gpgTrustModel": "always",
             "image": "quay.io/integreatly/backup-container:1.0.8",
             "productName": "postgresql",
             "schedule": "0 0 * * *"
@@ -56,6 +44,11 @@ metadata:
         }
       ]
     capabilities: Full Lifecycle
+    categories: Database
+    containerImage: quay.io/dev4devs-com/postgresql-operator:0.0.2
+    createdAt: "2019-08-18T08:00:00Z"
+    repository: https://github.com/dev4devs-com/postgresql-operator
+    support: Dev4Devs, Inc.
   name: postgresql-operator.v0.0.1
   namespace: placeholder
 spec:
@@ -102,8 +95,8 @@ spec:
           - serviceaccounts
           - rolebindings
           - pods
-          - services
-          - services/finalizers
+          - service
+          - service/finalizers
           - endpoints
           - persistentvolumeclaims
           - events
@@ -218,10 +211,7 @@ spec:
   - backup
   - PostgreSQL
   labels:
-    operated-by: postgresqloperator
-  selector:
-    matchLabels:
-      operated-by: postgresqloperator
+    operated-by: postgresql-operator
   links:
   - name: Documentation
     url: https://github.com/dev4devs-com/postgresql-operator/blob/master/README.adoc
@@ -233,4 +223,7 @@ spec:
   maturity: alpha
   provider:
     name: Dev4Devs.com
+  selector:
+    matchLabels:
+      operated-by: postgresql-operator
   version: 0.0.1

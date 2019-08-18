@@ -1,7 +1,8 @@
-package postgresql
+package resource
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	corev1 "k8s.io/api/core/v1"
@@ -11,8 +12,8 @@ import (
 )
 
 // Returns the service object for the PostgreSQL
-func buildDBService(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.Service {
-	ls := getDBLabels(db.Name)
+func NewPostgresqlService(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.Service {
+	ls := utils.GetLabels(db.Name)
 	ser := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      db.Name,

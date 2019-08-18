@@ -15,6 +15,9 @@ type BackupSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
+	// Name of the PostgreSQL CR applied which this backup will work with
+	PostgresqlCRName string `json:"postgresqlCRName,omitempty"`
+
 	// Schedule period for the CronJob  "0 0 * * *" # daily at 00:00.
 	Schedule string `json:"schedule,omitempty"`
 
@@ -47,11 +50,11 @@ type BackupSpec struct {
 	// Name of the namespace where the scret with the AWS data credentials is in the cluster
 	AwsCredentialsSecretNamespace string `json:"awsCredentialsSecretNamespace,omitempty"`
 
-	// Name of the secret with the EncryptionKey data already created in the cluster
-	EncryptionKeySecretName string `json:"encryptionKeySecretName,omitempty"`
+	// Name of the secret with the EncryptKey data already created in the cluster
+	EncryptKeySecretName string `json:"encryptKeySecretName,omitempty"`
 
-	// Name of the namespace where the secret with the EncryptionKey data is in the cluster
-	EncryptionKeySecretNamespace string `json:"encryptionKeySecretNamespace,omitempty"`
+	// Name of the namespace where the secret with the EncryptKey data is in the cluster
+	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace,omitempty"`
 
 	// GPG public key to create the EncryptionKeySecret with this data
 	// See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key

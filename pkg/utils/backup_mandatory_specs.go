@@ -1,15 +1,15 @@
-package backup
+package utils
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/config"
 )
 
 var defaultBackupConfig = config.NewDefaultBackupConfig()
 
-// addMandatorySpecsDefinitions will add the specs which are mandatory for Backup CR in the case them
+// AddBackupMandatorySpecs will add the specs which are mandatory for Backup CR in the case them
 // not be applied
-func addMandatorySpecsDefinitions(bkp *v1alpha1.Backup) {
+func AddBackupMandatorySpecs(bkp *v1alpha1.Backup) {
 
 	/*
 		 Backup Container
@@ -19,6 +19,10 @@ func addMandatorySpecsDefinitions(bkp *v1alpha1.Backup) {
 
 	if bkp.Spec.Schedule == "" {
 		bkp.Spec.Schedule = defaultBackupConfig.Schedule
+	}
+
+	if bkp.Spec.PostgresqlCRName == "" {
+		bkp.Spec.PostgresqlCRName = defaultBackupConfig.PostgresqlCRName
 	}
 
 	if bkp.Spec.Image == "" {

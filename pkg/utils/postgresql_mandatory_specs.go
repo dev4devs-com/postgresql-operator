@@ -1,15 +1,15 @@
-package postgresql
+package utils
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/config"
 )
 
 var defaultPostgreSQLConfig = config.NewPostgreSQLConfig()
 
-// addMandatorySpecsDefinitions will add the specs which are mandatory for PostgreSQL CR in the case them
+// AddPostgresqlMandatorySpecs will add the specs which are mandatory for PostgreSQL CR in the case them
 // not be applied
-func addMandatorySpecsDefinitions(db *v1alpha1.Postgresql) {
+func AddPostgresqlMandatorySpecs(db *v1alpha1.Postgresql) {
 
 	/*
 	   CR DB Resource

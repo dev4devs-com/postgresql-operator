@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -23,8 +23,8 @@ var (
 
 	awsSecretWithMadatorySpec = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getAWSSecretName(&bkpInstanceWithMandatorySpec),
-			Namespace: getAwsSecretNamespace(&bkpInstanceWithMandatorySpec),
+			Name:      utils.GetAWSSecretName(&bkpInstanceWithMandatorySpec),
+			Namespace: utils.GetAwsSecretNamespace(&bkpInstanceWithMandatorySpec),
 		},
 	}
 
@@ -37,7 +37,7 @@ var (
 
 	dbSecretWithMadatorySpec = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      dbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
+			Name:      utils.DbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
 			Namespace: bkpInstanceWithMandatorySpec.Namespace,
 		},
 	}
@@ -52,8 +52,8 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.BackupSpec{
-			EncryptionKeySecretName:       "enc-secret-test",
-			EncryptionKeySecretNamespace:  "postgresql",
+			EncryptKeySecretName:          "enc-secret-test",
+			EncryptKeySecretNamespace:     "postgresql",
 			AwsCredentialsSecretName:      "aws-secret-test",
 			AwsCredentialsSecretNamespace: "postgresql",
 		},
@@ -61,8 +61,8 @@ var (
 
 	awsSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getAWSSecretName(&bkpInstanceWithSecretNames),
-			Namespace: getAwsSecretNamespace(&bkpInstanceWithSecretNames),
+			Name:      utils.GetAWSSecretName(&bkpInstanceWithSecretNames),
+			Namespace: utils.GetAwsSecretNamespace(&bkpInstanceWithSecretNames),
 		},
 	}
 
@@ -75,14 +75,14 @@ var (
 
 	encSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getEncSecretName(&bkpInstanceWithSecretNames),
-			Namespace: getEncSecretNamespace(&bkpInstanceWithSecretNames),
+			Name:      utils.GetEncSecretName(&bkpInstanceWithSecretNames),
+			Namespace: utils.GetEncSecretNamespace(&bkpInstanceWithSecretNames),
 		},
 	}
 
 	dbSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      dbSecretPrefix + bkpInstanceWithSecretNames.Name,
+			Name:      utils.DbSecretPrefix + bkpInstanceWithSecretNames.Name,
 			Namespace: bkpInstanceWithSecretNames.Namespace,
 		},
 	}
@@ -104,10 +104,8 @@ var (
 	}
 
 	/**
-	Mock of PostgreSQL resources
+	Mock of PostgreSQL resource
 	*/
-
-	lsDB = map[string]string{"app": "postgresql", "postgresql_cr": dbInstanceWithoutSpec.Name}
 
 	dbInstanceWithoutSpec = v1alpha1.Postgresql{
 		ObjectMeta: metav1.ObjectMeta{
@@ -120,7 +118,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-test",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
@@ -178,7 +176,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-test",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithConfigMap.Name),
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
@@ -197,7 +195,7 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameParam, dbInstanceWithConfigMap.Spec.DatabaseNameParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameParam, dbInstanceWithConfigMap.Spec.DatabaseNameParam),
 							},
 						},
 					},
@@ -208,7 +206,7 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserParam, dbInstanceWithConfigMap.Spec.DatabaseUserParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserParam, dbInstanceWithConfigMap.Spec.DatabaseUserParam),
 							},
 						},
 					},
@@ -219,7 +217,7 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordParam, dbInstanceWithConfigMap.Spec.DatabasePasswordParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordParam, dbInstanceWithConfigMap.Spec.DatabasePasswordParam),
 							},
 						},
 					},
@@ -272,7 +270,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 	}
 
@@ -300,15 +298,39 @@ var (
 		},
 	}
 
-	configMapOtherKeyValuesInvalidKeys = corev1.ConfigMap{
+	configMapInvalidDatabaseKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			"PGDATABASE": "dbname",
-			"DBPASSWORD": "root",
-			"DBUSER":     "root",
+			"invalid": "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseUserParam:     "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+		},
+	}
+
+	configMapInvalidUserKey = corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "config-otherkeys",
+			Namespace: "postgresql",
+		},
+		Data: map[string]string{
+			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			"invalid": "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+		},
+	}
+
+	configMapInvalidPwdKey = corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "config-otherkeys",
+			Namespace: "postgresql",
+		},
+		Data: map[string]string{
+			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseUserParam: "root",
+			"invalid": "root",
 		},
 	}
 

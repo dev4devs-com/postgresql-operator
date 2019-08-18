@@ -71,7 +71,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Should return error when not found aws secret",
+			name: "Should update status when the was was not found",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
@@ -87,10 +87,10 @@ func TestUpdateBackupStatus(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
-			name: "Should return error when not found the cronjob",
+			name: "Should update status when the cronjob was not found",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
@@ -106,7 +106,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 					},
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -411,7 +411,6 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 	}
 	type args struct {
 		request reconcile.Request
-		pod     corev1.Pod
 	}
 	tests := []struct {
 		name    string
@@ -431,7 +430,6 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 						Namespace: bkpInstanceWithMandatorySpec.Namespace,
 					},
 				},
-				pod: corev1.Pod{},
 			},
 			wantErr: false,
 		},
@@ -461,7 +459,7 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			err := r.updatePodDatabaseFoundStatus(tt.args.request, &tt.args.pod)
+			err := r.updatePodDatabaseFoundStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdatePodDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -530,7 +528,7 @@ func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			err := r.updateServiceDatabaseFoundStatus(tt.args.request)
+			err := r.updateServiceDbServiceFoundStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateServiceDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return

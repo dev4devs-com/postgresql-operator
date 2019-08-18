@@ -2,7 +2,8 @@ package backup
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -45,14 +46,56 @@ func TestReconcileBackup(t *testing.T) {
 			wantCronJob:   true,
 		},
 		{
-			name: "Should fail with wrong key values mapped",
+			name: "Should fail with wrong database name key mapped when it will build the db data secret",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
 					&dbInstanceWithConfigMap,
 					&podDatabaseConfigMap,
 					&serviceDatabase,
-					&configMapOtherKeyValuesInvalidKeys,
+					&configMapInvalidDatabaseKey,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail with wrong database user key mapped when it will build the db data secret",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithMandatorySpec,
+					&dbInstanceWithConfigMap,
+					&podDatabaseConfigMap,
+					&serviceDatabase,
+					&configMapInvalidUserKey,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail with wrong database pwd key mapped when it will build the db data secret",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithMandatorySpec,
+					&dbInstanceWithConfigMap,
+					&podDatabaseConfigMap,
+					&serviceDatabase,
+					&configMapInvalidPwdKey,
 				},
 			},
 			args: args{
@@ -73,7 +116,7 @@ func TestReconcileBackup(t *testing.T) {
 					&dbInstanceWithConfigMapAndCustomizeKeys,
 					&podDatabaseConfigMap,
 					&serviceDatabase,
-					&configMapOtherKeyValuesInvalidKeys,
+					&configMapInvalidDatabaseKey,
 				},
 			},
 			args: args{
@@ -129,6 +172,50 @@ func TestReconcileBackup(t *testing.T) {
 			wantDBSecret:  true,
 			wantEncSecret: true,
 			wantCronJob:   true,
+		},
+		{
+			name: "Should fail when the aws secret informed by the user do not exist",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithSecretNames,
+					&dbInstanceWithoutSpec,
+					&podDatabase,
+					&serviceDatabase,
+					&encSecretWithSecretNames,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithSecretNames,
+			},
+
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  true,
+			wantEncSecret: true,
+			wantCronJob:   true,
+		},
+		{
+			name: "Should fail when the enc secret informed by the user do not exist",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithSecretNames,
+					&dbInstanceWithoutSpec,
+					&podDatabase,
+					&serviceDatabase,
+					&awsSecretWithSecretNames,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithSecretNames,
+			},
+
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: true,
+			wantDBSecret:  true,
+			wantEncSecret: false,
+			wantCronJob:   false,
 		},
 		{
 			name: "Should fail when it is missing the pod database",
@@ -207,6 +294,33 @@ func TestReconcileBackup(t *testing.T) {
 			wantEncSecret: false,
 			wantCronJob:   false,
 		},
+		{
+			name: "Should fail because is missing the PostgreSQL CR",
+			fields: fields{
+				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail because is missing the Backup CR",
+			fields: fields{
+				objs: []runtime.Object{&dbInstanceWithoutSpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -228,21 +342,21 @@ func TestReconcileBackup(t *testing.T) {
 			}
 
 			awsSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: getAWSSecretName(&tt.args.bkpInstance), Namespace: getAwsSecretNamespace(&tt.args.bkpInstance)}, awsSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetAWSSecretName(&tt.args.bkpInstance), Namespace: utils.GetAwsSecretNamespace(&tt.args.bkpInstance)}, awsSecret)
 			if (err == nil) != tt.wantAwsSecret {
 				t.Errorf("TestReconcileBackup to get aws secret error = %v, wantErr %v", err, tt.wantAwsSecret)
 				return
 			}
 
 			dbSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: dbSecretPrefix + tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, dbSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.DbSecretPrefix + tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, dbSecret)
 			if (err == nil) != tt.wantDBSecret {
 				t.Errorf("TestReconcileBackup to get db secret error = %v, wantErr %v", err, tt.wantDBSecret)
 				return
 			}
 
 			encSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: getEncSecretName(&tt.args.bkpInstance), Namespace: getEncSecretNamespace(&tt.args.bkpInstance)}, encSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetEncSecretName(&tt.args.bkpInstance), Namespace: utils.GetEncSecretNamespace(&tt.args.bkpInstance)}, encSecret)
 			if (err == nil) != tt.wantEncSecret {
 				t.Errorf("TestReconcileBackup to get enc secret error = %v, wantErr %v", err, tt.wantEncSecret)
 				return

@@ -19,8 +19,8 @@ rules:
   - serviceaccounts
   - rolebindings
   - pods
-  - services
-  - services/finalizers
+  - service
+  - service/finalizers
   - endpoints
   - persistentvolumeclaims
   - events

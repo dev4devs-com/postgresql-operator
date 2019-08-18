@@ -11,16 +11,16 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.Backup":           schema_pkg_apis_postgresqloperator_v1alpha1_Backup(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupSpec":       schema_pkg_apis_postgresqloperator_v1alpha1_BackupSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupStatus":     schema_pkg_apis_postgresqloperator_v1alpha1_BackupStatus(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.Postgresql":       schema_pkg_apis_postgresqloperator_v1alpha1_Postgresql(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlSpec":   schema_pkg_apis_postgresqloperator_v1alpha1_PostgresqlSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlStatus": schema_pkg_apis_postgresqloperator_v1alpha1_PostgresqlStatus(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.Backup":           schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec":       schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus":     schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.Postgresql":       schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec":   schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus": schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlStatus(ref),
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_Backup(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -35,7 +35,7 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_Backup(ref common.ReferenceCall
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -47,28 +47,35 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_Backup(ref common.ReferenceCall
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupSpec"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupStatus"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_BackupSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "BackupSpec defines the desired state of Backup",
 				Properties: map[string]spec.Schema{
+					"postgresqlCRName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name of the PostgreSQL CR applied which this backup will work with",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"schedule": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Schedule period for the CronJob  \"0 0 * * *\" # daily at 00:00.",
@@ -132,16 +139,16 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_BackupSpec(ref common.Reference
 							Format:      "",
 						},
 					},
-					"encryptionKeySecretName": {
+					"encryptKeySecretName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the secret with the EncryptionKey data already created in the cluster",
+							Description: "Name of the secret with the EncryptKey data already created in the cluster",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"encryptionKeySecretNamespace": {
+					"encryptKeySecretNamespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the namespace where the secret with the EncryptionKey data is in the cluster",
+							Description: "Name of the namespace where the secret with the EncryptKey data is in the cluster",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -174,7 +181,7 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_BackupSpec(ref common.Reference
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_BackupStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -307,7 +314,7 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_BackupStatus(ref common.Referen
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_Postgresql(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -322,7 +329,7 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_Postgresql(ref common.Reference
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -334,23 +341,23 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_Postgresql(ref common.Reference
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlSpec"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlStatus"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1.PostgresqlStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_PostgresqlSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -489,7 +496,7 @@ func schema_pkg_apis_postgresqloperator_v1alpha1_PostgresqlSpec(ref common.Refer
 	}
 }
 
-func schema_pkg_apis_postgresqloperator_v1alpha1_PostgresqlStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
