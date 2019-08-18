@@ -35,7 +35,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCal
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -250,21 +250,21 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 							Format:      "",
 						},
 					},
-					"encryptionKeySecretName": {
+					"encryptKeySecretName": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name  of the secret object with the Encryption GPG Key",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"encryptionKeySecretNamespace": {
+					"encryptKeySecretNamespace": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Namespace of the secret object with the Encryption GPG Key",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"encryptionKeySecretData": {
+					"encryptKeySecretData": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Data of the secret object with the Encryption GPG Key",
 							Type:        []string{"object"},
@@ -278,21 +278,21 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 							},
 						},
 					},
-					"hasEncryptionKey": {
+					"hasEncryptKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Boolean value which has true when it has an EncryptionKey to be used to send the backup files",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
 					},
-					"databasePodFound": {
+					"isDatabasePodFound": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Boolean value which has true when the Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
 					},
-					"databaseServiceFound": {
+					"isDatabaseServiceFound": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Boolean value which has true when the Service Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.",
 							Type:        []string{"boolean"},
@@ -306,7 +306,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"backupStatus", "cronJobName", "dbSecretName", "dbSecretData", "awsSecretName", "awsSecretData", "awsCredentialsSecretNamespace", "encryptionKeySecretName", "encryptionKeySecretNamespace", "encryptionKeySecretData", "hasEncryptionKey", "databasePodFound", "databaseServiceFound", "cronJobStatus"},
+				Required: []string{"backupStatus", "cronJobName", "dbSecretName", "dbSecretData", "awsSecretName", "awsSecretData", "awsCredentialsSecretNamespace", "encryptKeySecretName", "encryptKeySecretNamespace", "encryptKeySecretData", "hasEncryptKey", "isDatabasePodFound", "isDatabaseServiceFound", "cronJobStatus"},
 			},
 		},
 		Dependencies: []string{
@@ -329,7 +329,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.Referenc
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
 							Type:        []string{"string"},
 							Format:      "",
 						},

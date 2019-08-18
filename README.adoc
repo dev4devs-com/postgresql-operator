@@ -12,7 +12,7 @@ endif::[]
 :toc:
 :toc-placement!:
 
-= PostgreSQL Operator
+== PostgreSQL Operator
 
 ifdef::status[]
 .*Project health*
@@ -31,17 +31,23 @@ A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOper
 
 == Prerequisites
 
+The following prerequisites are just required if you would like to install it as standalone (without OLM).
+
 |===
-|https://golang.org/doc/install[Install Golang]
+|https://golang.org/doc/install[Install Golang] v1.11+
 |https://github.com/golang/go/wiki/SettingGOPATH[Ensure the $GOPATH environment variable is set]
-|https://golang.github.io/dep/docs/installation.html[Install the dep package manager]
-|https://github.com/operator-framework/operator-sdk#quick-start[Install Operator-SDK]
 |https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl[Install kubectl]
+|===
+
+The following prerequisite is just required if you would like to contribute with.
+
+|===
+|https://github.com/operator-framework/operator-sdk#quick-start[Install Operator-SDK]
 |===
 
 == Getting Started
 
-NOTE: The following steps will allow you use this project as standalone.
+NOTE: The following steps will allow you use this project as standalone (without OLM).
 
 === Cloning the repository
 
@@ -240,17 +246,17 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 +
 |===
 | *Resource*    | *Description*
-| link:./pkg/controller/postgresql/deployments.go[deployments.go]           | Define the Deployment resource of Database. (E.g container and resources definitions)
-| link:./pkg/controller/postgresql/pvs.go[pvs.go]                           | Define the PersistentVolumeClaim resource used by its Database.
-| link:./pkg/controller/postgresql/services.go[services.go]                 | Define the Service resource of Database.
+| link:./pkg/resource/deployments.go[deployments.go]           | Define the Deployment resource of Database. (E.g container and resources definitions)
+| link:./pkg/resource/pvs.go[pvs.go]                           | Define the PersistentVolumeClaim resource used by its Database.
+| link:./pkg/resource/services.go[services.go]                 | Define the Service resource of Database.
 |===
 
 * *link:./pkg/controller/backup/controller.go[Backup]*
 +
 |===
 | *Resource*    | *Description*
-| link:./pkg/controller/backup/cronjobs.go[cronjobs.go]         | Define the CronJob resources in order to do the Backup.
-| link:./pkg/controller/backup/secrets.go[secrets.go]           | Define the database and AWS secrets resources created.
+| link:./pkg/resource/cronjobs.go[cronjobs.go]         | Define the CronJob resources in order to do the Backup.
+| link:./pkg/resource/secrets.go[secrets.go]           | Define the database and AWS secrets resources created.
 |===
 
 == Administration
@@ -281,12 +287,12 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 | `awsSecretName` | Name of AWS S3 bucket secret resource used in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to AWS to send the backup .
 | `awsSecretData` | Data used to in the secret to send the backup files to the AWS S3.
 | `awsSecretDataNamespace` | Namespace where the backup image will looking for the of the Aws Secret  used.
-| `encryptionKeySecretName` | Name of the EncryptionKey used.
-| `encryptionKeySecretNamespace` | Namespace where the backup image will looking for the of the EncryptionKey used.
-| `encryptionKeySecretData` | Data used into the EncryptionKey.
-| `hasEncryptionKey` | Expected true when it was configured to use an EncryptionKey secret
-| `databasePodFound` | The value expected here is true which shows that the database pod was found.
-| `servicePodFound` | The value expected here is true which shows that the database service was found.
+| `encryptKeySecretName` | Name of the EncryptKey used.
+| `encryptKeySecretNamespace` | Namespace where the backup image will looking for the of the EncryptKey used.
+| `encryptKeySecretData` | Data used into the EncryptKey.
+| `hasEncryptionKey` | Expected true when it was configured to use an EncryptnKey secret
+| `isDatabasePodFound` | The value expected here is true which shows that the database pod was found.
+| `isDatabaseServiceFound` | The value expected here is true which shows that the database service was found.
 |===
 
 == Development
@@ -299,6 +305,8 @@ Run the following command to setup this project locally.
 ----
 $ make setup
 ----
+
+NOTE: It is using go modules o manage dependencies.
 
 === Running the operator locally
 

@@ -18,7 +18,7 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
@@ -115,16 +115,6 @@ spec:
             cronJobStatus:
               description: Status of the CronJob object
               type: object
-            databasePodFound:
-              description: Boolean value which has true when the Database Pod was
-                found in order to create the secret with the database data to allow
-                the backup image connect into it.
-              type: boolean
-            databaseServiceFound:
-              description: Boolean value which has true when the Service Database
-                Pod was found in order to create the secret with the database data
-                to allow the backup image connect into it.
-              type: boolean
             dbSecretData:
               additionalProperties:
                 type: string
@@ -135,21 +125,31 @@ spec:
               description: Name of the secret object created with the database data
                 to allow the backup image connect to the database
               type: string
-            encryptionKeySecretData:
+            encryptKeySecretData:
               additionalProperties:
                 type: string
               description: Data of the secret object with the Encryption GPG Key
               type: object
-            encryptionKeySecretName:
+            encryptKeySecretName:
               description: Name  of the secret object with the Encryption GPG Key
               type: string
-            encryptionKeySecretNamespace:
+            encryptKeySecretNamespace:
               description: Namespace of the secret object with the Encryption GPG
                 Key
               type: string
-            hasEncryptionKey:
+            hasEncryptKey:
               description: Boolean value which has true when it has an EncryptionKey
                 to be used to send the backup files
+              type: boolean
+            isDatabasePodFound:
+              description: Boolean value which has true when the Database Pod was
+                found in order to create the secret with the database data to allow
+                the backup image connect into it.
+              type: boolean
+            isDatabaseServiceFound:
+              description: Boolean value which has true when the Service Database
+                Pod was found in order to create the secret with the database data
+                to allow the backup image connect into it.
               type: boolean
           required:
           - backupStatus
@@ -159,12 +159,12 @@ spec:
           - awsSecretName
           - awsSecretData
           - awsCredentialsSecretNamespace
-          - encryptionKeySecretName
-          - encryptionKeySecretNamespace
-          - encryptionKeySecretData
-          - hasEncryptionKey
-          - databasePodFound
-          - databaseServiceFound
+          - encryptKeySecretName
+          - encryptKeySecretNamespace
+          - encryptKeySecretData
+          - hasEncryptKey
+          - isDatabasePodFound
+          - isDatabaseServiceFound
           - cronJobStatus
           type: object
   version: v1alpha1

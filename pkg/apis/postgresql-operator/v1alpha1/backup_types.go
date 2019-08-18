@@ -98,22 +98,22 @@ type BackupStatus struct {
 	AwsCredentialsSecretNamespace string `json:"awsCredentialsSecretNamespace"`
 
 	// Name  of the secret object with the Encryption GPG Key
-	EncryptionKeySecretName string `json:"encryptionKeySecretName"`
+	EncryptKeySecretName string `json:"encryptKeySecretName"`
 
 	// Namespace of the secret object with the Encryption GPG Key
-	EncryptionKeySecretNamespace string `json:"encryptionKeySecretNamespace"`
+	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace"`
 
 	// Data of the secret object with the Encryption GPG Key
-	EncryptionKeySecretData map[string]string `json:"encryptionKeySecretData"`
+	EncryptKeySecretData map[string]string `json:"encryptKeySecretData"`
 
 	// Boolean value which has true when it has an EncryptionKey to be used to send the backup files
-	HasEncryptionKey bool `json:"hasEncryptionKey"`
+	HasEncryptKey bool `json:"hasEncryptKey"`
 
 	// Boolean value which has true when the Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
-	DatabasePodFound bool `json:"databasePodFound"`
+	IsDatabasePodFound bool `json:"isDatabasePodFound"`
 
 	// Boolean value which has true when the Service Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
-	DatabaseServiceFound bool `json:"databaseServiceFound"`
+	IsDatabaseServiceFound bool `json:"isDatabaseServiceFound"`
 
 	// Status of the CronJob object
 	CronJobStatus v1beta1.CronJobStatus `json:"cronJobStatus"`

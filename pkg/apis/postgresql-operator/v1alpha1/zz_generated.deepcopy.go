@@ -102,8 +102,8 @@ func (in *BackupStatus) DeepCopyInto(out *BackupStatus) {
 			(*out)[key] = val
 		}
 	}
-	if in.EncryptionKeySecretData != nil {
-		in, out := &in.EncryptionKeySecretData, &out.EncryptionKeySecretData
+	if in.EncryptKeySecretData != nil {
+		in, out := &in.EncryptKeySecretData, &out.EncryptKeySecretData
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
