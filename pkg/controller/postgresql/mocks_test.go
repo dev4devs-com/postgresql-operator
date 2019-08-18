@@ -8,28 +8,6 @@ import (
 
 // Centralized mock objects for use in tests
 var (
-	dbInstance = v1alpha1.Postgresql{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
-		},
-		Spec: v1alpha1.PostgresqlSpec{
-			Image:                  "centos/postgresql-96-centos7",
-			Size:                   1,
-			ContainerName:          "database",
-			DatabaseNameParam:      "POSTGRESQL_DATABASE",
-			DatabasePasswordParam:  "POSTGRESQL_PASSWORD",
-			DatabaseUserParam:      "POSTGRESQL_USER",
-			DatabasePort:           5432,
-			DatabaseMemoryLimit:    "512Mi",
-			DatabaseMemoryRequest:  "512Mi",
-			DatabaseStorageRequest: "1Gi",
-			DatabaseName:           "mock-test",
-			DatabasePassword:       "postgres",
-			DatabaseUser:           "postgresql",
-		},
-	}
-
 	dbInstanceWithoutSpec = v1alpha1.Postgresql{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql",

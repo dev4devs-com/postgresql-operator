@@ -9,20 +9,15 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 func TestUpdateDBStatus(t *testing.T) {
 	type fields struct {
-		objs   []runtime.Object
-		scheme *runtime.Scheme
+		objs []runtime.Object
 	}
 	type args struct {
-		deploymentStatus *appsv1.Deployment
-		serviceStatus    *corev1.Service
-		pvcStatus        *corev1.PersistentVolumeClaim
-		request          reconcile.Request
+		request reconcile.Request
 	}
 	tests := []struct {
 		name    string
@@ -31,44 +26,17 @@ func TestUpdateDBStatus(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Should return an error when no name found",
-			fields: fields{
-				objs:   []runtime.Object{&dbInstance},
-				scheme: scheme.Scheme,
-			},
-			args: args{
-				request: reconcile.Request{
-					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
-					},
-				},
-				deploymentStatus: &appsv1.Deployment{},
-				serviceStatus:    &corev1.Service{},
-				pvcStatus:        &corev1.PersistentVolumeClaim{},
-			},
-			wantErr: true,
-		},
-		{
 			name: "Should update status",
 			fields: fields{
-				objs:   []runtime.Object{&dbInstance},
-				scheme: scheme.Scheme,
+				objs: []runtime.Object{&dbInstanceWithoutSpec},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
-				deploymentStatus: &appsv1.Deployment{
-					ObjectMeta: metav1.ObjectMeta{
-						Name: "DeploymentName",
-					},
-				},
-				serviceStatus: &corev1.Service{},
-				pvcStatus:     &corev1.PersistentVolumeClaim{},
 			},
 			wantErr: false,
 		},
@@ -78,7 +46,7 @@ func TestUpdateDBStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			if err := r.updateDBStatus(tt.args.deploymentStatus, tt.args.serviceStatus, tt.args.pvcStatus, tt.args.request); (err != nil) != tt.wantErr {
+			if err := r.updateDBStatus(tt.args.request); (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateDBStatus error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -87,8 +55,7 @@ func TestUpdateDBStatus(t *testing.T) {
 
 func TestUpdateDeploymentStatus(t *testing.T) {
 	type fields struct {
-		scheme *runtime.Scheme
-		objs   []runtime.Object
+		objs []runtime.Object
 	}
 	type args struct {
 		request reconcile.Request
@@ -103,41 +70,40 @@ func TestUpdateDeploymentStatus(t *testing.T) {
 		{
 			name: "Should not find the deployment",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs:   []runtime.Object{&dbInstance},
+				objs: []runtime.Object{&dbInstanceWithoutSpec},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: true,
-			want:    reflect.TypeOf(&appsv1.Deployment{}),
 		},
 		{
-			name: "Should find the deployment",
+			name: "Should upddate with success",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs: []runtime.Object{&dbInstance, &appsv1.Deployment{
+				objs: []runtime.Object{&dbInstanceWithoutSpec, &appsv1.Deployment{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "postgresql",
-						Namespace: "postgresql",
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
+					},
+					Status: appsv1.DeploymentStatus{
+						Replicas: 3,
 					},
 				}},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: false,
-			want:    reflect.TypeOf(&appsv1.Deployment{}),
 		},
 	}
 	for _, tt := range tests {
@@ -145,13 +111,10 @@ func TestUpdateDeploymentStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			got, err := r.updateDeploymentStatus(tt.args.request)
+			err := r.updateDeploymentStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateDeploymentStatus) error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestUpdateDeploymentStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
@@ -159,8 +122,7 @@ func TestUpdateDeploymentStatus(t *testing.T) {
 
 func TestUpdateServiceStatus(t *testing.T) {
 	type fields struct {
-		scheme *runtime.Scheme
-		objs   []runtime.Object
+		objs []runtime.Object
 	}
 	type args struct {
 		request reconcile.Request
@@ -169,47 +131,51 @@ func TestUpdateServiceStatus(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    reflect.Type
 		wantErr bool
 	}{
 		{
 			name: "Should not find the service",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs:   []runtime.Object{&dbInstance},
+				objs: []runtime.Object{&dbInstanceWithoutSpec},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: true,
-			want:    reflect.TypeOf(&corev1.Service{}),
 		},
 		{
-			name: "Should find the service",
+			name: "Should update with success",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs: []runtime.Object{&dbInstance, &corev1.Service{
+				objs: []runtime.Object{&dbInstanceWithoutSpec, &corev1.Service{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "postgresql",
-						Namespace: "postgresql",
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
+					},
+					Status: corev1.ServiceStatus{
+						LoadBalancer: corev1.LoadBalancerStatus{
+							Ingress: []corev1.LoadBalancerIngress{
+								corev1.LoadBalancerIngress{
+									IP: "test",
+								},
+							},
+						},
 					},
 				}},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: false,
-			want:    reflect.TypeOf(&corev1.Service{}),
 		},
 	}
 	for _, tt := range tests {
@@ -217,13 +183,10 @@ func TestUpdateServiceStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			got, err := r.updateServiceStatus(tt.args.request)
+			err := r.updateServiceStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateServiceStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestUpdateServiceStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}
@@ -231,8 +194,7 @@ func TestUpdateServiceStatus(t *testing.T) {
 
 func TestUpdatePVCStatus(t *testing.T) {
 	type fields struct {
-		scheme *runtime.Scheme
-		objs   []runtime.Object
+		objs []runtime.Object
 	}
 	type args struct {
 		request reconcile.Request
@@ -241,47 +203,45 @@ func TestUpdatePVCStatus(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    reflect.Type
 		wantErr bool
 	}{
 		{
 			name: "Should not find the pvc",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs:   []runtime.Object{&dbInstance},
+				objs: []runtime.Object{&dbInstanceWithoutSpec},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: true,
-			want:    reflect.TypeOf(&corev1.PersistentVolumeClaim{}),
 		},
 		{
-			name: "Should find the pvc",
+			name: "Should update with success",
 			fields: fields{
-				scheme: scheme.Scheme,
-				objs: []runtime.Object{&dbInstance, &corev1.PersistentVolumeClaim{
+				objs: []runtime.Object{&dbInstanceWithoutSpec, &corev1.PersistentVolumeClaim{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "postgresql",
 						Namespace: "postgresql",
+					},
+					Status: corev1.PersistentVolumeClaimStatus{
+						Phase: "test",
 					},
 				}},
 			},
 			args: args{
 				request: reconcile.Request{
 					NamespacedName: types.NamespacedName{
-						Name:      dbInstance.Name,
-						Namespace: dbInstance.Namespace,
+						Name:      dbInstanceWithoutSpec.Name,
+						Namespace: dbInstanceWithoutSpec.Namespace,
 					},
 				},
 			},
 			wantErr: false,
-			want:    reflect.TypeOf(&corev1.PersistentVolumeClaim{}),
 		},
 	}
 	for _, tt := range tests {
@@ -289,13 +249,10 @@ func TestUpdatePVCStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			got, err := r.updatePvcStatus(tt.args.request)
+			err := r.updatePvcStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdatePVCStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if gotType := reflect.TypeOf(got); !reflect.DeepEqual(gotType, tt.want) {
-				t.Errorf("TestUpdatePVCStatus got = %v, want %v", gotType, tt.want)
 			}
 		})
 	}

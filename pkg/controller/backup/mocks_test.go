@@ -2,25 +2,49 @@ package backup
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
+	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Centralized mock objects for use in tests
 var (
-	bkpInstance = v1alpha1.Backup{
+
+	/**
+	BKP CR using mandatory specs
+	*/
+	bkpInstanceWithMandatorySpec = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-backup",
 			Namespace: "postgresql",
 		},
-		Spec: v1alpha1.BackupSpec{
-			Image:              "quay.io/integreatly/backup-container:latest",
-			Schedule:           "0 0 * * *",
-			AwsS3BucketName:    "example-awsS3BucketName",
-			AwsAccessKeyId:     "example-awsAccessKeyId",
-			AwsSecretAccessKey: "example-awsSecretAccessKey",
+	}
+
+	awsSecretWithMadatorySpec = corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      getAWSSecretName(&bkpInstanceWithMandatorySpec),
+			Namespace: getAwsSecretNamespace(&bkpInstanceWithMandatorySpec),
 		},
 	}
+
+	cronJobWithMadatorySpec = v1beta1.CronJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bkpInstanceWithMandatorySpec.Name,
+			Namespace: bkpInstanceWithMandatorySpec.Namespace,
+		},
+	}
+
+	dbSecretWithMadatorySpec = corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      dbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
+			Namespace: bkpInstanceWithMandatorySpec.Namespace,
+		},
+	}
+
+	/**
+	BKP CR to test when the user pass the name of the secrets
+	*/
 
 	bkpInstanceWithSecretNames = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
@@ -35,6 +59,38 @@ var (
 		},
 	}
 
+	awsSecretWithSecretNames = corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      getAWSSecretName(&bkpInstanceWithSecretNames),
+			Namespace: getAwsSecretNamespace(&bkpInstanceWithSecretNames),
+		},
+	}
+
+	croJobWithSecretNames = v1beta1.CronJob{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      bkpInstanceWithSecretNames.Name,
+			Namespace: bkpInstanceWithSecretNames.Namespace,
+		},
+	}
+
+	encSecretWithSecretNames = corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      getEncSecretName(&bkpInstanceWithSecretNames),
+			Namespace: getEncSecretNamespace(&bkpInstanceWithSecretNames),
+		},
+	}
+
+	dbSecretWithSecretNames = corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      dbSecretPrefix + bkpInstanceWithSecretNames.Name,
+			Namespace: bkpInstanceWithSecretNames.Namespace,
+		},
+	}
+
+	/**
+	BKP CR to test when the user pass the secret data
+	*/
+
 	bkpInstanceWithEncSecretData = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-backup",
@@ -47,26 +103,11 @@ var (
 		},
 	}
 
-	bkpInstanceNonDefaultNamespace = v1alpha1.Backup{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-db-backup",
-			Namespace: "postgresql-namespace",
-		},
-		Spec: v1alpha1.BackupSpec{
-			Image:              "quay.io/integreatly/backup-container:latest",
-			Schedule:           "0 0 * * *",
-			AwsS3BucketName:    "example-awsS3BucketName",
-			AwsAccessKeyId:     "example-awsAccessKeyId",
-			AwsSecretAccessKey: "example-awsSecretAccessKey",
-		},
-	}
+	/**
+	Mock of PostgreSQL resources
+	*/
 
-	bkpInstanceWithoutSpec = v1alpha1.Backup{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-backup",
-			Namespace: "postgresql",
-		},
-	}
+	lsDB = map[string]string{"app": "postgresql", "postgresql_cr": dbInstanceWithoutSpec.Name}
 
 	dbInstanceWithoutSpec = v1alpha1.Postgresql{
 		ObjectMeta: metav1.ObjectMeta{
@@ -74,8 +115,6 @@ var (
 			Namespace: "postgresql",
 		},
 	}
-
-	lsDB = map[string]string{"app": "postgresql", "postgresql_cr": dbInstanceWithoutSpec.Name}
 
 	podDatabase = corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -119,6 +158,22 @@ var (
 		},
 	}
 
+	dbInstanceWithConfigMap = v1alpha1.Postgresql{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "postgresql",
+			Namespace: "postgresql",
+		},
+		Spec: v1alpha1.PostgresqlSpec{
+			ConfigMapName:         "config-map-test",
+			DatabaseNameParam:     "POSTGRESQL_DATABASE",
+			DatabasePasswordParam: "POSTGRESQL_PASSWORD",
+			DatabaseUserParam:     "POSTGRESQL_USER",
+			DatabaseName:          "solution-database-name",
+			DatabasePassword:      "postgres",
+			DatabaseUser:          "postgresql",
+		},
+	}
+
 	podDatabaseConfigMap = corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-test",
@@ -127,42 +182,46 @@ var (
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
-				Image: "postgresql",
-				Name:  "postgresql",
+				Image:           dbInstanceWithConfigMap.Spec.Image,
+				Name:            dbInstanceWithConfigMap.Spec.ContainerName,
+				ImagePullPolicy: dbInstanceWithConfigMap.Spec.ContainerImagePullPolicy,
 				Ports: []corev1.ContainerPort{{
-					ContainerPort: 5000,
+					ContainerPort: dbInstanceWithConfigMap.Spec.DatabasePort,
 					Protocol:      "TCP",
 				}},
 				Env: []corev1.EnvVar{
 					corev1.EnvVar{
-						ValueFrom: &corev1.EnvVarSource{
-							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
-								LocalObjectReference: corev1.LocalObjectReference{
-									Name: configMapOtherKeyValues.Name,
-								},
-							},
-						},
 						Name: dbInstanceWithConfigMap.Spec.DatabaseNameParam,
-					},
-					corev1.EnvVar{
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name: configMapOtherKeyValues.Name,
+									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
+								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameParam, dbInstanceWithConfigMap.Spec.DatabaseNameParam),
 							},
 						},
+					},
+					corev1.EnvVar{
 						Name: dbInstanceWithConfigMap.Spec.DatabaseUserParam,
-					},
-					corev1.EnvVar{
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
-									Name: configMapOtherKeyValues.Name,
+									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
+								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserParam, dbInstanceWithConfigMap.Spec.DatabaseUserParam),
 							},
 						},
+					},
+					corev1.EnvVar{
 						Name: dbInstanceWithConfigMap.Spec.DatabasePasswordParam,
+						ValueFrom: &corev1.EnvVarSource{
+							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+								LocalObjectReference: corev1.LocalObjectReference{
+									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
+								},
+								Key: utils.GetConfigMapEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordParam, dbInstanceWithConfigMap.Spec.DatabasePasswordParam),
+							},
+						},
 					},
 					{
 						Name:  "PGDATA",
@@ -171,10 +230,40 @@ var (
 				},
 				VolumeMounts: []corev1.VolumeMount{
 					{
-						Name:      "test",
+						Name:      dbInstanceWithConfigMap.Name,
 						MountPath: "/var/lib/pgsql/data",
 					},
 				},
+				LivenessProbe: &corev1.Probe{
+					Handler: corev1.Handler{
+						Exec: &corev1.ExecAction{
+							Command: []string{
+								"/usr/libexec/check-container",
+								"'--live'",
+							},
+						},
+					},
+					FailureThreshold:    3,
+					InitialDelaySeconds: 120,
+					PeriodSeconds:       10,
+					TimeoutSeconds:      10,
+					SuccessThreshold:    1,
+				},
+				ReadinessProbe: &corev1.Probe{
+					Handler: corev1.Handler{
+						Exec: &corev1.ExecAction{
+							Command: []string{
+								"/usr/libexec/check-container",
+							},
+						},
+					},
+					FailureThreshold:    3,
+					InitialDelaySeconds: 5,
+					PeriodSeconds:       10,
+					TimeoutSeconds:      1,
+					SuccessThreshold:    1,
+				},
+				TerminationMessagePath: "/dev/termination-log",
 			}},
 		},
 	}
@@ -187,29 +276,15 @@ var (
 		},
 	}
 
-	awsSecretMock = corev1.Secret{
+	configMapDefault = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "aws-secret-test",
-			Namespace: "postgresql",
-			Labels:    lsDB,
-		},
-	}
-
-	encSecretMock = corev1.Secret{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "enc-secret-test",
-			Namespace: "postgresql",
-			Labels:    lsDB,
-		},
-	}
-
-	dbInstanceWithConfigMap = v1alpha1.Postgresql{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
+			Name:      "config-map-test",
 			Namespace: "postgresql",
 		},
-		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName: "config-otherkeys",
+		Data: map[string]string{
+			"POSTGRESQL_DATABASE": "solution-database-name",
+			"POSTGRESQL_PASSWORD": "postgres",
+			"POSTGRESQL_USER":     "postgresql",
 		},
 	}
 

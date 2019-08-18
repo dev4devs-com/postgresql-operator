@@ -2,8 +2,36 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
+    categories: "Database"
+    containerImage: quay.io/dev4devs-com/postgresql-operator:0.0.2
+    support: Dev4Devs, Inc.
+    repository: https://github.com/dev4devs-com/postgresql-operator
+    createdAt: 2019-08-18T08:00:00Z
     alm-examples: |-
       [
+        {
+          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup"
+          },
+          "spec": {
+            "awsAccessKeyId": "example-awsAccessKeyId",
+            "awsCredentialsSecretName": "example-awsCredentialsSecretName",
+            "awsCredentialsSecretNamespace": "example-awsCredentialsSecretNamespace",
+            "awsS3BucketName": "example-awsS3BucketName",
+            "awsSecretAccessKey": "example-awsSecretAccessKey",
+            "databaseVersion": "9.6",
+            "encryptionKeySecretName": "example-encryptionKeySecretName",
+            "encryptionKeySecretNamespace": "example-encryptionKeySecretNamespace",
+            "gpgEmail": "email@gmai.com",
+            "gpgPublicKey": "example-gpgPublicKey",
+            "gpgTrustModel": "always",
+            "image": "quay.io/integreatly/backup-container:1.0.8",
+            "productName": "postgresql",
+            "schedule": "0 0 * * *"
+          }
+        },
         {
           "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
           "kind": "Postgresql",
@@ -25,31 +53,27 @@ metadata:
             "image": "centos/postgresql-96-centos7",
             "size": 1
           }
-        },
-        {
-          "apiVersion": "postgresql-operator.dev4devs.com/v1alpha1",
-          "kind": "Backup",
-          "metadata": {
-            "name": "backup"
-          },
-          "spec": {
-            "awsAccessKeyId": "example-awsAccessKeyId",
-            "awsS3BucketName": "example-awsS3BucketName",
-            "awsSecretAccessKey": "example-awsSecretAccessKey",
-            "databaseVersion": "9.6",
-            "image": "quay.io/integreatly/backup-container:1.0.8",
-            "productName": "postgresql",
-            "schedule": "0 0 * * *"
-          }
         }
       ]
-    capabilities: Basic Install
+    capabilities: Full Lifecycle
   name: postgresql-operator.v0.0.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions: {}
-  description: Placeholder description
+  description: |-
+    A very flexible and customizable Operator in Go developed using the Operator Framework to package, install, configure and manage a PostgreSQL database. Also, the usage of this operator offers:
+
+    * Backup your data and sent to a AWS Storage
+    * Usage of encryption to send the data
+    * Customization of the image and version of your PostgreSQL
+    * Customization the enviroment variables keys as values that should be used with
+    * Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user, password and database name already setup for your application )
+    * Automatically manage its installation and configuration by ensuring the minimal quantity of instances that it should have
+
+    NOTE: Once the operator is installed in the cluster, you now can use enable the Backup feature.
+
+    More info: https://github.com/dev4devs-com/postgresql-operator/blob/master/README.adoc
   displayName: Postgresql Operator
   install:
     spec:
@@ -187,6 +211,26 @@ spec:
     type: MultiNamespace
   - supported: true
     type: AllNamespaces
+  keywords:
+  - postgresql
+  - postgre
+  - database
+  - backup
+  - PostgreSQL
+  labels:
+    operated-by: postgresqloperator
+  selector:
+    matchLabels:
+      operated-by: postgresqloperator
+  links:
+  - name: Documentation
+    url: https://github.com/dev4devs-com/postgresql-operator/blob/master/README.adoc
+  - name: Source
+    url: https://github.com/dev4devs-com/postgresql-operator
+  maintainers:
+  - email: dev4devs.com@gmail.com
+    name: Dev4Devs.com
   maturity: alpha
-  provider: {}
+  provider:
+    name: Dev4Devs.com
   version: 0.0.1
