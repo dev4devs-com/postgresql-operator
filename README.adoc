@@ -345,7 +345,7 @@ $ dlv debug --headless --listen=:2345 --api-version=2
 
 Then, debug the project from the IDE by using the default setup of `Go Remote` option.
 
-==== Visual Code
+==== Visual Studio Code
 
 [source,shell]
 ----
@@ -353,7 +353,7 @@ $ make setup/debug
 $ dlv --listen=:2345 --headless=true --api-version=2 exec ./build/_output/bin/postgresql-operator-local  --
 ----
 
-debug the project using the following Visual Code launch config.
+debug the project using the following Visual Studio Code launch config.
 
 [source,yaml]
 ----
