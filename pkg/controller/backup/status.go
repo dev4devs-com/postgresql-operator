@@ -140,9 +140,9 @@ func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error
 	}
 
 	// Check if the config(boolean status) was changed, if yes update it
-	if isEncryptionKeyOptionConfig != bkp.Status.HasEncryptionKey {
+	if isEncryptionKeyOptionConfig != bkp.Status.HasEncryptKey {
 
-		bkp.Status.HasEncryptionKey = isEncryptionKeyOptionConfig
+		bkp.Status.HasEncryptKey = isEncryptionKeyOptionConfig
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
 		}
@@ -155,9 +155,9 @@ func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v
 	data := covertDataSecretToString(secret)
 	if isEncryptKeyStatusEquals(secret, bkp, data) {
 
-		bkp.Status.EncryptionKeySecretName = secret.Name
-		bkp.Status.EncryptionKeySecretData = data
-		bkp.Status.EncryptionKeySecretNamespace = secret.Namespace
+		bkp.Status.EncryptKeySecretName = secret.Name
+		bkp.Status.EncryptKeySecretData = data
+		bkp.Status.EncryptKeySecretNamespace = secret.Namespace
 
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
@@ -168,7 +168,7 @@ func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v
 
 // isEncryptKeyStatusEquals return true when something related to the aws status fields change
 func isEncryptKeyStatusEquals(secret *corev1.Secret, bkp *v1alpha1.Backup, data map[string]string) bool {
-	return secret.Name != bkp.Status.EncryptionKeySecretName || secret.Namespace != bkp.Status.EncryptionKeySecretNamespace || !reflect.DeepEqual(data, bkp.Status.EncryptionKeySecretData)
+	return secret.Name != bkp.Status.EncryptKeySecretName || secret.Namespace != bkp.Status.EncryptKeySecretNamespace || !reflect.DeepEqual(data, bkp.Status.EncryptKeySecretData)
 }
 
 // covertDataSecretToString coverts data secret in []byte to map[string]string
@@ -238,8 +238,8 @@ func (r *ReconcileBackup) updatePodDatabaseFoundStatus(request reconcile.Request
 
 // insertUpdatePodDbFoundStatus will check and update the Pod Found status changed and update it
 func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) error {
-	if r.isDbPodFound() != bkp.Status.DatabasePodFound {
-		bkp.Status.DatabasePodFound = r.isDbPodFound()
+	if r.isDbPodFound() != bkp.Status.IsDatabasePodFound {
+		bkp.Status.IsDatabasePodFound = r.isDbPodFound()
 
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
@@ -264,8 +264,8 @@ func (r *ReconcileBackup) updateServiceDbServiceFoundStatus(request reconcile.Re
 
 // insertUpdatePodDbFoundStatus will check and update the Database Found status changed and update it
 func (r *ReconcileBackup) insertUpdateDbServiceFoundStatus(bkp *v1alpha1.Backup) error {
-	if r.isDbServiceFound() != bkp.Status.DatabaseServiceFound {
-		bkp.Status.DatabaseServiceFound = r.isDbServiceFound()
+	if r.isDbServiceFound() != bkp.Status.IsDatabaseServiceFound {
+		bkp.Status.IsDatabaseServiceFound = r.isDbServiceFound()
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
 		}
