@@ -35,7 +35,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCal
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -69,6 +69,13 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.Referenc
 			SchemaProps: spec.SchemaProps{
 				Description: "BackupSpec defines the desired state of Backup",
 				Properties: map[string]spec.Schema{
+					"postgresqlCRName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name of the PostgreSQL CR applied which this backup will work with",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"schedule": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Schedule period for the CronJob  \"0 0 * * *\" # daily at 00:00.",
@@ -322,7 +329,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.Referenc
 					},
 					"apiVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources",
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource",
 							Type:        []string{"string"},
 							Format:      "",
 						},

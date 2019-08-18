@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
@@ -12,15 +14,15 @@ import (
 
 const statusOk = "OK"
 
-//updateAppStatus returns error when status regards  all required resources could not be updated with OK
+//updateAppStatus returns error when status regards  all required resource could not be updated with OK
 func (r *ReconcileBackup) updateBackupStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
 	statusMsgUpdate := statusOk
-	// Check if all required resources were created and found
+	// Check if all required resource were created and found
 	if err := r.isAllCreated(bkp); err != nil {
 		statusMsgUpdate = err.Error()
 	}
@@ -45,13 +47,13 @@ func (r *ReconcileBackup) insertUpdateBackupStatus(bkp *v1alpha1.Backup, statusM
 
 // updateCronJobStatus returns error when was not possible update the CronJob status successfully
 func (r *ReconcileBackup) updateCronJobStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
 	// Check if Cronjob Name or Status was changed, if yes update it
-	cronJob, err := r.fetchCronJob(bkp)
+	cronJob, err := service.FetchCronJob(bkp.Name, bkp.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -79,12 +81,12 @@ func (r *ReconcileBackup) insertUpdateCronJobStatus(cronJob *v1beta1.CronJob, bk
 
 // updateAWSSecretStatus returns error when was not possible update the AWS status fields in the CR successfully
 func (r *ReconcileBackup) updateAWSSecretStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	aws, err := r.fetchSecret(getAwsSecretNamespace(bkp), getAWSSecretName(bkp))
+	aws, err := service.FetchSecret(utils.GetAwsSecretNamespace(bkp), utils.GetAWSSecretName(bkp), r.client)
 	if err != nil {
 		return err
 	}
@@ -119,14 +121,14 @@ func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup, data map[string]
 
 // updateAWSSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	isEncryptionKeyOptionConfig := isEncryptionKeyOptionConfig(bkp)
+	isEncryptionKeyOptionConfig := utils.IsEncryptionKeyOptionConfig(bkp)
 	if isEncryptionKeyOptionConfig {
-		secret, err := r.fetchSecret(getEncSecretNamespace(bkp), getEncSecretName(bkp))
+		secret, err := service.FetchSecret(utils.GetEncSecretNamespace(bkp), utils.GetEncSecretName(bkp), r.client)
 		if err != nil {
 			return err
 		}
@@ -189,12 +191,12 @@ func covertDataSecretToString(secret *corev1.Secret) map[string]string {
 
 // updateDBSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateDBSecretStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	dbSecret, err := r.fetchSecret(bkp.Namespace, dbSecretPrefix+bkp.Name)
+	dbSecret, err := service.FetchSecret(bkp.Namespace, utils.DbSecretPrefix+bkp.Name, r.client)
 	if err != nil {
 		return err
 	}
@@ -222,7 +224,7 @@ func (r *ReconcileBackup) insertUpdateDBSecretStatus(dbSecret *corev1.Secret, bk
 
 // updatePodDatabaseFoundStatus returns error when was not possible update the DB Pod Found status field in the CR successfully
 func (r *ReconcileBackup) updatePodDatabaseFoundStatus(request reconcile.Request) error {
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -248,8 +250,7 @@ func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) err
 
 // updateServiceDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
 func (r *ReconcileBackup) updateServiceDbServiceFoundStatus(request reconcile.Request) error {
-	// Get the latest version of the CR
-	bkp, err := r.fetchBackupCR(request)
+	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -298,27 +299,27 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	}
 
 	// Check if DB secret was created
-	dbSecretName := dbSecretPrefix + bkp.Name
-	_, err := r.fetchSecret(bkp.Namespace, dbSecretName)
+	dbSecretName := utils.DbSecretPrefix + bkp.Name
+	_, err := service.FetchSecret(bkp.Namespace, dbSecretName, r.client)
 	if err != nil {
 		err = fmt.Errorf("Error: DB Secret is missing. (%v)", dbSecretName)
 		return err
 	}
 
 	// Check if AWS secret was created
-	awsSecretName := getAwsSecretNamespace(bkp)
-	awsSecretNamespace := getAWSSecretName(bkp)
-	_, err = r.fetchSecret(awsSecretNamespace, awsSecretName)
+	awsSecretName := utils.GetAwsSecretNamespace(bkp)
+	awsSecretNamespace := utils.GetAWSSecretName(bkp)
+	_, err = service.FetchSecret(awsSecretNamespace, awsSecretName, r.client)
 	if err != nil {
 		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)", awsSecretName, awsSecretNamespace)
 		return err
 	}
 
 	// Check if Enc secret was created (if was configured to be used)
-	if isEncryptionKeyOptionConfig(bkp) {
-		encSecretName := getEncSecretName(bkp)
-		encSecretNamespace := getEncSecretNamespace(bkp)
-		_, err := r.fetchSecret(encSecretNamespace, encSecretName)
+	if utils.IsEncryptionKeyOptionConfig(bkp) {
+		encSecretName := utils.GetEncSecretName(bkp)
+		encSecretNamespace := utils.GetEncSecretNamespace(bkp)
+		_, err := service.FetchSecret(encSecretNamespace, encSecretName, r.client)
 		if err != nil {
 			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace)
 			return err
@@ -326,7 +327,7 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	}
 
 	//check if the cronJob was created
-	_, err = r.fetchCronJob(bkp)
+	_, err = service.FetchCronJob(bkp.Name, bkp.Namespace, r.client)
 	if err != nil {
 		err := fmt.Errorf("Error: CronJob is missing")
 		return err

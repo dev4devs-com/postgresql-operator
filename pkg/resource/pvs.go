@@ -1,7 +1,8 @@
-package postgresql
+package resource
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,8 +11,8 @@ import (
 )
 
 //Returns the deployment object for the PostgreSQL
-func buildPVCForDB(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.PersistentVolumeClaim {
-	ls := getDBLabels(db.Name)
+func NewPostgresqlPvc(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.PersistentVolumeClaim {
+	ls := utils.GetLabels(db.Name)
 	pv := &corev1.PersistentVolumeClaim{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      db.Name,
@@ -29,7 +30,6 @@ func buildPVCForDB(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.Pers
 			},
 		},
 	}
-	// Set PostgreSQL db as the owner and controller
 	controllerutil.SetControllerReference(db, pv, scheme)
 	return pv
 }

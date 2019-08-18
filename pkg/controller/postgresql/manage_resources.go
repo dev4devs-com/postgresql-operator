@@ -3,13 +3,14 @@ package postgresql
 import (
 	"context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"k8s.io/api/apps/v1"
 )
 
-// manageResources will ensure that the resources are with the expected values in the cluster
+// manageResources will ensure that the resource are with the expected values in the cluster
 func (r *ReconcilePostgresql) manageResources(db *v1alpha1.Postgresql) error {
 	// get the latest version of db deployment
-	dep, err := r.fetchDBDeployment(db)
+	dep, err := service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
 		return err
 	}

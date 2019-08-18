@@ -1,17 +1,12 @@
-package postgresql
+package utils
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
-	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 )
 
-func getDBLabels(name string) map[string]string {
-	return map[string]string{"app": "postgresql", "postgresql_cr": name}
-}
-
-//buildDatabaseNameEnvVar return the corev1.EnvVar object wth the key:value for the database name
-func buildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+//BuildDatabaseNameEnvVar return the corev1.EnvVar object wth the key:value for the database name
+func BuildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabaseNameParam,
@@ -20,7 +15,7 @@ func buildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam),
 				},
 			},
 		}
@@ -32,8 +27,8 @@ func buildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	}
 }
 
-//buildDatabaseUserEnvVar return the corev1.EnvVar object wth the key:value for the database user
-func buildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+//BuildDatabaseUserEnvVar return the corev1.EnvVar object wth the key:value for the database user
+func BuildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabaseUserParam,
@@ -42,7 +37,7 @@ func buildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam),
 				},
 			},
 		}
@@ -54,8 +49,8 @@ func buildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	}
 }
 
-//buildDatabasePasswordEnvVar return the corev1.EnvVar object wth the key:value for the database pwd
-func buildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+//BuildDatabasePasswordEnvVar return the corev1.EnvVar object wth the key:value for the database pwd
+func BuildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabasePasswordParam,
@@ -64,7 +59,7 @@ func buildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam),
 				},
 			},
 		}
@@ -74,4 +69,12 @@ func buildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 		Name:  db.Spec.DatabasePasswordParam,
 		Value: db.Spec.DatabasePassword,
 	}
+}
+
+//GetEnvVarKey check if the customized key is in place for the configMap and returned the valid key
+func GetEnvVarKey(cgfKey, defaultKey string) string {
+	if len(cgfKey) > 0 {
+		return cgfKey
+	}
+	return defaultKey
 }

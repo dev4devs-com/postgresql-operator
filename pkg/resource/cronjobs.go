@@ -1,7 +1,8 @@
-package backup
+package resource
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -10,13 +11,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//Returns the NewCronJob object for the PostgreSQL Backup
-func buildCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob {
+//Returns the NewBackupCronJob object for the PostgreSQL Backup
+func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob {
 	cron := &v1beta1.CronJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      bkp.Name,
 			Namespace: bkp.Namespace,
-			Labels:    getBkpLabels(bkp.Name),
+			Labels:    utils.GetLabels(bkp.Name),
 		},
 		Spec: v1beta1.CronJobSpec{
 			Schedule: bkp.Spec.Schedule,
@@ -33,23 +34,23 @@ func buildCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob
 									Env: []corev1.EnvVar{
 										{
 											Name:  "BACKEND_SECRET_NAME",
-											Value: getAWSSecretName(bkp),
+											Value: utils.GetAWSSecretName(bkp),
 										},
 										{
 											Name:  "BACKEND_SECRET_NAMESPACE",
-											Value: getAwsSecretNamespace(bkp),
+											Value: utils.GetAwsSecretNamespace(bkp),
 										},
 										{
 											Name:  "ENCRYPTION_SECRET_NAME",
-											Value: getEncSecretName(bkp),
+											Value: utils.GetEncSecretName(bkp),
 										},
 										{
 											Name:  "ENCRYPTION_SECRET_NAMESPACE",
-											Value: getEncSecretNamespace(bkp),
+											Value: utils.GetEncSecretNamespace(bkp),
 										},
 										{
 											Name:  "COMPONENT_SECRET_NAME",
-											Value: dbSecretPrefix + bkp.Name,
+											Value: utils.DbSecretPrefix + bkp.Name,
 										},
 										{
 											Name:  "COMPONENT_SECRET_NAMESPACE",
@@ -69,7 +70,6 @@ func buildCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob
 			},
 		},
 	}
-	// Set PostgreSQL db as the owner and controller
 	controllerutil.SetControllerReference(bkp, cron, scheme)
 	return cron
 }

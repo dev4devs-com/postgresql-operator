@@ -2,6 +2,10 @@ package postgresql
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
+	"k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -34,22 +38,24 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource Postgresql
-	err = c.Watch(&source.Kind{Type: &v1alpha1.Postgresql{}}, &handler.EnqueueRequestForObject{})
-	if err != nil {
+	if err := c.Watch(&source.Kind{Type: &v1alpha1.Postgresql{}}, &handler.EnqueueRequestForObject{}); err != nil {
 		return err
 	}
 
-	/** Watch for changes to secondary resources and create the owner PostgreSQL **/
+	/** Watch for changes to secondary resource and create the owner PostgreSQL **/
 
-	if err := watchDeployment(c); err != nil {
+	// Watch Deployment resource controlled and created by it
+	if err := service.Watch(c, &v1.Deployment{}, true, &v1alpha1.Postgresql{}); err != nil {
 		return err
 	}
 
-	if err := watchService(c); err != nil {
+	// Watch PersistenceVolumeClaim resource controlled and created by it
+	if err := service.Watch(c, &corev1.PersistentVolumeClaim{}, true, &v1alpha1.Postgresql{}); err != nil {
 		return err
 	}
 
-	if err := watchPersistenceVolumeClaim(c); err != nil {
+	// Watch Service resource controlled and created by it
+	if err := service.Watch(c, &corev1.Service{}, true, &v1alpha1.Postgresql{}); err != nil {
 		return err
 	}
 
@@ -76,22 +82,22 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	reqLogger.Info("Reconciling Postgresql ...")
 
-	db, err := r.fetchPostgreSQLCR(request)
+	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
 		reqLogger.Error(err, "Failed to get the Postgresql Custom Resource. Check if the Backup CR is applied in the cluster")
 		return reconcile.Result{}, err
 	}
 
 	// Add const values for mandatory specs
-	addMandatorySpecsDefinitions(db)
+	utils.AddPostgresqlMandatorySpecs(db)
 
-	if err := r.createSecondaryResources(db); err != nil {
-		reqLogger.Error(err, "Failed to create the secondary resources required for the PostgreSQL CR")
+	if err := r.createResources(db); err != nil {
+		reqLogger.Error(err, "Failed to create the secondary resource required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
 	if err := r.manageResources(db); err != nil {
-		reqLogger.Error(err, "Failed to manage resources required for the PostgreSQL CR")
+		reqLogger.Error(err, "Failed to manage resource required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
 
@@ -124,8 +130,8 @@ func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) er
 	return nil
 }
 
-//createSecondaryResources will create the secondary resources which are required in order to make works successfully the primary resource(CR)
-func (r *ReconcilePostgresql) createSecondaryResources(db *v1alpha1.Postgresql) error {
+//createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql) error {
 	// Check if deployment for the app exist, if not create one
 	if err := r.createDeployment(db); err != nil {
 		return err

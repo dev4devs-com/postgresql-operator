@@ -23,8 +23,8 @@ var (
 
 	awsSecretWithMadatorySpec = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getAWSSecretName(&bkpInstanceWithMandatorySpec),
-			Namespace: getAwsSecretNamespace(&bkpInstanceWithMandatorySpec),
+			Name:      utils.GetAWSSecretName(&bkpInstanceWithMandatorySpec),
+			Namespace: utils.GetAwsSecretNamespace(&bkpInstanceWithMandatorySpec),
 		},
 	}
 
@@ -37,7 +37,7 @@ var (
 
 	dbSecretWithMadatorySpec = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      dbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
+			Name:      utils.DbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
 			Namespace: bkpInstanceWithMandatorySpec.Namespace,
 		},
 	}
@@ -61,8 +61,8 @@ var (
 
 	awsSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getAWSSecretName(&bkpInstanceWithSecretNames),
-			Namespace: getAwsSecretNamespace(&bkpInstanceWithSecretNames),
+			Name:      utils.GetAWSSecretName(&bkpInstanceWithSecretNames),
+			Namespace: utils.GetAwsSecretNamespace(&bkpInstanceWithSecretNames),
 		},
 	}
 
@@ -75,14 +75,14 @@ var (
 
 	encSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      getEncSecretName(&bkpInstanceWithSecretNames),
-			Namespace: getEncSecretNamespace(&bkpInstanceWithSecretNames),
+			Name:      utils.GetEncSecretName(&bkpInstanceWithSecretNames),
+			Namespace: utils.GetEncSecretNamespace(&bkpInstanceWithSecretNames),
 		},
 	}
 
 	dbSecretWithSecretNames = corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      dbSecretPrefix + bkpInstanceWithSecretNames.Name,
+			Name:      utils.DbSecretPrefix + bkpInstanceWithSecretNames.Name,
 			Namespace: bkpInstanceWithSecretNames.Namespace,
 		},
 	}
@@ -104,10 +104,8 @@ var (
 	}
 
 	/**
-	Mock of PostgreSQL resources
+	Mock of PostgreSQL resource
 	*/
-
-	lsDB = map[string]string{"app": "postgresql", "postgresql_cr": dbInstanceWithoutSpec.Name}
 
 	dbInstanceWithoutSpec = v1alpha1.Postgresql{
 		ObjectMeta: metav1.ObjectMeta{
@@ -120,7 +118,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-test",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
@@ -178,7 +176,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql-test",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithConfigMap.Name),
 		},
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{{
@@ -272,7 +270,7 @@ var (
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "postgresql",
 			Namespace: "postgresql",
-			Labels:    lsDB,
+			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 	}
 

@@ -15,6 +15,9 @@ type BackupSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
+	// Name of the PostgreSQL CR applied which this backup will work with
+	PostgresqlCRName string `json:"postgresqlCRName,omitempty"`
+
 	// Schedule period for the CronJob  "0 0 * * *" # daily at 00:00.
 	Schedule string `json:"schedule,omitempty"`
 

@@ -1,7 +1,8 @@
-package postgresql
+package resource
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -11,8 +12,8 @@ import (
 )
 
 //buildDBDeployment returns the deployment object for the PostgreSQL
-func buildDBDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.Deployment {
-	ls := getDBLabels(db.Name)
+func NewPostgresqlDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.Deployment {
+	ls := utils.GetLabels(db.Name)
 	auto := true
 	replicas := db.Spec.Size
 	dep := &appsv1.Deployment{
@@ -43,9 +44,9 @@ func buildDBDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.
 							Protocol:      "TCP",
 						}},
 						Env: []corev1.EnvVar{
-							buildDatabaseNameEnvVar(db),
-							buildDatabaseUserEnvVar(db),
-							buildDatabasePasswordEnvVar(db),
+							utils.BuildDatabaseNameEnvVar(db),
+							utils.BuildDatabaseUserEnvVar(db),
+							utils.BuildDatabasePasswordEnvVar(db),
 							{
 								Name:  "PGDATA",
 								Value: "/var/lib/pgsql/data/pgdata",
@@ -113,7 +114,6 @@ func buildDBDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.
 			},
 		},
 	}
-	// Set PostgreSQL db as the owner and controller
 	controllerutil.SetControllerReference(db, dep, scheme)
 	return dep
 }

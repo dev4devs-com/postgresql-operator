@@ -18,7 +18,7 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resource'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
@@ -76,6 +76,10 @@ spec:
               type: string
             image:
               description: 'Image:tag used to do the backup. More Info: https://github.com/integr8ly/backup-container-image'
+              type: string
+            postgresqlCRName:
+              description: Name of the PostgreSQL CR applied which this backup will
+                work with
               type: string
             productName:
               description: Used to create the directory where the files will be stored

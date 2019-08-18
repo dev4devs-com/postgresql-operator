@@ -11,7 +11,6 @@ spec:
   # ---------------------------------
 
   # NOTE: Default values are applied by the operator if values are not specified below.
-
   schedule: "0 0 * * *" # daily at 00:00
   image: "quay.io/integreatly/backup-container:1.0.8"
 
@@ -67,4 +66,7 @@ spec:
   #gpgPublicKey: "example-gpgPublicKey"
   #gpgEmail: "email@gmai.com"
   #gpgTrustModel: "always"
+
+  # Use the following spec if you change the name of the Postgresql CR
+  # postgresqlCRName: "postgresql"
 

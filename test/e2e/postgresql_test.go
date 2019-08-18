@@ -87,9 +87,9 @@ func PostgreSQLCluster(t *testing.T) {
 	defer ctx.Cleanup()
 	err := ctx.InitializeClusterResources(&framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
 	if err != nil {
-		t.Fatalf("failed to initialize cluster resources: %v", err)
+		t.Fatalf("failed to initialize cluster resource: %v", err)
 	}
-	t.Log("Initialized cluster resources")
+	t.Log("Initialized cluster resource")
 	namespace, err := ctx.GetNamespace()
 	if err != nil {
 		t.Fatal(err)

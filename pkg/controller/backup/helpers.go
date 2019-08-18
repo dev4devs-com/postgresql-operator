@@ -3,18 +3,9 @@ package backup
 import (
 	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
-
-const (
-	awsSecretPrefix = "aws-"
-	dbSecretPrefix  = "db-"
-	encSecretPrefix = "encryption-"
-)
-
-func getBkpLabels(name string) map[string]string {
-	return map[string]string{"app": "postgresql", "backup_cr": name}
-}
 
 // DbSecret keep the data which will be used in the DB secret
 type DbSecret struct {
@@ -113,7 +104,7 @@ func (dt *HelperDbSecret) newErrorUnableToGetKeyFrom() error {
 // getKeyValueFromConfigMap returns the value of some key defined in the ConfigMap
 func (r *ReconcileBackup) getKeyValueFromConfigMap(dt *HelperDbSecret) string {
 	// search for ConfigMap
-	cfg, err := r.fetchConfigMap(dt.cfgName, dt.cfgNamespace)
+	cfg, err := service.FetchConfigMap(dt.cfgName, dt.cfgNamespace, r.client)
 	if err != nil {
 		return ""
 	}
@@ -152,68 +143,4 @@ func createEncDataMaps(bkp *v1alpha1.Backup) (map[string][]byte, map[string]stri
 		"GPG_TRUST_MODEL": bkp.Spec.GpgTrustModel,
 	}
 	return dataByte, dataString
-}
-
-// getAWSSecretName returns the name of the secret
-// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one in the same namespace where the backup is applied
-func getAWSSecretName(bkp *v1alpha1.Backup) string {
-	if isAwsKeySetupByName(bkp) {
-		return bkp.Spec.AwsCredentialsSecretName
-	}
-	return awsSecretPrefix + bkp.Name
-}
-
-// getAwsSecretNamespace returns the namespace where the secret is applied already
-// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one in the same namespace where the backup is applied
-func getAwsSecretNamespace(bkp *v1alpha1.Backup) string {
-	if isAwsKeySetupByName(bkp) && bkp.Spec.AwsCredentialsSecretNamespace != "" {
-		return bkp.Spec.AwsCredentialsSecretNamespace
-	}
-	return bkp.Namespace
-}
-
-// getEncSecretNamespace returns the namespace where the secret is applied already
-// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one in the same namespace where the backup is applied
-func getEncSecretNamespace(bkp *v1alpha1.Backup) string {
-	if isEncKeySetupByNameAndNamaspace(bkp) {
-		return bkp.Spec.EncryptKeySecretNamespace
-	}
-	return bkp.Namespace
-}
-
-// getEncSecretName returns the name of the secret
-// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one in the same namespace where the backup is applied
-func getEncSecretName(bkp *v1alpha1.Backup) string {
-	if isEncKeySetupByName(bkp) {
-		return bkp.Spec.EncryptKeySecretName
-	}
-	return encSecretPrefix + bkp.Name
-}
-
-// isEncryptionKeyOptionConfig returns true when the CR has the configuration to allow it be used
-func isEncryptionKeyOptionConfig(bkp *v1alpha1.Backup) bool {
-	return bkp.Spec.AwsCredentialsSecretName != "" ||
-		(bkp.Spec.GpgTrustModel != "" && bkp.Spec.GpgEmail != "" && bkp.Spec.GpgPublicKey != "")
-}
-
-// isEncKeySetupByName returns true when it is setup to get an pre-existing secret applied in the cluster.
-// NOTE: The user can just inform the name of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one
-func isEncKeySetupByName(bkp *v1alpha1.Backup) bool {
-	return bkp.Spec.EncryptKeySecretName != ""
-}
-
-// isAwsKeySetupByName returns true when it is setup to get an pre-existing secret applied in the cluster.
-// NOTE: The user can just inform the name of the Secret which is already applied in the cluster OR
-// the data required for the operator be able to create one
-func isAwsKeySetupByName(bkp *v1alpha1.Backup) bool {
-	return bkp.Spec.AwsCredentialsSecretName != ""
-}
-
-func isEncKeySetupByNameAndNamaspace(bkp *v1alpha1.Backup) bool {
-	return isEncKeySetupByName(bkp) && bkp.Spec.EncryptKeySecretNamespace != ""
 }

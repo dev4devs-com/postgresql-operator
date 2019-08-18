@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"reflect"
@@ -12,15 +13,15 @@ import (
 
 const statusOk = "OK"
 
-//updateDBStatus returns error when status regards the all required resources could not be updated
+//updateDBStatus returns error when status regards the all required resource could not be updated
 func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
-	db, err := r.fetchPostgreSQLCR(request)
+	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
 	statusMsgUpdate := statusOk
-	// Check if all required resources were created and found
+	// Check if all required resource were created and found
 	if err := r.isAllCreated(db); err != nil {
 		statusMsgUpdate = err.Error()
 	}
@@ -45,12 +46,12 @@ func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql
 
 //updateDeploymentStatus returns error when status regards the deployment resource could not be updated
 func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) error {
-	db, err := r.fetchPostgreSQLCR(request)
+	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	dep, err := r.fetchDBDeployment(db)
+	dep, err := service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -76,12 +77,12 @@ func (r *ReconcilePostgresql) insertUpdateDeploymentStatus(deploymentStatus *v1.
 
 //updateServiceStatus returns error when status regards the service resource could not be updated
 func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) error {
-	db, err := r.fetchPostgreSQLCR(request)
+	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	ser, err := r.fetchDBService(db)
+	ser, err := service.FetchService(db.Name, db.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -107,12 +108,12 @@ func (r *ReconcilePostgresql) insertUpdateServiceStatus(serviceStatus *corev1.Se
 
 // updatePvcStatus returns error when status regards the PersistentVolumeClaim resource could not be updated
 func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) error {
-	db, err := r.fetchPostgreSQLCR(request)
+	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
 
-	pvc, err := r.fetchDBPvc(db)
+	pvc, err := service.FetchPersistentVolumeClaim(db.Name, db.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -136,19 +137,19 @@ func (r *ReconcilePostgresql) insertUpdatePvcStatus(pvc *corev1.PersistentVolume
 func (r *ReconcilePostgresql) isAllCreated(db *v1alpha1.Postgresql) error {
 
 	// Check if the PersistentVolumeClaim was created
-	_, err := r.fetchDBPvc(db)
+	_, err := service.FetchPersistentVolumeClaim(db.Name, db.Namespace, r.client)
 	if err != nil {
 		err = fmt.Errorf("Error: PersistentVolumeClaim is missing.")
 	}
 
 	// Check if the Deployment was created
-	_, err = r.fetchDBDeployment(db)
+	_, err = service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
 		err = fmt.Errorf("Error: Deployment is missing.")
 	}
 
 	// Check if the Service was created
-	_, err = r.fetchDBService(db)
+	_, err = service.FetchService(db.Name, db.Namespace, r.client)
 	if err != nil {
 		err = fmt.Errorf("Error: Service is missing.")
 	}

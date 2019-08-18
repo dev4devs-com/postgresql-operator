@@ -3,6 +3,7 @@ package backup
 import (
 	"context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -341,21 +342,21 @@ func TestReconcileBackup(t *testing.T) {
 			}
 
 			awsSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: getAWSSecretName(&tt.args.bkpInstance), Namespace: getAwsSecretNamespace(&tt.args.bkpInstance)}, awsSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetAWSSecretName(&tt.args.bkpInstance), Namespace: utils.GetAwsSecretNamespace(&tt.args.bkpInstance)}, awsSecret)
 			if (err == nil) != tt.wantAwsSecret {
 				t.Errorf("TestReconcileBackup to get aws secret error = %v, wantErr %v", err, tt.wantAwsSecret)
 				return
 			}
 
 			dbSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: dbSecretPrefix + tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, dbSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.DbSecretPrefix + tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, dbSecret)
 			if (err == nil) != tt.wantDBSecret {
 				t.Errorf("TestReconcileBackup to get db secret error = %v, wantErr %v", err, tt.wantDBSecret)
 				return
 			}
 
 			encSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: getEncSecretName(&tt.args.bkpInstance), Namespace: getEncSecretNamespace(&tt.args.bkpInstance)}, encSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetEncSecretName(&tt.args.bkpInstance), Namespace: utils.GetEncSecretNamespace(&tt.args.bkpInstance)}, encSecret)
 			if (err == nil) != tt.wantEncSecret {
 				t.Errorf("TestReconcileBackup to get enc secret error = %v, wantErr %v", err, tt.wantEncSecret)
 				return
