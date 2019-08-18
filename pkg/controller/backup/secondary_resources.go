@@ -48,7 +48,9 @@ func (r *ReconcileBackup) createEncryptionKey(bkp *v1alpha1.Backup) error {
 	if isEncryptionKeyOptionConfig(bkp) {
 		if _, err := r.fetchSecret(getEncSecretNamespace(bkp), getEncSecretName(bkp)); err != nil {
 			// The user can just inform the name of the Secret which is already applied in the cluster
-			if !isEncKeySetupByName(bkp) {
+			if isEncKeySetupByName(bkp) {
+				return err
+			} else {
 				secretData, secretStringData := createEncDataMaps(bkp)
 				encSecret := buildSecret(bkp, encSecretPrefix, secretData, secretStringData, r.scheme)
 				if err := r.client.Create(context.TODO(), encSecret); err != nil {

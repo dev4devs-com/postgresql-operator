@@ -45,14 +45,56 @@ func TestReconcileBackup(t *testing.T) {
 			wantCronJob:   true,
 		},
 		{
-			name: "Should fail with wrong key values mapped",
+			name: "Should fail with wrong database name key mapped when it will build the db data secret",
 			fields: fields{
 				objs: []runtime.Object{
 					&bkpInstanceWithMandatorySpec,
 					&dbInstanceWithConfigMap,
 					&podDatabaseConfigMap,
 					&serviceDatabase,
-					&configMapOtherKeyValuesInvalidKeys,
+					&configMapInvalidDatabaseKey,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail with wrong database user key mapped when it will build the db data secret",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithMandatorySpec,
+					&dbInstanceWithConfigMap,
+					&podDatabaseConfigMap,
+					&serviceDatabase,
+					&configMapInvalidUserKey,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail with wrong database pwd key mapped when it will build the db data secret",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithMandatorySpec,
+					&dbInstanceWithConfigMap,
+					&podDatabaseConfigMap,
+					&serviceDatabase,
+					&configMapInvalidPwdKey,
 				},
 			},
 			args: args{
@@ -73,7 +115,7 @@ func TestReconcileBackup(t *testing.T) {
 					&dbInstanceWithConfigMapAndCustomizeKeys,
 					&podDatabaseConfigMap,
 					&serviceDatabase,
-					&configMapOtherKeyValuesInvalidKeys,
+					&configMapInvalidDatabaseKey,
 				},
 			},
 			args: args{
@@ -129,6 +171,50 @@ func TestReconcileBackup(t *testing.T) {
 			wantDBSecret:  true,
 			wantEncSecret: true,
 			wantCronJob:   true,
+		},
+		{
+			name: "Should fail when the aws secret informed by the user do not exist",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithSecretNames,
+					&dbInstanceWithoutSpec,
+					&podDatabase,
+					&serviceDatabase,
+					&encSecretWithSecretNames,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithSecretNames,
+			},
+
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  true,
+			wantEncSecret: true,
+			wantCronJob:   true,
+		},
+		{
+			name: "Should fail when the enc secret informed by the user do not exist",
+			fields: fields{
+				objs: []runtime.Object{
+					&bkpInstanceWithSecretNames,
+					&dbInstanceWithoutSpec,
+					&podDatabase,
+					&serviceDatabase,
+					&awsSecretWithSecretNames,
+				},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithSecretNames,
+			},
+
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: true,
+			wantDBSecret:  true,
+			wantEncSecret: false,
+			wantCronJob:   false,
 		},
 		{
 			name: "Should fail when it is missing the pod database",
@@ -200,6 +286,33 @@ func TestReconcileBackup(t *testing.T) {
 				bkpInstance: bkpInstanceWithMandatorySpec,
 			},
 
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail because is missing the PostgreSQL CR",
+			fields: fields{
+				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
+			},
+			args: args{
+				bkpInstance: bkpInstanceWithMandatorySpec,
+			},
+			wantErr:       true,
+			wantRequeue:   false,
+			wantAwsSecret: false,
+			wantDBSecret:  false,
+			wantEncSecret: false,
+			wantCronJob:   false,
+		},
+		{
+			name: "Should fail because is missing the Backup CR",
+			fields: fields{
+				objs: []runtime.Object{&dbInstanceWithoutSpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
+			},
 			wantErr:       true,
 			wantRequeue:   false,
 			wantAwsSecret: false,

@@ -61,6 +61,14 @@ func TestReconcilePostgresql(t *testing.T) {
 			wantService:    true,
 			wantPVC:        true,
 		},
+		{
+			name:           "Should fail because is missing the instance",
+			wantErr:        true,
+			wantRequeue:    false,
+			wantDeployment: false,
+			wantService:    false,
+			wantPVC:        false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

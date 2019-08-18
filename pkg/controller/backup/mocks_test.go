@@ -300,15 +300,39 @@ var (
 		},
 	}
 
-	configMapOtherKeyValuesInvalidKeys = corev1.ConfigMap{
+	configMapInvalidDatabaseKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			"PGDATABASE": "dbname",
-			"DBPASSWORD": "root",
-			"DBUSER":     "root",
+			"invalid": "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseUserParam:     "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+		},
+	}
+
+	configMapInvalidUserKey = corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "config-otherkeys",
+			Namespace: "postgresql",
+		},
+		Data: map[string]string{
+			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			"invalid": "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+		},
+	}
+
+	configMapInvalidPwdKey = corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "config-otherkeys",
+			Namespace: "postgresql",
+		},
+		Data: map[string]string{
+			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseUserParam: "root",
+			"invalid": "root",
 		},
 	}
 
