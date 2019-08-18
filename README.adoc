@@ -84,7 +84,7 @@ $ make install
 
 === Verifying
 
-To verify that the installation was successful completed you can check the  `Database Status` field of link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[Postgresql CRD] in the cluster. The expected result when all was installed with success is `OK`.
+To verify that the installation was successful completed you can check the  `Database Status` field of link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[Postgresql CRD] in the cluster. The expected result when all was installed with success is `OK`.
 
 ```shell
 $ oc describe Postgresql
@@ -131,7 +131,7 @@ NOTE: To uninstall you need be logged in as a user with cluster privileges like 
 
 === Using configMap to share required values
 
-By the specs in link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_cr.yaml[Postgresql CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the PostgreSQL should use in its required env vars.
+By the specs in link:deploy/crds/postgresql-operator_v1alpha1_postgresql_cr.yaml[Postgresql CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the PostgreSQL should use in its required env vars.
 
 If just the name of the configMap be informed, `configMapName`,  then it will look for the values stored with the same keys required for each env var of the image used for its database version (`databaseNameParam`, `databasePasswordParam`, `databaseUserParam`). However, you are able to customize the keys too by using the optional specs; `configMapDatabaseNameParam`, `configMapDatabasePasswordParam`, `configMapDatabaseUserParam`. In this way, this operator will be able to looking for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
@@ -152,7 +152,7 @@ By using the command `make install` the default namespace `postgresql`,  defined
 ===== Install
 The backup service is implemented by using  https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image]. It will do the backup of the database to be restore in the case of failures. Following the steps to enable it.
 
-. Setup the AWS in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresqloperator_v1alpha1_backup_cr.yaml[Backup CR] as follows or add the name of the secret which has already this data in the cluster.
+. Setup the AWS in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml[Backup CR] as follows or add the name of the secret which has already this data in the cluster.
 +
 [source,yaml]
 ----
@@ -230,8 +230,8 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 
 |===
 | *CustomResourceDefinition*    | *Description*
-| link:./deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml[PostgreSQL]     | Packages, manages, installs and configures the Database on the cluster.
-| link:./deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
+| link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[PostgreSQL]     | Packages, manages, installs and configures the Database on the cluster.
+| link:deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
 |===
 
 === Resources managed by each CRD Controller
@@ -258,7 +258,7 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 === Status Definition per Types
 
 
-* link:./pkg/apis/postgresqloperator/v1alpha1/postgresql_types.go[PostgreSQL]
+* link:./pkg/apis/postgresql-operator/v1alpha1/postgresql_types.go[PostgreSQL]
 +
 |===
 | *Status*    | *Description*
@@ -269,7 +269,7 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 |===
 
 
-* link:./pkg/apis/postgresqloperator/v1alpha1/backup_types.go[Backup]
+* link:./pkg/apis/postgresql-operator/v1alpha1/backup_types.go[Backup]
 +
 |===
 | *Status*    | *Description*

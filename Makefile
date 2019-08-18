@@ -29,8 +29,8 @@ install:
 	@echo ....... Creating namespace ....... 
 	- kubectl create namespace ${NAMESPACE}
 	@echo ....... Applying CRDS and Operator .......
-	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
-	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
 	@echo ....... Applying Rules and Service Account .......
 	- kubectl apply -f deploy/role.yaml -n ${NAMESPACE}
 	- kubectl apply -f deploy/role_binding.yaml  -n ${NAMESPACE}
@@ -38,14 +38,14 @@ install:
 	@echo ....... Applying PostgreSQL Operator .......
 	- kubectl apply -f deploy/operator.yaml -n ${NAMESPACE}
 	@echo ....... Creating the Database .......
-	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_postgresql_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_postgresql_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall
 uninstall:
 	@echo ....... Uninstalling .......
 	@echo ....... Deleting CRDs.......
-	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
-	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
 	@echo ....... Deleting Rules and Service Account .......
 	- kubectl delete -f deploy/role.yaml -n ${NAMESPACE}
 	- kubectl delete -f deploy/role_binding.yaml -n ${NAMESPACE}
@@ -58,12 +58,12 @@ uninstall:
 .PHONY: backup/install
 backup/install:
 	@echo Installing backup service in ${NAMESPACE} :
-	- kubectl apply -f deploy/crds/postgresqloperator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 .PHONY: backup/uninstall
 backup/uninstall:
 	@echo Uninstalling backup service from ${NAMESPACE} :
-	- kubectl delete -f deploy/crds/postgresqloperator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 ##############################
 # CI                         #

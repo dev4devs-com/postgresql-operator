@@ -4,7 +4,7 @@ import (
 	goctx "context"
 	"fmt"
 	apis "github.com/dev4devs-com/postgresql-operator/pkg/apis"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"testing"
 	"time"
 

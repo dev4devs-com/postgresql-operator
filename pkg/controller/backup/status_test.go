@@ -411,7 +411,6 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 	}
 	type args struct {
 		request reconcile.Request
-		pod     corev1.Pod
 	}
 	tests := []struct {
 		name    string
@@ -431,7 +430,6 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 						Namespace: bkpInstanceWithMandatorySpec.Namespace,
 					},
 				},
-				pod: corev1.Pod{},
 			},
 			wantErr: false,
 		},
@@ -461,7 +459,7 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			err := r.updatePodDatabaseFoundStatus(tt.args.request, &tt.args.pod)
+			err := r.updatePodDatabaseFoundStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdatePodDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -530,7 +528,7 @@ func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			err := r.updateServiceDatabaseFoundStatus(tt.args.request)
+			err := r.updateServiceDbServiceFoundStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateServiceDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return

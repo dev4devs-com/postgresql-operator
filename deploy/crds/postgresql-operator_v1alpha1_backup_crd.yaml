@@ -53,12 +53,12 @@ spec:
               description: 'Database version. (E.g 9.6). IMPORTANT: Just the first
                 2 digits should be used.'
               type: string
-            encryptionKeySecretName:
-              description: Name of the secret with the EncryptionKey data already
-                created in the cluster
+            encryptKeySecretName:
+              description: Name of the secret with the EncryptKey data already created
+                in the cluster
               type: string
-            encryptionKeySecretNamespace:
-              description: Name of the namespace where the secret with the EncryptionKey
+            encryptKeySecretNamespace:
+              description: Name of the namespace where the secret with the EncryptKey
                 data is in the cluster
               type: string
             gpgEmail:

@@ -52,11 +52,11 @@ spec:
   # NOTE: The following values are optional.
 
   # Add in the following attribute the secret name created in the cluster with the encryption details
-  # encryptionKeySecretName: "example-encryptionKeySecretName"
+  # encryptKeySecretName: "example-encryptKeySecretName"
 
-  # Add the namespace where the encryptionKeySecretName is applied
-  # NOTE: Just valid when the encryptionKeySecretName is used
-  # encryptionKeySecretNamespace: "example-encryptionKeySecretNamespace"
+  # Add the namespace where the encryptKeySecretName is applied
+  # NOTE: Just valid when the encryptKeySecretName is used
+  # encryptKeySecretNamespace: "example-encryptKeySecretNamespace"
 
   # OR
 

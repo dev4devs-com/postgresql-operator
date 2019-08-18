@@ -218,10 +218,10 @@ spec:
   - backup
   - PostgreSQL
   labels:
-    operated-by: postgresqloperator
+    operated-by: postgresql-operator
   selector:
     matchLabels:
-      operated-by: postgresqloperator
+      operated-by: postgresql-operator
   links:
   - name: Documentation
     url: https://github.com/dev4devs-com/postgresql-operator/blob/master/README.adoc

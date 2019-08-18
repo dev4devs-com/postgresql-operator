@@ -2,7 +2,7 @@ package postgresql
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -31,8 +31,8 @@ func (r *ReconcilePostgresql) fetchDBDeployment(db *v1alpha1.Postgresql) (*appsv
 	return deployment, err
 }
 
-//fetchDBPersistentVolumeClaim returns the PersistentVolumeClaim resource created for this instance
-func (r *ReconcilePostgresql) fetchDBPersistentVolumeClaim(db *v1alpha1.Postgresql) (*corev1.PersistentVolumeClaim, error) {
+//fetchDBPvc returns the PersistentVolumeClaim resource created for this instance
+func (r *ReconcilePostgresql) fetchDBPvc(db *v1alpha1.Postgresql) (*corev1.PersistentVolumeClaim, error) {
 	pvc := &corev1.PersistentVolumeClaim{}
 	err := r.client.Get(context.TODO(), types.NamespacedName{Name: db.Name, Namespace: db.Namespace}, pvc)
 	return pvc, err

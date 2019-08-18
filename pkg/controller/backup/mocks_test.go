@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -52,8 +52,8 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.BackupSpec{
-			EncryptionKeySecretName:       "enc-secret-test",
-			EncryptionKeySecretNamespace:  "postgresql",
+			EncryptKeySecretName:          "enc-secret-test",
+			EncryptKeySecretNamespace:     "postgresql",
 			AwsCredentialsSecretName:      "aws-secret-test",
 			AwsCredentialsSecretNamespace: "postgresql",
 		},

@@ -2,7 +2,7 @@ package backup
 
 import (
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresqloperator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
 
@@ -16,12 +16,26 @@ func getBkpLabels(name string) map[string]string {
 	return map[string]string{"app": "postgresql", "backup_cr": name}
 }
 
+type DatabaseSecretData struct {
+	databaseName string
+	user         string
+	pwd          string
+	host         string
+	superuser    string
+	dbVersion    string
+}
+
+// buildDBSecretData will returns the data required to create the database secret according to the configuration
+// NOTE: The user can:
+// - Customize the environment variables keys as values that should be used with
+// - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user, password and database name already setup for another application )
 func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (map[string][]byte, error) {
-	database := ""
-	user := ""
-	pwd := ""
-	host := r.dbService.Name + "." + bkp.Namespace + ".svc"
-	superuser := "false"
+
+	dbData := &DatabaseSecretData{
+		host:      r.dbService.Name + "." + bkp.Namespace + ".svc",
+		superuser: "false",
+		dbVersion: bkp.Spec.DatabaseVersion,
+	}
 
 	for i := 0; i < len(r.dbPod.Spec.Containers[0].Env); i++ {
 
@@ -36,49 +50,42 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 
 		switch envVarName {
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam):
-			database = envVarValue
-			if database == "" {
-				database, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+			dbData.databaseName = envVarValue
+			if dbData.databaseName == "" {
+				database, err := r.getKeyValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
 				if database == "" || err != nil {
-					err := fmt.Errorf("Unable to get the database name to add in the secret")
+					err := fmt.Errorf("Unable to get the user the database env var %v to create the secret",
+						utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam))
 					return nil, err
 				}
 			}
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam):
-			user = envVarValue
-			if user == "" {
-				user, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+			dbData.user = envVarValue
+			if dbData.user == "" {
+				user, err := r.getKeyValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
 				if user == "" || err != nil {
-					err := fmt.Errorf("Unable to get the database user to add in the secret")
+					err := fmt.Errorf("Unable to get the user  the database env var %v to create the secret",
+						utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam))
 					return nil, err
 				}
 			}
 		case utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam):
-			pwd = envVarValue
-			if pwd == "" {
-				pwd, err := r.getValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
+			dbData.pwd = envVarValue
+			if dbData.pwd == "" {
+				pwd, err := r.getKeyValueFromConfigMap(cfgName, bkp.Namespace, cfgKey)
 				if pwd == "" || err != nil {
-					err := fmt.Errorf("Unable to get the pwd user to add in the secret")
+					err := fmt.Errorf("Unable to get the pwd for the database env var %v to create the secret",
+						utils.GetConfigMapEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam))
 					return nil, err
 				}
 			}
 		}
 	}
-	return getDDBSecretData(user, pwd, database, host, superuser, bkp), nil
+	return createDbDataByteMap(dbData), nil
 }
 
-func getDDBSecretData(user string, pwd string, database string, host string, superuser string, bkp *v1alpha1.Backup) map[string][]byte {
-	return map[string][]byte{
-		"POSTGRES_USERNAME":  []byte(user),
-		"POSTGRES_PASSWORD":  []byte(pwd),
-		"POSTGRES_DATABASE":  []byte(database),
-		"POSTGRES_HOST":      []byte(host),
-		"POSTGRES_SUPERUSER": []byte(superuser),
-		"VERSION":            []byte(bkp.Spec.DatabaseVersion),
-	}
-}
-
-func (r *ReconcileBackup) getValueFromConfigMap(configMapName, configMapNamespace, configMapKey string) (string, error) {
+// getKeyValueFromConfigMap returns the value of some key defined in the ConfigMap
+func (r *ReconcileBackup) getKeyValueFromConfigMap(configMapName, configMapNamespace, configMapKey string) (string, error) {
 	// search for ConfigMap
 	cfg, err := r.fetchConfigMap(configMapName, configMapNamespace)
 	if err != nil {
@@ -88,7 +95,19 @@ func (r *ReconcileBackup) getValueFromConfigMap(configMapName, configMapNamespac
 	return cfg.Data[configMapKey], nil
 }
 
-func buildAwsSecretData(bkp *v1alpha1.Backup) map[string][]byte {
+// createDbDataByteMap returns the a map with the data in the []byte format required to create the database secret
+func createDbDataByteMap(data *DatabaseSecretData) map[string][]byte {
+	return map[string][]byte{
+		"POSTGRES_USERNAME":  []byte(data.user),
+		"POSTGRES_PASSWORD":  []byte(data.pwd),
+		"POSTGRES_DATABASE":  []byte(data.databaseName),
+		"POSTGRES_HOST":      []byte(data.host),
+		"POSTGRES_SUPERUSER": []byte(data.superuser),
+		"VERSION":            []byte(data.dbVersion),
+	}
+}
+
+func createAwsDataByteMap(bkp *v1alpha1.Backup) map[string][]byte {
 	dataByte := map[string][]byte{
 		"AWS_S3_BUCKET_NAME":    []byte(bkp.Spec.AwsS3BucketName),
 		"AWS_ACCESS_KEY_ID":     []byte(bkp.Spec.AwsAccessKeyId),
@@ -97,7 +116,7 @@ func buildAwsSecretData(bkp *v1alpha1.Backup) map[string][]byte {
 	return dataByte
 }
 
-func buildEncSecretData(bkp *v1alpha1.Backup) (map[string][]byte, map[string]string) {
+func createEncDataMaps(bkp *v1alpha1.Backup) (map[string][]byte, map[string]string) {
 	dataByte := map[string][]byte{
 		"GPG_PUBLIC_KEY": []byte(bkp.Spec.GpgPublicKey),
 	}
@@ -109,43 +128,66 @@ func buildEncSecretData(bkp *v1alpha1.Backup) (map[string][]byte, map[string]str
 	return dataByte, dataString
 }
 
+// getAWSSecretName returns the name of the secret
+// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one in the same namespace where the backup is applied
 func getAWSSecretName(bkp *v1alpha1.Backup) string {
-	awsSecretName := awsSecretPrefix + bkp.Name
-	if bkp.Spec.AwsCredentialsSecretName != "" {
-		awsSecretName = bkp.Spec.AwsCredentialsSecretName
+	if isAwsKeySetupByName(bkp) {
+		return bkp.Spec.AwsCredentialsSecretName
 	}
-	return awsSecretName
+	return awsSecretPrefix + bkp.Name
 }
 
+// getAwsSecretNamespace returns the namespace where the secret is applied already
+// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one in the same namespace where the backup is applied
 func getAwsSecretNamespace(bkp *v1alpha1.Backup) string {
-	if bkp.Spec.AwsCredentialsSecretName != "" && bkp.Spec.AwsCredentialsSecretNamespace != "" {
+	if isAwsKeySetupByName(bkp) && bkp.Spec.AwsCredentialsSecretNamespace != "" {
 		return bkp.Spec.AwsCredentialsSecretNamespace
 	}
 	return bkp.Namespace
 }
 
+// getEncSecretNamespace returns the namespace where the secret is applied already
+// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one in the same namespace where the backup is applied
 func getEncSecretNamespace(bkp *v1alpha1.Backup) string {
-	if hasEncryptionKeySecret(bkp) {
-		if bkp.Spec.EncryptionKeySecretName != "" && bkp.Spec.EncryptionKeySecretNamespace != "" {
-			return bkp.Spec.EncryptionKeySecretNamespace
-		}
-		return bkp.Namespace
+	if isEncKeySetupByNameAndNamaspace(bkp) {
+		return bkp.Spec.EncryptKeySecretNamespace
 	}
-	return ""
+	return bkp.Namespace
 }
 
+// getEncSecretName returns the name of the secret
+// NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one in the same namespace where the backup is applied
 func getEncSecretName(bkp *v1alpha1.Backup) string {
-	awsSecretName := ""
-	if hasEncryptionKeySecret(bkp) {
-		awsSecretName = encSecretPrefix + bkp.Name
+	if isEncKeySetupByName(bkp) {
+		return bkp.Spec.EncryptKeySecretName
 	}
-	if bkp.Spec.AwsCredentialsSecretName != "" {
-		awsSecretName = bkp.Spec.EncryptionKeySecretName
-	}
-	return awsSecretName
+	return encSecretPrefix + bkp.Name
 }
 
-func hasEncryptionKeySecret(bkp *v1alpha1.Backup) bool {
+// isEncryptionKeyOptionConfig returns true when the CR has the configuration to allow it be used
+func isEncryptionKeyOptionConfig(bkp *v1alpha1.Backup) bool {
 	return bkp.Spec.AwsCredentialsSecretName != "" ||
 		(bkp.Spec.GpgTrustModel != "" && bkp.Spec.GpgEmail != "" && bkp.Spec.GpgPublicKey != "")
+}
+
+// isEncKeySetupByName returns true when it is setup to get an pre-existing secret applied in the cluster.
+// NOTE: The user can just inform the name of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one
+func isEncKeySetupByName(bkp *v1alpha1.Backup) bool {
+	return bkp.Spec.EncryptKeySecretName != ""
+}
+
+// isAwsKeySetupByName returns true when it is setup to get an pre-existing secret applied in the cluster.
+// NOTE: The user can just inform the name of the Secret which is already applied in the cluster OR
+// the data required for the operator be able to create one
+func isAwsKeySetupByName(bkp *v1alpha1.Backup) bool {
+	return bkp.Spec.AwsCredentialsSecretName != ""
+}
+
+func isEncKeySetupByNameAndNamaspace(bkp *v1alpha1.Backup) bool {
+	return isEncKeySetupByName(bkp) && bkp.Spec.EncryptKeySecretNamespace != ""
 }
