@@ -87,7 +87,7 @@ spec:
   # base64 encoded public opengpg cert
   # ---------------------------------
   # gpgPublicKey: "example-gpgPublicKey"
-  # gpgEmail: "email@gmai.com"
+  # gpgEmail: "email@example.com"
   # gpgTrustModel: "always"
 
 

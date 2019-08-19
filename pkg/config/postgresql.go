@@ -2,9 +2,9 @@ package config
 
 const (
 	size                      = 1
-	databaseName              = "solution-database-name"
+	databaseName              = "solution"
 	databasePassword          = "postgres"
-	databaseUser              = "postgresql"
+	databaseUser              = "postgres"
 	databaseNameKeyEnvVar     = "POSTGRESQL_DATABASE"
 	databasePasswordKeyEnvVar = "POSTGRESQL_PASSWORD"
 	databaseUserKeyEnvVar     = "POSTGRESQL_USER"
@@ -12,8 +12,10 @@ const (
 	containerName             = "database"
 	databasePort              = 5432
 	databaseMemoryLimit       = "512Mi"
-	databaseMemoryRequest     = "512Mi"
+	databaseMemoryRequest     = "128Mi"
 	databaseStorageRequest    = "1Gi"
+	databaseCpuLimit          = "20Mi"
+	databaseCpu               = "10Mi"
 )
 
 type DefaultPostgreSQLConfig struct {
@@ -29,6 +31,8 @@ type DefaultPostgreSQLConfig struct {
 	DatabasePort              int32  `json:"databasePort"`
 	DatabaseMemoryLimit       string `json:"databaseMemoryLimit"`
 	DatabaseMemoryRequest     string `json:"databaseMemoryRequest"`
+	DatabaseCpuLimit          string `json:"databaseCpuLimit"`
+	DatabaseCpu               string `json:"databaseCpu"`
 	DatabaseStorageRequest    string `json:"databaseStorageRequest"`
 }
 
@@ -46,6 +50,8 @@ func NewPostgreSQLConfig() *DefaultPostgreSQLConfig {
 		DatabasePort:              databasePort,
 		DatabaseMemoryLimit:       databaseMemoryLimit,
 		DatabaseMemoryRequest:     databaseMemoryRequest,
+		DatabaseCpu:               databaseCpu,
+		DatabaseCpuLimit:          databaseCpuLimit,
 		DatabaseStorageRequest:    databaseStorageRequest,
 	}
 }

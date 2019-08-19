@@ -20,6 +20,13 @@ spec:
           command:
           - postgresql-operator
           imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 60m
+              memory: 128Mi
+            requests:
+              cpu: 30m
+              memory: 64Mi
           env:
             - name: WATCH_NAMESPACE
               valueFrom:

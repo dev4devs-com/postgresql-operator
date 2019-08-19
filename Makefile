@@ -162,8 +162,8 @@ test/integration-cover:
 
 .PHONY: test/compile/e2e
 test/compile/e2e:
-	 @GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o=$(TEST_COMPILE_OUTPUT) ./test/e2e/...
+	 @GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o=$(TEST_COMPILE_OUTPUT) ./test/e2e ...
 
 .PHONY: test/e2e
 test/e2e:
-	  operator-sdk test local ./test/e2e/ --go-test-flags "-v -parallel=2"
+	  operator-sdk test local ./test/e2e --go-test-flags "-v -parallel=2"
