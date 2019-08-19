@@ -33,7 +33,7 @@ type BackupSpec struct {
 	ProductName string `json:"productName,omitempty"`
 
 	// Name of AWS S3 storage.
-	// Required to create the Secret with the data to allow send the backup files to AWS S3 storage.
+	// Required to create the Secret with the AWS data to allow send the backup files to AWS S3 storage.
 	AwsS3BucketName string `json:"awsS3BucketName,omitempty"`
 
 	// Key ID of AWS S3 storage.
@@ -44,16 +44,20 @@ type BackupSpec struct {
 	// Required to create the Secret with the data to allow send the backup files to AWS S3 storage.
 	AwsSecretAccessKey string `json:"awsSecretAccessKey,omitempty"`
 
-	// Name of the secret with the AWS data credentials already created in the cluster
-	AwsCredentialsSecretName string `json:"awsCredentialsSecretName,omitempty"`
+	// Name of the secret with the AWS data credentials pre-existing in the cluster
+	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
+	AwsSecretName string `json:"awsSecretName,omitempty"`
 
-	// Name of the namespace where the scret with the AWS data credentials is in the cluster
-	AwsCredentialsSecretNamespace string `json:"awsCredentialsSecretNamespace,omitempty"`
+	// Namespace of the secret with the AWS data credentials pre-existing in the cluster
+	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+	AwsSecretNamespace string `json:"awsSecretNamespace,omitempty"`
 
-	// Name of the secret with the EncryptKey data already created in the cluster
+	// Name of the secret with the Encrypt data pre-existing in the cluster
+	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
 	EncryptKeySecretName string `json:"encryptKeySecretName,omitempty"`
 
-	// Name of the namespace where the secret with the EncryptKey data is in the cluster
+	// Namespace of the secret with the Encrypt data pre-existing in the cluster
+	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
 	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace,omitempty"`
 
 	// GPG public key to create the EncryptionKeySecret with this data

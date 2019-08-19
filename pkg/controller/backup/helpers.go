@@ -40,17 +40,17 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 		var err error
 
 		switch helper.envVarName {
-		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam):
+		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameKey, db.Spec.DatabaseNameKeyEnvVar):
 			dbSecret.databaseName, err = r.getEnvVarValue(dbSecret.databaseName, dbSecret, helper)
 			if err != nil {
 				return nil, err
 			}
-		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam):
+		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserKey, db.Spec.DatabaseUserKeyEnvVar):
 			dbSecret.user, err = r.getEnvVarValue(dbSecret.user, dbSecret, helper)
 			if err != nil {
 				return nil, err
 			}
-		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam):
+		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordKey, db.Spec.DatabasePasswordKeyEnvVar):
 			dbSecret.pwd, err = r.getEnvVarValue(dbSecret.pwd, dbSecret, helper)
 			if err != nil {
 				return nil, err

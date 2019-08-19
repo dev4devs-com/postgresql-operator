@@ -29,15 +29,15 @@ spec:
           type: object
         spec:
           properties:
-            configMapDatabaseNameParam:
+            configMapDatabaseNameKey:
               description: Name of the configMap key where the operator should looking
                 for the value for the database name for its env var
               type: string
-            configMapDatabasePasswordParam:
+            configMapDatabasePasswordKey:
               description: Name of the configMap key where the operator should looking
                 for the value for the database user for its env var
               type: string
-            configMapDatabaseUserParam:
+            configMapDatabaseUserKey:
               description: Name of the configMap key where the operator should looking
                 for the value for the database password for its env var
               type: string
@@ -61,17 +61,17 @@ spec:
                 database container
               type: string
             databaseName:
-              description: Value for the Database Environment Variable (Spec.DatabaseNameParam).
+              description: Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).
               type: string
-            databaseNameParam:
+            databaseNameKeyEnvVar:
               description: Key Value for the Database Environment Variable in order
                 to inform the database mame Note that each database version/image
                 can expected a different value for it.
               type: string
             databasePassword:
-              description: Value for the Database Environment Variable (Spec.DatabasePasswordParam).
+              description: Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).
               type: string
-            databasePasswordParam:
+            databasePasswordKeyEnvVar:
               description: Key Value for the Database Environment Variable in order
                 to inform the database password Note that each database version/image
                 can expected a different value for it.
@@ -87,9 +87,9 @@ spec:
                 database container
               type: string
             databaseUser:
-              description: Value for the Database Environment Variable (Spec.DatabaseUser).
+              description: Value for the Database Environment Variable (spec.databaseUserKeyEnvVar).
               type: string
-            databaseUserParam:
+            databaseUserKeyEnvVar:
               description: Key Value for the Database Environment Variable in order
                 to inform the database user Note that each database version/image
                 can expected a different value for it.

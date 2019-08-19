@@ -4,10 +4,13 @@ metadata:
   name: postgresql
 spec:
 
-  # NOTE: Default values are applied by the operator if values are not specified below.
+  # ---------------------------------
+  # IMPORTANT: In this CR you will find an example of all options and possible configurations.
+  # However, by default values are applied by the operator if values are not specified below.
+  # ---------------------------------
 
   # ---------------------------------
-  # DB Resources
+  # ## Default Setup
   # ---------------------------------
 
   size: 1
@@ -15,46 +18,50 @@ spec:
   databaseMemoryRequest: "512Mi"
   databaseStorageRequest: "1Gi"
 
-  # ---------------------------------
-  # Database Container
-  # ---------------------------------
-
   # The imaged used in this project is from Red Hat. See more in https://docs.okd.io/latest/using_images/db_images/postgresql.html
   image: "centos/postgresql-96-centos7"
-  containerName: "database"
-  databasePort: 5432
+
+  # Environment Variables
+  # ---------------------------------
+  # Following are the values which will be used as the key label for the environment variable of the database image.
+  # NOTES:
+  # - They need to be as the values expected by the image used
+  # - If you are using the optional setup to allow the operator looking for this value in a ConfigMap pre-existent then it will look for these keys by default
+  # ---------------------------------
+  databaseNameKeyEnvVar: "POSTGRESQL_DATABASE"
+  databasePasswordKeyEnvVar: "POSTGRESQL_PASSWORD"
+  databaseUserKeyEnvVar: "POSTGRESQL_USER"
+
+  # The following values will be used fill the env variables. (Optional)
+  # They will be not required if you are using the configMap setup
+  # ---------------------------------
+  databaseName: "example-database-name"
+  databasePassword: "postgresql"
+  databaseUser: "postgresql"
+
+  # ---------------------------------
+  # ## Customizations Options
+  # ---------------------------------
+
+  # Database Container
+  # ---------------------------------
+  # Name which will be used to create the container where the database will be running
+
+  # containerName: "database"
+  # databasePort: 5432
 
   # Use the following spec if you would like to define the image pull policy
   # containerImagePullPolicy: "IfNotPresent"
 
-  # ---------------------------------
-  # Environment Variables
-  # ---------------------------------
-
-  # Following are the values which will be used as the key label for the environment variable of the database image.
-  # NOTES:
-  # - The following values are mandatory
-  # - They need to be as the values expected by the image used
-  # - If you are using the optional setup to allow the operator looking for this value in a ConfigMap pre-existent then it will look for these keys by default
-  databaseNameParam: "POSTGRESQL_DATABASE"
-  databasePasswordParam: "POSTGRESQL_PASSWORD"
-  databaseUserParam: "POSTGRESQL_USER"
-
-  # The following values will be used fill the env variables. (Optional)
-  # They will be not required if you are using the configMap setup
-  databaseName: "solution-database-name"
-  databasePassword: "postgres"
-  databaseUser: "postgresql"
-
-  # ---------------------------------
-  # Get Values from ConfigMap (Optional)
+  # Get Values from ConfigMap
   # ---------------------------------
   # NOTE: It is very useful if you would like to centralize and share this information with your solutions
 
-  # ConfigMap (Optional)
+  # The following attribute allows you tell for the operator that it should look for the data to create the env vars is some
+  # ConfigMap which pre-exist in the cluster
   # configMapName: "cfgmap-name"
 
-  # The following specs allow you customiza the name of the keys which the operator should look for the env vars in the configMap. (Optional)
-  # configMapDatabaseNameParam: "POSTGRESQL_DATABASE"
-  # configMapDatabasePasswordParam: "POSTGRESQL_PASSWORD"
-  # configMapDatabaseUserParam: "POSTGRESQL_USER"
+  # The following specs allow you customiza the name of the keys which the operator should look for the env vars in the configMap.
+  # configMapDatabaseNameKey: "POSTGRESQL_DATABASE"
+  # configMapDatabasePasswordKey: "POSTGRESQL_PASSWORD"
+  # configMapDatabaseUserKey: "POSTGRESQL_USER"

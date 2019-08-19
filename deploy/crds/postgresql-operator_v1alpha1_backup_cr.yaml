@@ -5,68 +5,89 @@ metadata:
 spec:
 
   # ---------------------------------
-  # Backup Container
+  # ## Backup Container
   # ----------------------------
   # See https://github.com/integr8ly/backup-container-image
   # ---------------------------------
 
-  # NOTE: Default values are applied by the operator if values are not specified below.
-  schedule: "0 0 * * *" # daily at 00:00
-  image: "quay.io/integreatly/backup-container:1.0.8"
-
-  # Following the steps to get the databaseVersion
-  # 1. Go to the database pod terminal
-  # 2. Run the command psql as follows.
-  # //sh-4.2$ psql
-  # //psql (9.6.10)
-  # IMPORTANT: Just the first 2 digits should be used.
-  databaseVersion: "9.6"
-
-  # The following information is optional and will be used to tag the data in the AWS bucket
-  productName: "postgresql"
+  # ---------------------------------
+  # IMPORTANT: In this CR you will find an example of all options and possible configurations.
+  # However, by default values are applied by the operator if values are not specified below.
+  # ---------------------------------
 
   # ---------------------------------
-  # Stored Host - AWS
-  # ----------------------------
+  # ## Default Setup
+  # ---------------------------------
 
-  # NOTE: The following values are mandatory in order to allow the backup be stored outside if the cluster
+  # This spec allow you setup the backup frequency
+  schedule: "0 0 * * *" # daily at 00:00
 
-  # Add in the following attribute the secret name created in the cluster with the AWS credentials
-  # awsCredentialsSecretName: "example-awsCredentialsSecretName"
-
-  # Add the namespace where the awsCredentialsSecretName is applied
-  # NOTE: Just valid when the awsCredentialsSecretName is used
-  # awsCredentialsSecretNamespace: "example-awsCredentialsSecretNamespace"
-
-  # OR
-
-  # Add the AWS S3 bucket details in order to allow the operator build it
+  # The following specs are required to send the data to your AWS S3 storage
   awsS3BucketName: "example-awsS3BucketName"
   awsAccessKeyId: "example-awsAccessKeyId"
   awsSecretAccessKey: "example-awsSecretAccessKey"
+
   # ---------------------------------
-  # Encryption Key (Optional)
+  # ## Customizations Options
+  # ---------------------------------
+
+  # Change the following spec if you change the name of the Postgresql CR
+  # postgresqlCRName: "postgresql"
+
+  # This spec allow you change the <image>:<tag> used to perform the backup
+  # ---------------------------------
+  # image: "quay.io/integreatly/backup-container:1.0.8"
+
+  # This spec allow you change the "version" of the database which will be installed
+  # used to perform the backup(It needs be the same used by the Postgresql CR)
+  # ---------------------------------
+  # databaseVersion: "9.6"
+
+      # ---------------------------------
+      # TIP: Following the steps to get the databaseVersion
+      # ---------------------------------
+      # 1. Go to the database pod terminal
+      # 2. Run the command psql as follows.
+      # //sh-4.2$ psql
+      # //psql (9.6.10)
+      # IMPORTANT: Just the first 2 digits should be used.
+      # ---------------------------------
+
+  # The following information is optional and will be used to tag the data in the AWS bucket
+  # ---------------------------------
+  # productName: "postgresql"
+
+  # The following attribute allows you tell for the operator that it should use an pre-existing secret
+  # with the AWS data info in the format required.
+  # See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
+  # ---------------------------------
+  # NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+  # ---------------------------------
+  # awsSecretName: "example-awsCredentialsSecretName"
+  # awsSecretNamespace: "example-awsSecretNamespace"
+
+  # ---------------------------------
+  # EncryptKey (Optional Setup)
   # ----------------------------
 
-  # NOTE: The following values are optional.
-
-  # Add in the following attribute the secret name created in the cluster with the encryption details
+  # The following attribute allows you tell for the operator that it should use an pre-existing secret
+  # with the encrypt data info in the format required.
+  # See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
+  # ---------------------------------
+  # NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+  # ---------------------------------
   # encryptKeySecretName: "example-encryptKeySecretName"
-
-  # Add the namespace where the encryptKeySecretName is applied
-  # NOTE: Just valid when the encryptKeySecretName is used
   # encryptKeySecretNamespace: "example-encryptKeySecretNamespace"
 
   # OR
 
-  # Add the encryption details in order to allow the operator build it
+  # Add the encryption details in order to allow the operator create the secret for you
   # See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
 
   # base64 encoded public opengpg cert
-  #gpgPublicKey: "example-gpgPublicKey"
-  #gpgEmail: "email@gmai.com"
-  #gpgTrustModel: "always"
+  # ---------------------------------
+  # gpgPublicKey: "example-gpgPublicKey"
+  # gpgEmail: "email@gmai.com"
+  # gpgTrustModel: "always"
 
-  # Use the following spec if you change the name of the Postgresql CR
-  # postgresqlCRName: "postgresql"
 
