@@ -9,20 +9,20 @@ import (
 func BuildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
-			Name: db.Spec.DatabaseNameParam,
+			Name: db.Spec.DatabaseNameKeyEnvVar,
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseNameParam, db.Spec.DatabaseNameParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseNameKey, db.Spec.DatabaseNameKeyEnvVar),
 				},
 			},
 		}
 	}
 
 	return corev1.EnvVar{
-		Name:  db.Spec.DatabaseNameParam,
+		Name:  db.Spec.DatabaseNameKeyEnvVar,
 		Value: db.Spec.DatabaseName,
 	}
 }
@@ -31,20 +31,20 @@ func BuildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 func BuildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
-			Name: db.Spec.DatabaseUserParam,
+			Name: db.Spec.DatabaseUserKeyEnvVar,
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseUserParam, db.Spec.DatabaseUserParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabaseUserKey, db.Spec.DatabaseUserKeyEnvVar),
 				},
 			},
 		}
 	}
 
 	return corev1.EnvVar{
-		Name:  db.Spec.DatabaseUserParam,
+		Name:  db.Spec.DatabaseUserKeyEnvVar,
 		Value: db.Spec.DatabaseUser,
 	}
 }
@@ -53,20 +53,20 @@ func BuildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 func BuildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
-			Name: db.Spec.DatabasePasswordParam,
+			Name: db.Spec.DatabasePasswordKeyEnvVar,
 			ValueFrom: &corev1.EnvVarSource{
 				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 					LocalObjectReference: corev1.LocalObjectReference{
 						Name: db.Spec.ConfigMapName,
 					},
-					Key: GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordParam, db.Spec.DatabasePasswordParam),
+					Key: GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordKey, db.Spec.DatabasePasswordKeyEnvVar),
 				},
 			},
 		}
 	}
 
 	return corev1.EnvVar{
-		Name:  db.Spec.DatabasePasswordParam,
+		Name:  db.Spec.DatabasePasswordKeyEnvVar,
 		Value: db.Spec.DatabasePassword,
 	}
 }

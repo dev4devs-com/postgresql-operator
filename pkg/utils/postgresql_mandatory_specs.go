@@ -44,16 +44,16 @@ func AddPostgresqlMandatorySpecs(db *v1alpha1.Postgresql) {
 	*/
 
 	//Following are the values which will be used as the key label for the environment variable of the database image.
-	if db.Spec.DatabaseNameParam == "" {
-		db.Spec.DatabaseNameParam = defaultPostgreSQLConfig.DatabaseNameParam
+	if db.Spec.DatabaseNameKeyEnvVar == "" {
+		db.Spec.DatabaseNameKeyEnvVar = defaultPostgreSQLConfig.DatabaseNameKeyEnvVar
 	}
 
-	if db.Spec.DatabasePasswordParam == "" {
-		db.Spec.DatabasePasswordParam = defaultPostgreSQLConfig.DatabasePasswordParam
+	if db.Spec.DatabasePasswordKeyEnvVar == "" {
+		db.Spec.DatabasePasswordKeyEnvVar = defaultPostgreSQLConfig.DatabasePasswordKeyEnvVar
 	}
 
-	if db.Spec.DatabaseUserParam == "" {
-		db.Spec.DatabaseUserParam = defaultPostgreSQLConfig.DatabaseUserParam
+	if db.Spec.DatabaseUserKeyEnvVar == "" {
+		db.Spec.DatabaseUserKeyEnvVar = defaultPostgreSQLConfig.DatabaseUserKeyEnvVar
 	}
 
 	if db.Spec.Image == "" {

@@ -11,7 +11,7 @@ func GetLabels(name string) map[string]string {
 // the data required for the operator be able to create one in the same namespace where the backup is applied
 func GetAWSSecretName(bkp *v1alpha1.Backup) string {
 	if IsAwsKeySetupByName(bkp) {
-		return bkp.Spec.AwsCredentialsSecretName
+		return bkp.Spec.AwsSecretName
 	}
 	return AwsSecretPrefix + bkp.Name
 }
@@ -20,8 +20,8 @@ func GetAWSSecretName(bkp *v1alpha1.Backup) string {
 // NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
 // the data required for the operator be able to create one in the same namespace where the backup is applied
 func GetAwsSecretNamespace(bkp *v1alpha1.Backup) string {
-	if IsAwsKeySetupByName(bkp) && bkp.Spec.AwsCredentialsSecretNamespace != "" {
-		return bkp.Spec.AwsCredentialsSecretNamespace
+	if IsAwsKeySetupByName(bkp) && bkp.Spec.AwsSecretNamespace != "" {
+		return bkp.Spec.AwsSecretNamespace
 	}
 	return bkp.Namespace
 }
@@ -48,7 +48,7 @@ func GetEncSecretName(bkp *v1alpha1.Backup) string {
 
 // IsEncryptionKeyOptionConfig returns true when the CR has the configuration to allow it be used
 func IsEncryptionKeyOptionConfig(bkp *v1alpha1.Backup) bool {
-	return bkp.Spec.AwsCredentialsSecretName != "" ||
+	return bkp.Spec.AwsSecretName != "" ||
 		(bkp.Spec.GpgTrustModel != "" && bkp.Spec.GpgEmail != "" && bkp.Spec.GpgPublicKey != "")
 }
 
@@ -63,7 +63,7 @@ func IsEncKeySetupByName(bkp *v1alpha1.Backup) bool {
 // NOTE: The user can just inform the name of the Secret which is already applied in the cluster OR
 // the data required for the operator be able to create one
 func IsAwsKeySetupByName(bkp *v1alpha1.Backup) bool {
-	return bkp.Spec.AwsCredentialsSecretName != ""
+	return bkp.Spec.AwsSecretName != ""
 }
 
 func IsEncKeySetupByNameAndNamaspace(bkp *v1alpha1.Backup) bool {

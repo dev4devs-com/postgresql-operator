@@ -31,10 +31,10 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName:                  "config-otherkeys",
-			ConfigMapDatabaseNameParam:     "PGDATABASE",
-			ConfigMapDatabasePasswordParam: "PGPASSWORD",
-			ConfigMapDatabaseUserParam:     "PGUSER",
+			ConfigMapName:                "config-otherkeys",
+			ConfigMapDatabaseNameKey:     "PGDATABASE",
+			ConfigMapDatabasePasswordKey: "PGPASSWORD",
+			ConfigMapDatabaseUserKey:     "PGUSER",
 		},
 	}
 

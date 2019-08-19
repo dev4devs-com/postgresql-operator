@@ -33,33 +33,36 @@ spec:
               description: Key ID of AWS S3 storage. Required to create the Secret
                 with the data to allow send the backup files to AWS S3 storage.
               type: string
-            awsCredentialsSecretName:
-              description: Name of the secret with the AWS data credentials already
-                created in the cluster
-              type: string
-            awsCredentialsSecretNamespace:
-              description: Name of the namespace where the scret with the AWS data
-                credentials is in the cluster
-              type: string
             awsS3BucketName:
               description: Name of AWS S3 storage. Required to create the Secret with
-                the data to allow send the backup files to AWS S3 storage.
+                the AWS data to allow send the backup files to AWS S3 storage.
               type: string
             awsSecretAccessKey:
               description: Secret/Token of AWS S3 storage. Required to create the
                 Secret with the data to allow send the backup files to AWS S3 storage.
+              type: string
+            awsSecretName:
+              description: 'Name of the secret with the AWS data credentials pre-existing
+                in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml'
+              type: string
+            awsSecretNamespace:
+              description: 'Namespace of the secret with the AWS data credentials
+                pre-existing in the cluster NOTE: If the namespace be not informed
+                then the operator will try to find it in the same namespace where
+                it is applied'
               type: string
             databaseVersion:
               description: 'Database version. (E.g 9.6). IMPORTANT: Just the first
                 2 digits should be used.'
               type: string
             encryptKeySecretName:
-              description: Name of the secret with the EncryptKey data already created
-                in the cluster
+              description: 'Name of the secret with the Encrypt data pre-existing
+                in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml'
               type: string
             encryptKeySecretNamespace:
-              description: Name of the namespace where the secret with the EncryptKey
-                data is in the cluster
+              description: 'Namespace of the secret with the Encrypt data pre-existing
+                in the cluster NOTE: If the namespace be not informed then the operator
+                will try to find it in the same namespace where it is applied'
               type: string
             gpgEmail:
               description: 'GPG email to create the EncryptionKeySecret with this

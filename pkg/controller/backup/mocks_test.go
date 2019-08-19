@@ -52,10 +52,10 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.BackupSpec{
-			EncryptKeySecretName:          "enc-secret-test",
-			EncryptKeySecretNamespace:     "postgresql",
-			AwsCredentialsSecretName:      "aws-secret-test",
-			AwsCredentialsSecretNamespace: "postgresql",
+			EncryptKeySecretName:      "enc-secret-test",
+			EncryptKeySecretNamespace: "postgresql",
+			AwsSecretName:             "aws-secret-test",
+			AwsSecretNamespace:        "postgresql",
 		},
 	}
 
@@ -162,13 +162,13 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName:         "config-map-test",
-			DatabaseNameParam:     "POSTGRESQL_DATABASE",
-			DatabasePasswordParam: "POSTGRESQL_PASSWORD",
-			DatabaseUserParam:     "POSTGRESQL_USER",
-			DatabaseName:          "solution-database-name",
-			DatabasePassword:      "postgres",
-			DatabaseUser:          "postgresql",
+			ConfigMapName:             "config-map-test",
+			DatabaseNameKeyEnvVar:     "POSTGRESQL_DATABASE",
+			DatabasePasswordKeyEnvVar: "POSTGRESQL_PASSWORD",
+			DatabaseUserKeyEnvVar:     "POSTGRESQL_USER",
+			DatabaseName:              "solution-database-name",
+			DatabasePassword:          "postgres",
+			DatabaseUser:              "postgresql",
 		},
 	}
 
@@ -189,35 +189,35 @@ var (
 				}},
 				Env: []corev1.EnvVar{
 					corev1.EnvVar{
-						Name: dbInstanceWithConfigMap.Spec.DatabaseNameParam,
+						Name: dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar,
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameParam, dbInstanceWithConfigMap.Spec.DatabaseNameParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameKey, dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar),
 							},
 						},
 					},
 					corev1.EnvVar{
-						Name: dbInstanceWithConfigMap.Spec.DatabaseUserParam,
+						Name: dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar,
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserParam, dbInstanceWithConfigMap.Spec.DatabaseUserParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserKey, dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar),
 							},
 						},
 					},
 					corev1.EnvVar{
-						Name: dbInstanceWithConfigMap.Spec.DatabasePasswordParam,
+						Name: dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar,
 						ValueFrom: &corev1.EnvVarSource{
 							ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordParam, dbInstanceWithConfigMap.Spec.DatabasePasswordParam),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordKey, dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar),
 							},
 						},
 					},
@@ -292,9 +292,9 @@ var (
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameParam:     "dbname",
-			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
-			dbInstanceWithConfigMap.Spec.DatabaseUserParam:     "root",
+			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar:     "dbname",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar: "root",
+			dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar:     "root",
 		},
 	}
 
@@ -305,8 +305,8 @@ var (
 		},
 		Data: map[string]string{
 			"invalid": "dbname",
-			dbInstanceWithConfigMap.Spec.DatabaseUserParam:     "root",
-			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+			dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar:     "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar: "root",
 		},
 	}
 
@@ -316,9 +316,9 @@ var (
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar: "dbname",
 			"invalid": "root",
-			dbInstanceWithConfigMap.Spec.DatabasePasswordParam: "root",
+			dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar: "root",
 		},
 	}
 
@@ -328,8 +328,8 @@ var (
 			Namespace: "postgresql",
 		},
 		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameParam: "dbname",
-			dbInstanceWithConfigMap.Spec.DatabaseUserParam: "root",
+			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar: "dbname",
+			dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar: "root",
 			"invalid": "root",
 		},
 	}
@@ -340,10 +340,10 @@ var (
 			Namespace: "postgresql",
 		},
 		Spec: v1alpha1.PostgresqlSpec{
-			ConfigMapName:                  "config-otherkeys",
-			ConfigMapDatabaseNameParam:     "PGDATABASE",
-			ConfigMapDatabasePasswordParam: "PGPASSWORD",
-			ConfigMapDatabaseUserParam:     "PGUSER",
+			ConfigMapName:                "config-otherkeys",
+			ConfigMapDatabaseNameKey:     "PGDATABASE",
+			ConfigMapDatabasePasswordKey: "PGPASSWORD",
+			ConfigMapDatabaseUserKey:     "PGUSER",
 		},
 	}
 )

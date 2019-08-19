@@ -106,7 +106,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.Referenc
 					},
 					"awsS3BucketName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of AWS S3 storage. Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
+							Description: "Name of AWS S3 storage. Required to create the Secret with the AWS data to allow send the backup files to AWS S3 storage.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -125,30 +125,30 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.Referenc
 							Format:      "",
 						},
 					},
-					"awsCredentialsSecretName": {
+					"awsSecretName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the secret with the AWS data credentials already created in the cluster",
+							Description: "Name of the secret with the AWS data credentials pre-existing in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"awsCredentialsSecretNamespace": {
+					"awsSecretNamespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the namespace where the scret with the AWS data credentials is in the cluster",
+							Description: "Namespace of the secret with the AWS data credentials pre-existing in the cluster NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"encryptKeySecretName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the secret with the EncryptKey data already created in the cluster",
+							Description: "Name of the secret with the Encrypt data pre-existing in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"encryptKeySecretNamespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the namespace where the secret with the EncryptKey data is in the cluster",
+							Description: "Namespace of the secret with the Encrypt data pre-existing in the cluster NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -365,40 +365,40 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 				Properties: map[string]spec.Schema{
 					"databaseName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (Spec.DatabaseNameParam).",
+							Description: "Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databasePassword": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (Spec.DatabasePasswordParam).",
+							Description: "Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseUser": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (Spec.DatabaseUser).",
+							Description: "Value for the Database Environment Variable (spec.databaseUserKeyEnvVar).",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"databaseNameParam": {
+					"databaseNameKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Key Value for the Database Environment Variable in order to inform the database mame Note that each database version/image can expected a different value for it.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"databasePasswordParam": {
+					"databasePasswordKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Key Value for the Database Environment Variable in order to inform the database password Note that each database version/image can expected a different value for it.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"databaseUserParam": {
+					"databaseUserKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Key Value for the Database Environment Variable in order to inform the database user Note that each database version/image can expected a different value for it.",
 							Type:        []string{"string"},
@@ -468,21 +468,21 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 							Format:      "",
 						},
 					},
-					"configMapDatabaseNameParam": {
+					"configMapDatabaseNameKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name of the configMap key where the operator should looking for the value for the database name for its env var",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"configMapDatabasePasswordParam": {
+					"configMapDatabasePasswordKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name of the configMap key where the operator should looking for the value for the database user for its env var",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"configMapDatabaseUserParam": {
+					"configMapDatabaseUserKey": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name of the configMap key where the operator should looking for the value for the database password for its env var",
 							Type:        []string{"string"},

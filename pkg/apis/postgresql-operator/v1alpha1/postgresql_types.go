@@ -16,26 +16,26 @@ type PostgresqlSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
-	// Value for the Database Environment Variable (Spec.DatabaseNameParam).
+	// Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).
 	DatabaseName string `json:"databaseName,omitempty"`
 
-	// Value for the Database Environment Variable (Spec.DatabasePasswordParam).
+	// Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).
 	DatabasePassword string `json:"databasePassword,omitempty"`
 
-	// Value for the Database Environment Variable (Spec.DatabaseUser).
+	// Value for the Database Environment Variable (spec.databaseUserKeyEnvVar).
 	DatabaseUser string `json:"databaseUser,omitempty"`
 
 	// Key Value for the Database Environment Variable in order to inform the database mame
 	// Note that each database version/image can expected a different value for it.
-	DatabaseNameParam string `json:"databaseNameParam,omitempty"`
+	DatabaseNameKeyEnvVar string `json:"databaseNameKeyEnvVar,omitempty"`
 
 	// Key Value for the Database Environment Variable in order to inform the database password
 	// Note that each database version/image can expected a different value for it.
-	DatabasePasswordParam string `json:"databasePasswordParam,omitempty"`
+	DatabasePasswordKeyEnvVar string `json:"databasePasswordKeyEnvVar,omitempty"`
 
 	// Key Value for the Database Environment Variable in order to inform the database user
 	// Note that each database version/image can expected a different value for it.
-	DatabaseUserParam string `json:"databaseUserParam,omitempty"`
+	DatabaseUserKeyEnvVar string `json:"databaseUserKeyEnvVar,omitempty"`
 
 	// Value for the Database Environment Variable in order to define the port which it should use. It will be used in its container as well
 	DatabasePort int32 `json:"databasePort,omitempty"`
@@ -66,13 +66,13 @@ type PostgresqlSpec struct {
 	ConfigMapName string `json:"configMapName,omitempty"`
 
 	// Name of the configMap key where the operator should looking for the value for the database name for its env var
-	ConfigMapDatabaseNameParam string `json:"configMapDatabaseNameParam,omitempty"`
+	ConfigMapDatabaseNameKey string `json:"configMapDatabaseNameKey,omitempty"`
 
 	// Name of the configMap key where the operator should looking for the value for the database user for its env var
-	ConfigMapDatabasePasswordParam string `json:"configMapDatabasePasswordParam,omitempty"`
+	ConfigMapDatabasePasswordKey string `json:"configMapDatabasePasswordKey,omitempty"`
 
 	// Name of the configMap key where the operator should looking for the value for the database password for its env var
-	ConfigMapDatabaseUserParam string `json:"configMapDatabaseUserParam,omitempty"`
+	ConfigMapDatabaseUserKey string `json:"configMapDatabaseUserKey,omitempty"`
 }
 
 // PostgresqlStatus defines the observed state of Postgresql
