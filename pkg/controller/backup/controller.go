@@ -156,15 +156,15 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 		return err
 	}
 
-	// Set in the ReconcileBackup the Pod database created by PostgreSQL
+	// Get the Database Pod created by the PostgreSQL Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
-	if err := r.setDatabasePod(bkp, db); err != nil {
+	if err := r.getDatabasePod(bkp, db); err != nil {
 		return err
 	}
 
-	// Set in the ReconcileBackup the Service database created by PostgreSQL
+	// Get the Database Service created by the PostgreSQL Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
-	if err := r.setDatabaseService(bkp, db); err != nil {
+	if err := r.getDatabaseService(bkp, db); err != nil {
 		return err
 	}
 

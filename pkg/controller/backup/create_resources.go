@@ -11,7 +11,7 @@ import (
 
 // Set in the ReconcileBackup the Pod database created by PostgreSQL
 // NOTE: This data is required in order to create the secrets which will access the database container to do the backup
-func (r *ReconcileBackup) setDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) error {
+func (r *ReconcileBackup) getDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) error {
 	dbPod, err := service.FetchPostgreSQLPod(bkp, db, r.client)
 	if err != nil || dbPod == nil {
 		r.dbPod = nil
@@ -24,7 +24,7 @@ func (r *ReconcileBackup) setDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Post
 
 // Set in the ReconcileBackup the service database created by PostgreSQL
 // NOTE: This data is required in order to create the secrets which will access the database container to do the backup
-func (r *ReconcileBackup) setDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) error {
+func (r *ReconcileBackup) getDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) error {
 	dbService, err := service.FetchPostgreSQLService(bkp, db, r.client)
 	if err != nil || dbService == nil {
 		r.dbService = nil
