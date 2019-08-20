@@ -24,7 +24,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCal
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Backup is the Schema for the backups API",
+				Description: "Backup represents the backup service in the cluster",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -78,98 +78,98 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.Referenc
 					},
 					"schedule": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Schedule period for the CronJob  \"0 0 * * *\" # daily at 00:00.",
+							Description: "Schedule period for the CronJob. Default Value: <0 0 * * *> daily at 00:00",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Image:tag used to do the backup. More Info: https://github.com/integr8ly/backup-container-image",
+							Description: "Image:tag used to do the backup. Default Value: <quay.io/integreatly/backup-container:1.0.8> More Info: https://github.com/integr8ly/backup-container-image",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseVersion": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Database version. (E.g 9.6). IMPORTANT: Just the first 2 digits should be used.",
+							Description: "Database version. (E.g 9.6). Default Value: <9.6> IMPORTANT: Just the first 2 digits should be used.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"productName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Used to create the directory where the files will be stored",
+							Description: "Used to create the directory where the files will be stored Default Value: <postgresql>",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"awsS3BucketName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of AWS S3 storage. Required to create the Secret with the AWS data to allow send the backup files to AWS S3 storage.",
+							Description: "Name of AWS S3 storage. Default Value: nil Required to create the Secret with the AWS data to allow send the backup files to AWS S3 storage.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"awsAccessKeyId": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Key ID of AWS S3 storage. Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
+							Description: "Key ID of AWS S3 storage. Default Value: nil Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"awsSecretAccessKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Secret/Token of AWS S3 storage. Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
+							Description: "Secret/Token of AWS S3 storage. Default Value: nil Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"awsSecretName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the secret with the AWS data credentials pre-existing in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml",
+							Description: "Name of the secret with the AWS data credentials pre-existing in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"awsSecretNamespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Namespace of the secret with the AWS data credentials pre-existing in the cluster NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
+							Description: "Namespace of the secret with the AWS data credentials pre-existing in the cluster Default Value: nil NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"encryptKeySecretName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the secret with the Encrypt data pre-existing in the cluster See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml",
+							Description: "Name of the secret with the Encrypt data pre-existing in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"encryptKeySecretNamespace": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Namespace of the secret with the Encrypt data pre-existing in the cluster NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
+							Description: "Namespace of the secret with the Encrypt data pre-existing in the cluster Default Value: nil NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"gpgPublicKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "GPG public key to create the EncryptionKeySecret with this data See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
+							Description: "GPG public key to create the EncryptionKeySecret with this data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"gpgEmail": {
 						SchemaProps: spec.SchemaProps{
-							Description: "GPG email to create the EncryptionKeySecret with this data See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
+							Description: "GPG email to create the EncryptionKeySecret with this data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"gpgTrustModel": {
 						SchemaProps: spec.SchemaProps{
-							Description: "GPG trust model to create the EncryptionKeySecret with this data. the default value is true when it is empty. See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
+							Description: "GPG trust model to create the EncryptionKeySecret with this data. the default value is true when it is empty. Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -318,7 +318,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Postgresql is the Schema for the postgresqls API",
+				Description: "Postgresql represents the PostgreSQL in the cluster",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -365,42 +365,42 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 				Properties: map[string]spec.Schema{
 					"databaseName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).",
+							Description: "Value for the Database Environment Variable (spec.databaseNameKeyEnvVar). Default value: example",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databasePassword": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).",
+							Description: "Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar). Default value: postgres",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseUser": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Value for the Database Environment Variable (spec.databaseUserKeyEnvVar).",
+							Description: "Value for the Database Environment Variable (spec.databaseUserKeyEnvVar). Default value: postgres",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseNameKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Key Value for the Database Environment Variable in order to inform the database mame Note that each database version/image can expected a different value for it.",
+							Description: "Key Value for the Database Environment Variable in order to inform the database mame Note that each database version/image can expected a different value for it. Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databasePasswordKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Key Value for the Database Environment Variable in order to inform the database password Note that each database version/image can expected a different value for it.",
+							Description: "Key Value for the Database Environment Variable in order to inform the database password Note that each database version/image can expected a different value for it. Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseUserKeyEnvVar": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Key Value for the Database Environment Variable in order to inform the database user Note that each database version/image can expected a different value for it.",
+							Description: "Key Value for the Database Environment Variable in order to inform the database user Note that each database version/image can expected a different value for it. Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -414,14 +414,14 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 					},
 					"size": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Quantity of instances",
+							Description: "Quantity of instances Default value: 1",
 							Type:        []string{"integer"},
 							Format:      "int32",
 						},
 					},
 					"image": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Database image:tag E.g \"centos/postgresql-96-centos7\"",
+							Description: "Database image:tag Default value: centos/postgresql-96-centos7",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -435,56 +435,70 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 					},
 					"databaseMemoryLimit": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Limit of Memory which will be available for the database container",
+							Description: "Limit of Memory which will be available for the database container Default value: 512Mi",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseMemoryRequest": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Limit of Memory Request which will be available for the database container",
+							Description: "Limit of Memory Request which will be available for the database container Default value: 128Mi",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"databaseStorageRequest": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Limit of Storage Request which will be available for the database container",
+							Description: "Limit of Storage Request which will be available for the database container Default value: 1Gi",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"databaseCpu": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CPU resource request which will be available for the database container Default value: 10Mi",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"databaseCpuLimit": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Limit of CPU request which will be available for the database container Default value: 20Mi",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"containerImagePullPolicy": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Policy definition to pull the Database Image More info: https://kubernetes.io/docs/concepts/containers/images/",
+							Description: "Policy definition to pull the Database Image More info: https://kubernetes.io/docs/concepts/containers/images/ Default value:",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"configMapName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the ConfigMap where the operator should looking for the EnvVars keys and/or values only",
+							Description: "Name of the ConfigMap where the operator should looking for the EnvVars keys and/or values only Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"configMapDatabaseNameKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the configMap key where the operator should looking for the value for the database name for its env var",
+							Description: "Name of the configMap key where the operator should looking for the value for the database name for its env var Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"configMapDatabasePasswordKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the configMap key where the operator should looking for the value for the database user for its env var",
+							Description: "Name of the configMap key where the operator should looking for the value for the database user for its env var Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
 					"configMapDatabaseUserKey": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the configMap key where the operator should looking for the value for the database password for its env var",
+							Description: "Name of the configMap key where the operator should looking for the value for the database password for its env var Default value: nil",
 							Type:        []string{"string"},
 							Format:      "",
 						},

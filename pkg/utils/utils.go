@@ -3,7 +3,7 @@ package utils
 import "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 
 func GetLabels(name string) map[string]string {
-	return map[string]string{"app": "postgresqloperator", "cr": name}
+	return map[string]string{"owner": "postgresqloperator", "cr": name}
 }
 
 // GetAWSSecretName returns the name of the secret

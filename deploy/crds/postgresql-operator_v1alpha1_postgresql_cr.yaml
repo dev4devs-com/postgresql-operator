@@ -15,7 +15,9 @@ spec:
 
   size: 1
   databaseMemoryLimit: "512Mi"
-  databaseMemoryRequest: "512Mi"
+  databaseMemoryRequest: "128Mi"
+  databaseCpuLimit: "20Mi"
+  databaseCpu: "10Mi"
   databaseStorageRequest: "1Gi"
 
   # The imaged used in this project is from Red Hat. See more in https://docs.okd.io/latest/using_images/db_images/postgresql.html
@@ -35,9 +37,9 @@ spec:
   # The following values will be used fill the env variables. (Optional)
   # They will be not required if you are using the configMap setup
   # ---------------------------------
-  databaseName: "example-database-name"
-  databasePassword: "postgresql"
-  databaseUser: "postgresql"
+  databaseName: "example"
+  databasePassword: "postgres"
+  databaseUser: "postgres"
 
   # ---------------------------------
   # ## Customizations Options

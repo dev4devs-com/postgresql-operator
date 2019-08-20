@@ -18,58 +18,99 @@ type BackupSpec struct {
 	// Name of the PostgreSQL CR applied which this backup will work with
 	PostgresqlCRName string `json:"postgresqlCRName,omitempty"`
 
-	// Schedule period for the CronJob  "0 0 * * *" # daily at 00:00.
+	// Schedule period for the CronJob.
+	// Default Value: <0 0 * * *> daily at 00:00
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	Schedule string `json:"schedule,omitempty"`
 
 	// Image:tag used to do the backup.
+	// Default Value: <quay.io/integreatly/backup-container:1.0.8>
 	// More Info: https://github.com/integr8ly/backup-container-image
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image:tag"
 	Image string `json:"image,omitempty"`
 
 	// Database version. (E.g 9.6).
+	// Default Value: <9.6>
 	// IMPORTANT: Just the first 2 digits should be used.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="PostgreSQLversion"
 	DatabaseVersion string `json:"databaseVersion,omitempty"`
 
 	// Used to create the directory where the files will be stored
+	// Default Value: <postgresql>
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS tag name"
 	ProductName string `json:"productName,omitempty"`
 
 	// Name of AWS S3 storage.
+	// Default Value: nil
 	// Required to create the Secret with the AWS data to allow send the backup files to AWS S3 storage.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS S3 Bucket name"
 	AwsS3BucketName string `json:"awsS3BucketName,omitempty"`
 
 	// Key ID of AWS S3 storage.
+	// Default Value: nil
 	// Required to create the Secret with the data to allow send the backup files to AWS S3 storage.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS S3 accessKey/token ID"
 	AwsAccessKeyId string `json:"awsAccessKeyId,omitempty"`
 
 	// Secret/Token of AWS S3 storage.
+	// Default Value: nil
 	// Required to create the Secret with the data to allow send the backup files to AWS S3 storage.
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS S3 accessKey/token"
 	AwsSecretAccessKey string `json:"awsSecretAccessKey,omitempty"`
 
 	// Name of the secret with the AWS data credentials pre-existing in the cluster
+	// Default Value: nil
 	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS Secret name:"
 	AwsSecretName string `json:"awsSecretName,omitempty"`
 
 	// Namespace of the secret with the AWS data credentials pre-existing in the cluster
+	// Default Value: nil
 	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS Secret namespace:"
 	AwsSecretNamespace string `json:"awsSecretNamespace,omitempty"`
 
 	// Name of the secret with the Encrypt data pre-existing in the cluster
+	// Default Value: nil
 	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey Secret name:"
 	EncryptKeySecretName string `json:"encryptKeySecretName,omitempty"`
 
 	// Namespace of the secret with the Encrypt data pre-existing in the cluster
+	// Default Value: nil
 	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey Secret namespace:"
 	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace,omitempty"`
 
 	// GPG public key to create the EncryptionKeySecret with this data
+	// Default Value: nil
 	// See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg public key:"
 	GpgPublicKey string `json:"gpgPublicKey,omitempty"`
 
 	// GPG email to create the EncryptionKeySecret with this data
+	// Default Value: nil
 	// See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg public email:"
 	GpgEmail string `json:"gpgEmail,omitempty"`
 
 	// GPG trust model to create the EncryptionKeySecret with this data. the default value is true when it is empty.
+	// Default Value: nil
 	// See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg trust model:"
 	GpgTrustModel string `json:"gpgTrustModel,omitempty"`
 }
 
@@ -125,9 +166,14 @@ type BackupStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Backup is the Schema for the backups API
+// Backup represents the backup service in the cluster
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
+// +operator-sdk:gen-csv:customresourcedefinitions.displayName="Backup"
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="CronJob,v1beta1,\"A Kubernetes CronJob\""
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="Secret,v1,\"A Kubernetes Secret\""
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="Service,v1,\"A Kubernetes Service\""
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="Pod,v1,\"A Kubernetes Pod\""
 type Backup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -136,9 +182,8 @@ type Backup struct {
 	Status BackupStatus `json:"status,omitempty"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-
 // BackupList contains a list of Backup
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 type BackupList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

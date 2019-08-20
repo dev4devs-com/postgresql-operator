@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	retryInterval        = time.Second * 5
+	retryInterval        = time.Second * 10
 	timeout              = time.Second * 60
-	cleanupRetryInterval = time.Second * 1
-	cleanupTimeout       = time.Second * 5
+	cleanupRetryInterval = time.Second * 2
+	cleanupTimeout       = time.Second * 10
 )
 
 func TestPostgreSQL(t *testing.T) {

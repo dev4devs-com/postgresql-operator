@@ -5,7 +5,6 @@ require (
 	github.com/go-openapi/spec v0.19.0
 	github.com/operator-framework/operator-sdk v0.10.1-0.20190809191117-c1e2eae6580e
 	github.com/spf13/pflag v1.0.3
-	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 	k8s.io/api v0.0.0-20190612125737-db0771252981
 	k8s.io/apimachinery v0.0.0-20190612125636-6a5db36e93ad
 	k8s.io/client-go v11.0.0+incompatible

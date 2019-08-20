@@ -1,0 +1,11 @@
+# ---------------
+# It is just used to test it in OLM before it be published
+# ---------------
+apiVersion: operators.coreos.com/v1alpha2
+kind: OperatorGroup
+metadata:
+  name: postgresql-operator-group
+  namespace: postgresql
+spec:
+  targetNamespaces:
+  - postgresql
