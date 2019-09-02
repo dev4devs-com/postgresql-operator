@@ -318,7 +318,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.Referenc
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Postgresql represents the PostgreSQL in the cluster",
+				Description: "Postgresql represents the PostgreSQL Database in the cluster",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
