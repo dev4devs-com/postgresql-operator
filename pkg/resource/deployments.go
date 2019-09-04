@@ -90,7 +90,7 @@ func NewPostgresqlDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *a
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
 								corev1.ResourceMemory:    resource.MustParse(db.Spec.DatabaseMemoryLimit),
-								corev1.ResourceLimitsCPU: resource.MustParse(db.Spec.DatabaseMemoryLimit),
+								corev1.ResourceCPU: resource.MustParse(db.Spec.DatabaseMemoryLimit),
 							},
 							Requests: corev1.ResourceList{
 								corev1.ResourceMemory: resource.MustParse(db.Spec.DatabaseMemoryRequest),
