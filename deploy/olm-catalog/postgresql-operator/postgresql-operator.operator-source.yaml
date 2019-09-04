@@ -1,0 +1,17 @@
+# ---------------
+# It is just used to test it in OLM before it be published
+# ---------------
+apiVersion: operators.coreos.com/v1
+kind: OperatorSource
+metadata:
+  name: postgresql-operator
+  namespace: marketplace
+spec:
+  type: appregistry
+  endpoint: https://quay.io/cnr
+  # The registryNamespace corresponds to the Quay user created under this URL : https://quay.io/organization/
+  # This org or registry will contain different applications published
+  # Example : https://quay.io/application/dev4devs-com/postgresql-operator-operatorhub
+  registryNamespace: dev4devs-com
+  displayName: "Postgresql Operator"
+  publisher: "Dev4Devs-com"

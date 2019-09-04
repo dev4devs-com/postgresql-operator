@@ -49,7 +49,7 @@ metadata:
     repository: https://github.com/dev4devs-com/postgresql-operator
     support: Dev4Devs, Inc.
   name: postgresql-operator.v0.0.1
-  namespace: postgresql
+  namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -501,14 +501,14 @@ spec:
                 - name: WATCH_NAMESPACE
                   valueFrom:
                     fieldRef:
-                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                      fieldPath: metadata.namespace
                 - name: POD_NAME
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
                 - name: OPERATOR_NAME
                   value: postgresql-operator
-                image: quay.io/dev4devs-com/postgresql-operator:master
+                image: quay.io/dev4devs-com/postgresql-operator:0.0.1
                 imagePullPolicy: Always
                 name: postgresql-operator
                 resources:
@@ -527,7 +527,7 @@ spec:
     type: SingleNamespace
   - supported: false
     type: MultiNamespace
-  - supported: true
+  - supported: false
     type: AllNamespaces
   keywords:
   - postgresql
@@ -550,7 +550,4 @@ spec:
   maturity: alpha
   provider:
     name: Dev4Devs.com
-  selector:
-    matchLabels:
-      operated-by: postgresql-operator
   version: 0.0.1

@@ -77,7 +77,7 @@ $ minishift config set insecure-registry 172.30.0.0/16
 $ minishift start
 ----
 
-=== Installing
+=== Installing as standalone
 
 Use the following command to install the Operator and Database
 
@@ -132,6 +132,10 @@ $ make uninstall
 ----
 
 NOTE: To uninstall you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+
+== OperatorHub.io
+
+This operator can be installed by the OperatorHub.io. Note that application image is deployed in https://quay.io/application/dev4devs-com/postgresql-operator-operatorhub.
 
 == Configuration and Options
 
