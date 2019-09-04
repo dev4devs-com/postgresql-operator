@@ -6,5 +6,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-## [0.0.1] - 2019-09-02
+## [0.0.1] - 2019-09-04
 - Initial development release which allows work with as standalone and has OLM files. 
