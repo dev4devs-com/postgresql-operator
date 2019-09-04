@@ -19,7 +19,7 @@ rules:
   - serviceaccounts
   - rolebindings
   - pods
-  - service
+  - services
   - service/finalizers
   - endpoints
   - persistentvolumeclaims

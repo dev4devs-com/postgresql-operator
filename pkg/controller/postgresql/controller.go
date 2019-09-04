@@ -84,7 +84,7 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 
 	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get the Postgresql Custom Resource. Check if the Backup CR is applied in the cluster")
+		reqLogger.Error(err, "Failed to get the Postgresql Custom Resource. Check if the PostgreSQL CR is applied in the cluster")
 		return reconcile.Result{}, err
 	}
 
