@@ -36,8 +36,8 @@ func (r *ReconcileBackup) updateBackupStatus(request reconcile.Request) error {
 
 // Check if BackupStatus was changed, if yes update it
 func (r *ReconcileBackup) insertUpdateBackupStatus(bkp *v1alpha1.Backup, statusMsgUpdate string) error {
-	if !reflect.DeepEqual(statusMsgUpdate, bkp.Status.BackupStatus) {
-		bkp.Status.BackupStatus = statusOk
+	if statusMsgUpdate != bkp.Status.BackupStatus {
+		bkp.Status.BackupStatus = statusMsgUpdate
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
 		}
@@ -282,8 +282,8 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	}
 
 	// Check if AWS secret was created
-	awsSecretName := utils.GetAwsSecretNamespace(bkp)
-	awsSecretNamespace := utils.GetAWSSecretName(bkp)
+	awsSecretName :=  utils.GetAWSSecretName(bkp)
+	awsSecretNamespace := utils.GetAwsSecretNamespace(bkp)
 	_, err = service.FetchSecret(awsSecretNamespace, awsSecretName, r.client)
 	if err != nil {
 		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)", awsSecretName, awsSecretNamespace)

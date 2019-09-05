@@ -103,6 +103,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	// Add const values for mandatory specs
+	reqLogger.Info( "Adding backup mandatory specs")
 	utils.AddBackupMandatorySpecs(bkp)
 
 	// Create mandatory objects for the Backup
@@ -160,14 +161,11 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 		return err
 	}
 
-	// Check if the encryptionKey was configured
-	if utils.IsEncryptionKeyOptionConfig(bkp) {
-		// // Check if the encryptionKey is created, if not create one
-		// NOTE: The user can config in the CR to use a pre-existing one by informing the name
-		if err := r.createEncryptionKey(bkp); err != nil {
-			reqLogger.Error(err, "Failed to create a Enc Secret")
-			return err
-		}
+	// Check if the encryptionKey is created, if not create one
+	// NOTE: The user can config in the CR to use a pre-existing one by informing the name
+	if err := r.createEncryptionKey(bkp); err != nil {
+		reqLogger.Error(err, "Failed to create a Enc Secret")
+		return err
 	}
 
 	// Check if the cronJob is created, if not create one
