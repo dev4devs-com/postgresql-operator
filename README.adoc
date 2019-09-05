@@ -287,13 +287,10 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 | `cronJobName` | Name of cronJob resource  created by it.
 | `cronJobStatus` | CronJob Status from ks8 API (https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.13/#cronjobstatus-v1beta1-batch[v1beta1.CronJobStatus]).
 | `dbSecretName` | Name of database secret resource created in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to the database .
-| `dbSecretData` | Data used into the secret to connect to the database .
 | `awsSecretName` | Name of AWS S3 bucket secret resource used in order to allow the https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image] connect to AWS to send the backup .
-| `awsSecretData` | Data used to in the secret to send the backup files to the AWS S3.
 | `awsSecretDataNamespace` | Namespace where the backup image will looking for the of the Aws Secret  used.
 | `encryptKeySecretName` | Name of the EncryptKey used.
 | `encryptKeySecretNamespace` | Namespace where the backup image will looking for the of the EncryptKey used.
-| `encryptKeySecretData` | Data used into the EncryptKey.
 | `hasEncryptionKey` | Expected true when it was configured to use an EncryptnKey secret
 | `isDatabasePodFound` | The value expected here is true which shows that the database pod was found.
 | `isDatabaseServiceFound` | The value expected here is true which shows that the database service was found.

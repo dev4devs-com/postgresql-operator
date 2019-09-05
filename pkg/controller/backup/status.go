@@ -100,11 +100,9 @@ func (r *ReconcileBackup) updateAWSSecretStatus(request reconcile.Request) error
 
 // insertUpdateAwsSecretStatus will check and update the AWS Secret status if the Secret with the AWS data was changed
 func (r *ReconcileBackup) insertUpdateAwsSecretStatus(aws *corev1.Secret, bkp *v1alpha1.Backup) error {
-	data := covertDataSecretToString(aws)
-	if isAwsStatusEqual(aws, bkp, data) {
+	if isAwsStatusEqual(aws, bkp) {
 
 		bkp.Status.AWSSecretName = aws.Name
-		bkp.Status.AWSSecretData = data
 		bkp.Status.AwsCredentialsSecretNamespace = aws.Namespace
 
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
@@ -115,8 +113,8 @@ func (r *ReconcileBackup) insertUpdateAwsSecretStatus(aws *corev1.Secret, bkp *v
 }
 
 // isAwsStatusEqual return true when something related to the aws status fields changed
-func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup, data map[string]string) bool {
-	return aws.Name != bkp.Status.AWSSecretName || !reflect.DeepEqual(data, bkp.Status.AWSSecretData) || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
+func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup) bool {
+	return aws.Name != bkp.Status.AWSSecretName  || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
 }
 
 // updateAWSSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
@@ -152,11 +150,9 @@ func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error
 
 // insertUpdateEncKeyStatus will check and update the EncryptionKey Secret status if the Secret with the AWS data was changed
 func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v1alpha1.Backup) error {
-	data := covertDataSecretToString(secret)
-	if isEncryptKeyStatusEquals(secret, bkp, data) {
+	if isEncryptKeyStatusEquals(secret, bkp) {
 
 		bkp.Status.EncryptKeySecretName = secret.Name
-		bkp.Status.EncryptKeySecretData = data
 		bkp.Status.EncryptKeySecretNamespace = secret.Namespace
 
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
@@ -167,26 +163,8 @@ func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v
 }
 
 // isEncryptKeyStatusEquals return true when something related to the aws status fields change
-func isEncryptKeyStatusEquals(secret *corev1.Secret, bkp *v1alpha1.Backup, data map[string]string) bool {
-	return secret.Name != bkp.Status.EncryptKeySecretName || secret.Namespace != bkp.Status.EncryptKeySecretNamespace || !reflect.DeepEqual(data, bkp.Status.EncryptKeySecretData)
-}
-
-// covertDataSecretToString coverts data secret in []byte to map[string]string
-func covertDataSecretToString(secret *corev1.Secret) map[string]string {
-	data := make(map[string]string)
-	if secret.Data != nil {
-		for k, v := range secret.Data {
-			value := ""
-			if v != nil {
-				value = string(v)
-			}
-			data[k] = value
-		}
-		for k, v := range secret.StringData {
-			data[k] = v
-		}
-	}
-	return data
+func isEncryptKeyStatusEquals(secret *corev1.Secret, bkp *v1alpha1.Backup) bool {
+	return secret.Name != bkp.Status.EncryptKeySecretName || secret.Namespace != bkp.Status.EncryptKeySecretNamespace
 }
 
 // updateDBSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
@@ -210,11 +188,8 @@ func (r *ReconcileBackup) updateDBSecretStatus(request reconcile.Request) error 
 
 // insertUpdateDBSecretStatus will check and update the DB Secret status if the Secret with the DB data was changed
 func (r *ReconcileBackup) insertUpdateDBSecretStatus(dbSecret *corev1.Secret, bkp *v1alpha1.Backup) error {
-	data := covertDataSecretToString(dbSecret)
-	if dbSecret.Name != bkp.Status.DBSecretName || !reflect.DeepEqual(data, bkp.Status.DBSecretData) {
+	if dbSecret.Name != bkp.Status.DBSecretName {
 		bkp.Status.DBSecretName = dbSecret.Name
-		bkp.Status.DBSecretData = data
-
 		if err := r.client.Status().Update(context.TODO(), bkp); err != nil {
 			return err
 		}
@@ -248,8 +223,8 @@ func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) err
 	return nil
 }
 
-// updateServiceDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
-func (r *ReconcileBackup) updateServiceDbServiceFoundStatus(request reconcile.Request) error {
+// updateDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
+func (r *ReconcileBackup) updateDbServiceFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
