@@ -2,8 +2,6 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    description: "Operator in Go developed using the Operator Framework to package, install, configure and manage a PostgreSQL database"
-    certified: "false"
     alm-examples: |-
       [
         {
@@ -26,8 +24,8 @@ metadata:
             "name": "postgresql"
           },
           "spec": {
-            "databaseCpu": "10Mi",
-            "databaseCpuLimit": "20Mi",
+            "databaseCpu": "30m",
+            "databaseCpuLimit": "60m",
             "databaseMemoryLimit": "512Mi",
             "databaseMemoryRequest": "128Mi",
             "databaseName": "example",
@@ -44,8 +42,11 @@ metadata:
       ]
     capabilities: Full Lifecycle
     categories: Database
+    certified: "false"
     containerImage: quay.io/dev4devs-com/postgresql-operator:0.0.1
     createdAt: "2019-08-19T08:00:00Z"
+    description: Operator in Go developed using the Operator Framework to package,
+      install, configure and manage a PostgreSQL database
     repository: https://github.com/dev4devs-com/postgresql-operator
     support: Dev4Devs, Inc.
   name: postgresql-operator.v0.0.1
@@ -414,7 +415,7 @@ spec:
           - serviceaccounts
           - rolebindings
           - pods
-          - service
+          - services
           - service/finalizers
           - endpoints
           - persistentvolumeclaims
@@ -501,7 +502,7 @@ spec:
                 - name: WATCH_NAMESPACE
                   valueFrom:
                     fieldRef:
-                      fieldPath: metadata.namespace
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
                 - name: POD_NAME
                   valueFrom:
                     fieldRef:
