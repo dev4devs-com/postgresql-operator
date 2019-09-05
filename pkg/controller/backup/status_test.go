@@ -528,7 +528,7 @@ func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 
 			r := buildReconcileWithFakeClientWithMocks(tt.fields.objs)
 
-			err := r.updateServiceDbServiceFoundStatus(tt.args.request)
+			err := r.updateDbServiceFoundStatus(tt.args.request)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TestUpdateServiceDatabaseFoundStatus error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -16,7 +16,7 @@ spec:
       containers:
         - name: postgresql-operator
           # Replace this with the built image name
-          image: cmacedo/postgresql-operator:memory2
+          image: cmacedo/postgresql-operator:test
           command:
           - postgresql-operator
           imagePullPolicy: Always

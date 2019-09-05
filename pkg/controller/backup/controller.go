@@ -4,7 +4,9 @@ import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
+	"k8s.io/api/batch/v1beta1"
 	"k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -12,13 +14,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/api/batch/v1beta1"
 )
-
-var log = logf.Log.WithName("controller_backup")
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
@@ -88,7 +85,7 @@ type ReconcileBackup struct {
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.BackupControllerName)
 	reqLogger.Info("Reconciling Backup ...")
 
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
@@ -126,32 +123,40 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 
 //createResources will create and update the secondary resource which are required in order to make works successfully the primary resource(CR)
 func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.BackupControllerName)
+	reqLogger.Info("Creating secondary Backup resources ...")
+
 	// Check if the database instance was created
 	db, err := service.FetchPostgreSQL(bkp.Spec.PostgresqlCRName, request.Namespace, r.client)
 	if err != nil {
+		reqLogger.Error(err, "Failed to fetch PostgreSQL instance/cr")
 		return err
 	}
 
 	// Get the Database Pod created by the PostgreSQL Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
 	if err := r.getDatabasePod(bkp, db); err != nil {
+		reqLogger.Error(err, "Failed to get a Database pod")
 		return err
 	}
 
 	// Get the Database Service created by the PostgreSQL Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
 	if err := r.getDatabaseService(bkp, db); err != nil {
+		reqLogger.Error(err, "Failed to get a Database service")
 		return err
 	}
 
 	// Checks if the secret with the database is created, if not create one
 	if err := r.createDatabaseSecret(bkp, db); err != nil {
+		reqLogger.Error(err, "Failed to create the Database secret")
 		return err
 	}
 
 	// Check if the secret with the aws data is created, if not create one
 	// NOTE: The user can config in the CR to use a pre-existing one by informing the name
 	if err := r.createAwsSecret(bkp); err != nil {
+		reqLogger.Error(err, "Failed to create the Aws secret")
 		return err
 	}
 
@@ -160,12 +165,14 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 		// // Check if the encryptionKey is created, if not create one
 		// NOTE: The user can config in the CR to use a pre-existing one by informing the name
 		if err := r.createEncryptionKey(bkp); err != nil {
+			reqLogger.Error(err, "Failed to create a Enc Secret")
 			return err
 		}
 	}
 
 	// Check if the cronJob is created, if not create one
 	if err := r.createCronJob(bkp); err != nil {
+		reqLogger.Error(err, "Failed to create the CronJob")
 		return err
 	}
 	return nil
@@ -173,31 +180,41 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 
 //createUpdateCRStatus will create and update the status in the CR applied in the cluster
 func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error {
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.BackupControllerName)
+	reqLogger.Info("Create/Update Backup status ...")
+
 	if err := r.updatePodDatabaseFoundStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update isDatabasePodFound status")
 		return err
 	}
 
-	if err := r.updateServiceDbServiceFoundStatus(request); err != nil {
+	if err := r.updateDbServiceFoundStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update isDatabaseServiceFound status")
 		return err
 	}
 
 	if err := r.updateCronJobStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update cronJob status")
 		return err
 	}
 
 	if err := r.updateDBSecretStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update dbSecret status")
 		return err
 	}
 
 	if err := r.updateAWSSecretStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update awsSecret status")
 		return err
 	}
 
 	if err := r.updateEncSecretStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update encSecret status")
 		return err
 	}
 
 	if err := r.updateBackupStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create/update backup status")
 		return err
 	}
 	return nil

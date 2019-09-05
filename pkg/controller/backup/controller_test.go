@@ -310,11 +310,11 @@ func TestReconcileBackup(t *testing.T) {
 			wantCronJob:   false,
 		},
 		{
-			name: "Should fail because is missing the Backup CR",
+			name: "When Backup CR was not applied",
 			fields: fields{
 				objs: []runtime.Object{&dbInstanceWithoutSpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
 			},
-			wantErr:       true,
+			wantErr:       false,
 			wantRequeue:   false,
 			wantAwsSecret: false,
 			wantDBSecret:  false,

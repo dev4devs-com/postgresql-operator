@@ -1,6 +1,13 @@
 package utils
 
-import "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+import (
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/go-logr/logr"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+
+
+)
 
 func GetLabels(name string) map[string]string {
 	return map[string]string{"owner": "postgresqloperator", "cr": name}
@@ -30,7 +37,7 @@ func GetAwsSecretNamespace(bkp *v1alpha1.Backup) string {
 // NOTE: The user can just inform the name and namespace of the Secret which is already applied in the cluster OR
 // the data required for the operator be able to create one in the same namespace where the backup is applied
 func GetEncSecretNamespace(bkp *v1alpha1.Backup) string {
-	if IsEncKeySetupByNameAndNamaspace(bkp) {
+	if IsEncKeySetupByNameAndNamespace(bkp) {
 		return bkp.Spec.EncryptKeySecretNamespace
 	}
 	return bkp.Namespace
@@ -66,6 +73,15 @@ func IsAwsKeySetupByName(bkp *v1alpha1.Backup) bool {
 	return bkp.Spec.AwsSecretName != ""
 }
 
-func IsEncKeySetupByNameAndNamaspace(bkp *v1alpha1.Backup) bool {
+// IsEncKeySetupByNameAndNamespace it will return true when the Enc Key is setup by using an preexisting
+// secret applied in the cluster.
+func IsEncKeySetupByNameAndNamespace(bkp *v1alpha1.Backup) bool {
 	return IsEncKeySetupByName(bkp) && bkp.Spec.EncryptKeySecretNamespace != ""
 }
+
+func GetLoggerByRequestAndController(request reconcile.Request, controllerName string) logr.Logger {
+	var log = logf.Log.WithName(controllerName)
+	return log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+}
+
+

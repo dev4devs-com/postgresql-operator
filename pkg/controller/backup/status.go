@@ -185,6 +185,8 @@ func covertDataSecretToString(secret *corev1.Secret) map[string]string {
 		for k, v := range secret.StringData {
 			data[k] = v
 		}
+	} else {
+		data[""] = ""
 	}
 	return data
 }
@@ -248,8 +250,8 @@ func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) err
 	return nil
 }
 
-// updateServiceDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
-func (r *ReconcileBackup) updateServiceDbServiceFoundStatus(request reconcile.Request) error {
+// updateDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
+func (r *ReconcileBackup) updateDbServiceFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err

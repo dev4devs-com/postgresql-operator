@@ -6,18 +6,15 @@ import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	"k8s.io/apimachinery/pkg/api/errors"
 )
-
-var log = logf.Log.WithName("controller_postgresql")
 
 // Add creates a new PostgreSQL Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
@@ -80,7 +77,7 @@ type ReconcilePostgresql struct {
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
 func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.PostgreSQLControllerName)
 	reqLogger.Info("Reconciling Postgresql ...")
 
 	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
@@ -100,7 +97,7 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	// Add const values for mandatory specs
 	utils.AddPostgresqlMandatorySpecs(db)
 
-	if err := r.createResources(db); err != nil {
+	if err := r.createResources(db, request); err != nil {
 		reqLogger.Error(err, "Failed to create the secondary resource required for the PostgreSQL CR")
 		return reconcile.Result{}, err
 	}
@@ -119,19 +116,25 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 }
 
 //createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
-func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql) error {
+func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql, request reconcile.Request) error {
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.PostgreSQLControllerName)
+	reqLogger.Info("Creating secondary PostgreSQL resources ...")
+
 	// Check if deployment for the app exist, if not create one
 	if err := r.createDeployment(db); err != nil {
+		reqLogger.Error(err, "Failed to create Deployment")
 		return err
 	}
 
 	// Check if service for the app exist, if not create one
 	if err := r.createService(db); err != nil {
+		reqLogger.Error(err, "Failed to create Service")
 		return err
 	}
 
 	// Check if PersistentVolumeClaim for the app exist, if not create one
 	if err := r.createPvc(db); err != nil {
+		reqLogger.Error(err, "Failed to create PVC")
 		return err
 	}
 
@@ -140,20 +143,26 @@ func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql) error {
 
 //createUpdateCRStatus will create and update the status in the CR applied in the cluster
 func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) error {
+	reqLogger := utils.GetLoggerByRequestAndController(request, utils.PostgreSQLControllerName)
+	reqLogger.Info("Create/Update PostgreSQL status ...")
 
 	if err := r.updateDeploymentStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create Deployment Status")
 		return err
 	}
 
 	if err := r.updateServiceStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create Service Status")
 		return err
 	}
 
 	if err := r.updatePvcStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create PVC Status")
 		return err
 	}
 
 	if err := r.updateDBStatus(request); err != nil {
+		reqLogger.Error(err, "Failed to create DB Status")
 		return err
 	}
 	return nil
