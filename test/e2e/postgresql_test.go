@@ -53,7 +53,7 @@ func PostgreSQLCluster(t *testing.T) {
 	// get global framework variables
 	f := framework.Global
 	// wait for memcached-operator to be ready
-	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, "postgresql-operator", 1, retryInterval, timeout)
+	err = e2eutil.WaitForOperatorDeployment(t, f.KubeClient, namespace, "postgresql-operator", 1, retryInterval, timeout)
 	if err != nil {
 		t.Fatal(err)
 	}
