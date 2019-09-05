@@ -35,8 +35,8 @@ func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
 
 // Check if DatabaseStatus was changed, if yes update it
 func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql, statusMsgUpdate string) error {
-	if !reflect.DeepEqual(statusMsgUpdate, db.Status.DatabaseStatus) {
-		db.Status.DatabaseStatus = statusOk
+	if statusMsgUpdate != db.Status.DatabaseStatus {
+		db.Status.DatabaseStatus = statusMsgUpdate
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
 			return err
 		}
