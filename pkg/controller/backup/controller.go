@@ -14,7 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/api/batch/v1beta1"
 )
 
@@ -93,7 +93,15 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get the Backup Custom Resource. Check if the Backup CR is applied in the cluster")
+		if errors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			reqLogger.Info("Backup resource not found. Ignoring since object must be deleted.")
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		reqLogger.Error(err, "Failed to get Backup.")
 		return reconcile.Result{}, err
 	}
 

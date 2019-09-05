@@ -76,6 +76,14 @@ func AddPostgresqlMandatorySpecs(db *v1alpha1.Postgresql) {
 		db.Spec.DatabaseStorageRequest = defaultPostgreSQLConfig.DatabaseStorageRequest
 	}
 
+	if db.Spec.DatabaseCpu == "" {
+		db.Spec.DatabaseCpu = defaultPostgreSQLConfig.DatabaseCpu
+	}
+
+	if db.Spec.DatabaseCpuLimit == "" {
+		db.Spec.DatabaseCpuLimit = defaultPostgreSQLConfig.DatabaseCpuLimit
+	}
+
 	if db.Spec.DatabasePort == 0 {
 		db.Spec.DatabasePort = defaultPostgreSQLConfig.DatabasePort
 	}

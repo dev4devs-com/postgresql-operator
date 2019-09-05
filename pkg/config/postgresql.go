@@ -14,8 +14,8 @@ const (
 	databaseMemoryLimit       = "512Mi"
 	databaseMemoryRequest     = "128Mi"
 	databaseStorageRequest    = "1Gi"
-	databaseCpuLimit          = "20Mi"
-	databaseCpu               = "10Mi"
+	databaseCpuLimit          = "60m"
+	databaseCpu               = "30m"
 )
 
 type DefaultPostgreSQLConfig struct {

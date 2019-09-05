@@ -14,6 +14,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	"k8s.io/apimachinery/pkg/api/errors"
 )
 
 var log = logf.Log.WithName("controller_postgresql")
@@ -84,7 +85,15 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 
 	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
 	if err != nil {
-		reqLogger.Error(err, "Failed to get the Postgresql Custom Resource. Check if the PostgreSQL CR is applied in the cluster")
+		if errors.IsNotFound(err) {
+			// Request object not found, could have been deleted after reconcile request.
+			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
+			// Return and don't requeue
+			reqLogger.Info("PostgreSQL resource not found. Ignoring since object must be deleted.")
+			return reconcile.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		reqLogger.Error(err, "Failed to get PostgreSQL.")
 		return reconcile.Result{}, err
 	}
 
