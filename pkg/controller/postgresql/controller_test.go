@@ -63,8 +63,8 @@ func TestReconcilePostgresql(t *testing.T) {
 			wantPVC:        true,
 		},
 		{
-			name:           "Should fail because is missing the instance",
-			wantErr:        true,
+			name:           "Should not fail because is missing the instance",
+			wantErr:        false,
 			wantRequeue:    false,
 			wantDeployment: false,
 			wantService:    false,
