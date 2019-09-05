@@ -49,7 +49,7 @@ func NewPostgresqlDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *a
 							utils.BuildDatabasePasswordEnvVar(db),
 							{
 								Name:  "PGDATA",
-								Value: "/var/lib/pgsql/data/pgdata",
+								Value: "/var/lib/pgsql/data",
 							},
 						},
 						VolumeMounts: []corev1.VolumeMount{
