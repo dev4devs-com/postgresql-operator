@@ -1,11 +1,14 @@
 package e2e
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis"
+	"fmt"
+	goctx "context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis"
+
 	"testing"
 	"time"
-
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/operator-framework/operator-sdk/pkg/test/e2eutil"
 )
@@ -32,12 +35,12 @@ func TestPostgreSQL(t *testing.T) {
 
 	// run subtests
 	t.Run("postgresql-group", func(t *testing.T) {
-		t.Run("Cluster", PostgreSQLCluster)
-		t.Run("Cluster2", PostgreSQLCluster)
+		t.Run("Cluster", OperatorCluster)
+		t.Run("Cluster2", OperatorCluster)
 	})
 }
 
-func PostgreSQLCluster(t *testing.T) {
+func OperatorCluster(t *testing.T) {
 	t.Parallel()
 	ctx := framework.NewTestCtx(t)
 	defer ctx.Cleanup()
@@ -52,9 +55,43 @@ func PostgreSQLCluster(t *testing.T) {
 	}
 	// get global framework variables
 	f := framework.Global
+
 	// wait for memcached-operator to be ready
-	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, "postgresql-operator", 1, retryInterval, timeout)
+	err = e2eutil.WaitForOperatorDeployment(t, f.KubeClient, namespace, "postgresql-operator", 1, retryInterval, timeout)
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	if err = postgresalSQLTest(t, f, ctx); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func postgresalSQLTest(t *testing.T, f *framework.Framework, ctx *framework.TestCtx) error {
+	namespace, err := ctx.GetNamespace()
+	if err != nil {
+		return fmt.Errorf("could not get namespace: %v", err)
+	}
+	// create memcached custom resource
+	examplePostgresql := &v1alpha1.Postgresql{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "example-postgresql",
+			Namespace: namespace,
+		},
+		Spec: v1alpha1.PostgresqlSpec{
+			Size: 1,
+		},
+	}
+	// use TestCtx's create helper to create the object and add a cleanup function for the new object
+	err = f.Client.Create(goctx.TODO(), examplePostgresql, &framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
+	if err != nil {
+		return err
+	}
+	// wait for example-memcached to reach 3 replicas
+	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, "example-postgresql", 1, retryInterval, timeout)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
