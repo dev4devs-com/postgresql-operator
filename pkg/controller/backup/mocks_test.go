@@ -143,7 +143,7 @@ var (
 					},
 					{
 						Name:  "PGDATA",
-						Value: "/var/lib/pgsql/data/pgdata",
+						Value: "/var/lib/pgsql/data",
 					},
 				},
 				VolumeMounts: []corev1.VolumeMount{
@@ -223,7 +223,7 @@ var (
 					},
 					{
 						Name:  "PGDATA",
-						Value: "/var/lib/pgsql/data/pgdata",
+						Value: "/var/lib/pgsql/data",
 					},
 				},
 				VolumeMounts: []corev1.VolumeMount{

@@ -29,6 +29,7 @@ func NewPostgresqlPvc(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.P
 				},
 			},
 		},
+
 	}
 	controllerutil.SetControllerReference(db, pv, scheme)
 	return pv
