@@ -379,7 +379,7 @@ debug the project using the following Visual Studio Code launch config.
             "mode": "remote",
             "remotePath": "${workspaceFolder}/cmd/manager/main.go",
             "port": 2345,
-            "host": "127.0.0.1",
+            "host": 1.0.0,
             "program": "${workspaceFolder}",
             "env": {},
             "args": []
