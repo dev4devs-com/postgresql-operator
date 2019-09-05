@@ -117,7 +117,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
-	// stop reconciliation
+	reqLogger.Info("Stop Reconciling Backup ...")
 	return reconcile.Result{}, nil
 }
 

@@ -130,14 +130,8 @@ type BackupStatus struct {
 	// Name of the secret object created with the database data to allow the backup image connect to the database
 	DBSecretName string `json:"dbSecretName"`
 
-	// Data  of the secret object created with the database data to allow the backup image connect to the database
-	DBSecretData map[string]string `json:"dbSecretData"`
-
 	// Name  of the secret object with the Aws data to allow send the backup files to the AWS storage
 	AWSSecretName string `json:"awsSecretName"`
-
-	// Data  of the secret object with the Aws data to allow send the backup files to the AWS storage
-	AWSSecretData map[string]string `json:"awsSecretData"`
 
 	// Namespace  of the secret object with the Aws data to allow send the backup files to the AWS storage
 	AwsCredentialsSecretNamespace string `json:"awsCredentialsSecretNamespace"`
@@ -147,9 +141,6 @@ type BackupStatus struct {
 
 	// Namespace of the secret object with the Encryption GPG Key
 	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace"`
-
-	// Data of the secret object with the Encryption GPG Key
-	EncryptKeySecretData map[string]string `json:"encryptKeySecretData"`
 
 	// Boolean value which has true when it has an EncryptionKey to be used to send the backup files
 	HasEncryptKey bool `json:"hasEncryptKey"`

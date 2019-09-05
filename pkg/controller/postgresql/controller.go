@@ -112,6 +112,7 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 		return reconcile.Result{}, err
 	}
 
+	reqLogger.Info("Stop Reconciling Postgresql ...")
 	return reconcile.Result{}, nil
 }
 

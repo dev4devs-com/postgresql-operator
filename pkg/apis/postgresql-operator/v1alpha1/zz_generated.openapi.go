@@ -208,39 +208,11 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 							Format:      "",
 						},
 					},
-					"dbSecretData": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Data  of the secret object created with the database data to allow the backup image connect to the database",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
-						},
-					},
 					"awsSecretName": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Name  of the secret object with the Aws data to allow send the backup files to the AWS storage",
 							Type:        []string{"string"},
 							Format:      "",
-						},
-					},
-					"awsSecretData": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Data  of the secret object with the Aws data to allow send the backup files to the AWS storage",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
 						},
 					},
 					"awsCredentialsSecretNamespace": {
@@ -262,20 +234,6 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 							Description: "Namespace of the secret object with the Encryption GPG Key",
 							Type:        []string{"string"},
 							Format:      "",
-						},
-					},
-					"encryptKeySecretData": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Data of the secret object with the Encryption GPG Key",
-							Type:        []string{"object"},
-							AdditionalProperties: &spec.SchemaOrBool{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Type:   []string{"string"},
-										Format: "",
-									},
-								},
-							},
 						},
 					},
 					"hasEncryptKey": {
@@ -306,7 +264,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 						},
 					},
 				},
-				Required: []string{"backupStatus", "cronJobName", "dbSecretName", "dbSecretData", "awsSecretName", "awsSecretData", "awsCredentialsSecretNamespace", "encryptKeySecretName", "encryptKeySecretNamespace", "encryptKeySecretData", "hasEncryptKey", "isDatabasePodFound", "isDatabaseServiceFound", "cronJobStatus"},
+				Required: []string{"backupStatus", "cronJobName", "dbSecretName", "awsSecretName", "awsCredentialsSecretNamespace", "encryptKeySecretName", "encryptKeySecretNamespace", "hasEncryptKey", "isDatabasePodFound", "isDatabaseServiceFound", "cronJobStatus"},
 			},
 		},
 		Dependencies: []string{

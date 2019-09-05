@@ -133,12 +133,6 @@ spec:
               description: Namespace  of the secret object with the Aws data to allow
                 send the backup files to the AWS storage
               type: string
-            awsSecretData:
-              additionalProperties:
-                type: string
-              description: Data  of the secret object with the Aws data to allow send
-                the backup files to the AWS storage
-              type: object
             awsSecretName:
               description: Name  of the secret object with the Aws data to allow send
                 the backup files to the AWS storage
@@ -153,21 +147,10 @@ spec:
             cronJobStatus:
               description: Status of the CronJob object
               type: object
-            dbSecretData:
-              additionalProperties:
-                type: string
-              description: Data  of the secret object created with the database data
-                to allow the backup image connect to the database
-              type: object
             dbSecretName:
               description: Name of the secret object created with the database data
                 to allow the backup image connect to the database
               type: string
-            encryptKeySecretData:
-              additionalProperties:
-                type: string
-              description: Data of the secret object with the Encryption GPG Key
-              type: object
             encryptKeySecretName:
               description: Name  of the secret object with the Encryption GPG Key
               type: string
@@ -193,13 +176,10 @@ spec:
           - backupStatus
           - cronJobName
           - dbSecretName
-          - dbSecretData
           - awsSecretName
-          - awsSecretData
           - awsCredentialsSecretNamespace
           - encryptKeySecretName
           - encryptKeySecretNamespace
-          - encryptKeySecretData
           - hasEncryptKey
           - isDatabasePodFound
           - isDatabaseServiceFound
