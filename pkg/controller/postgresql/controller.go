@@ -118,6 +118,26 @@ func (r *ReconcilePostgresql) Reconcile(request reconcile.Request) (reconcile.Re
 	return reconcile.Result{}, nil
 }
 
+//createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
+func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql) error {
+	// Check if deployment for the app exist, if not create one
+	if err := r.createDeployment(db); err != nil {
+		return err
+	}
+
+	// Check if service for the app exist, if not create one
+	if err := r.createService(db); err != nil {
+		return err
+	}
+
+	// Check if PersistentVolumeClaim for the app exist, if not create one
+	if err := r.createPvc(db); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 //createUpdateCRStatus will create and update the status in the CR applied in the cluster
 func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) error {
 
@@ -136,25 +156,5 @@ func (r *ReconcilePostgresql) createUpdateCRStatus(request reconcile.Request) er
 	if err := r.updateDBStatus(request); err != nil {
 		return err
 	}
-	return nil
-}
-
-//createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
-func (r *ReconcilePostgresql) createResources(db *v1alpha1.Postgresql) error {
-	// Check if deployment for the app exist, if not create one
-	if err := r.createDeployment(db); err != nil {
-		return err
-	}
-
-	// Check if service for the app exist, if not create one
-	if err := r.createService(db); err != nil {
-		return err
-	}
-
-	// Check if PersistentVolumeClaim for the app exist, if not create one
-	if err := r.createPvc(db); err != nil {
-		return err
-	}
-
 	return nil
 }

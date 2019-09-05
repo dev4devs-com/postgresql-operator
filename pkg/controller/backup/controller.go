@@ -124,38 +124,6 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	return reconcile.Result{}, nil
 }
 
-//createUpdateCRStatus will create and update the status in the CR applied in the cluster
-func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error {
-	if err := r.updatePodDatabaseFoundStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateServiceDbServiceFoundStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateCronJobStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateDBSecretStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateAWSSecretStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateEncSecretStatus(request); err != nil {
-		return err
-	}
-
-	if err := r.updateBackupStatus(request); err != nil {
-		return err
-	}
-	return nil
-}
-
 //createResources will create and update the secondary resource which are required in order to make works successfully the primary resource(CR)
 func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
 	// Check if the database instance was created
@@ -198,6 +166,38 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 
 	// Check if the cronJob is created, if not create one
 	if err := r.createCronJob(bkp); err != nil {
+		return err
+	}
+	return nil
+}
+
+//createUpdateCRStatus will create and update the status in the CR applied in the cluster
+func (r *ReconcileBackup) createUpdateCRStatus(request reconcile.Request) error {
+	if err := r.updatePodDatabaseFoundStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateServiceDbServiceFoundStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateCronJobStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateDBSecretStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateAWSSecretStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateEncSecretStatus(request); err != nil {
+		return err
+	}
+
+	if err := r.updateBackupStatus(request); err != nil {
 		return err
 	}
 	return nil
