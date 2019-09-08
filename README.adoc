@@ -135,7 +135,7 @@ NOTE: To uninstall you need be logged in as a user with cluster privileges like 
 
 == OperatorHub.io
 
-This operator can be installed by the OperatorHub.io. Note that application image is deployed in https://quay.io/application/dev4devs-com/postgresql-operator.
+This operator can be installed by the OperatorHub.io. Note that application image is deployed in https://quay.io/application/dev4devs-com/postgresql-operator-operatorhub.
 
 == Configuration and Options
 
