@@ -18,7 +18,7 @@ const (
 	databaseCpu               = "30m"
 )
 
-type DefaultPostgreSQLConfig struct {
+type DefaultDatabaseConfig struct {
 	Size                      int32  `json:"size"`
 	Image                     string `json:"image"`
 	DatabaseName              string `json:"databaseName"`
@@ -36,8 +36,8 @@ type DefaultPostgreSQLConfig struct {
 	DatabaseStorageRequest    string `json:"databaseStorageRequest"`
 }
 
-func NewPostgreSQLConfig() *DefaultPostgreSQLConfig {
-	return &DefaultPostgreSQLConfig{
+func NewDatabaseConfig() *DefaultDatabaseConfig {
+	return &DefaultDatabaseConfig{
 		Size:                      size,
 		Image:                     image,
 		DatabaseName:              databaseName,

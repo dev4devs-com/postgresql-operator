@@ -6,7 +6,7 @@ subjects:
 - kind: ServiceAccount
   name: postgresql-operator
   # Replace this with the namespace where the operator will be deployed.
-  namespace: postgresql
+  namespace: postgresql-operator
 roleRef:
   kind: ClusterRole
   name: postgresql-operator

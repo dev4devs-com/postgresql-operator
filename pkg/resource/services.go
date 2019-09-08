@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-// Returns the service object for the PostgreSQL
-func NewPostgresqlService(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *corev1.Service {
+// Returns the service object for the Database
+func NewDatabaseService(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.Service {
 	ls := utils.GetLabels(db.Name)
 	ser := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -36,7 +36,7 @@ func NewPostgresqlService(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *core
 			},
 		},
 	}
-	// Set PostgreSQL db as the owner and controller
+	// Set Database db as the owner and controller
 	controllerutil.SetControllerReference(db, ser, scheme)
 	return ser
 }

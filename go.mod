@@ -4,14 +4,14 @@ require (
 	github.com/NYTimes/gziphandler v1.0.1 // indirect
 	github.com/go-logr/logr v0.1.0
 	github.com/go-openapi/spec v0.19.0
-	github.com/operator-framework/operator-sdk v0.10.1-0.20190809191117-c1e2eae6580e
+	github.com/operator-framework/operator-sdk v0.10.1-0.20190906161029-1cb0481ca946
 	github.com/spf13/pflag v1.0.3
 	k8s.io/api v0.0.0-20190612125737-db0771252981
 	k8s.io/apimachinery v0.0.0-20190612125636-6a5db36e93ad
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/kube-openapi v0.0.0-20190603182131-db7b694dc208
 	sigs.k8s.io/controller-runtime v0.1.12
-	sigs.k8s.io/controller-tools v0.1.10
+	sigs.k8s.io/controller-tools v0.1.10 // indirect
 )
 
 // Pinned to kubernetes-1.13.4
@@ -32,4 +32,4 @@ replace (
 	sigs.k8s.io/controller-tools => sigs.k8s.io/controller-tools v0.1.11-0.20190411181648-9d55346c2bde
 )
 
-replace git.apache.org/thrift.git => github.com/apache/thrift v0.12.0
+replace github.com/operator-framework/operator-sdk => github.com/operator-framework/operator-sdk v0.10.0

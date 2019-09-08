@@ -1,14 +1,14 @@
-package postgresql
+package database
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"k8s.io/api/apps/v1"
 )
 
 // manageResources will ensure that the resource are with the expected values in the cluster
-func (r *ReconcilePostgresql) manageResources(db *v1alpha1.Postgresql) error {
+func (r *ReconcileDatabase) manageResources(db *v1alpha1.Database) error {
 	// get the latest version of db deployment
 	dep, err := service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
@@ -20,8 +20,8 @@ func (r *ReconcilePostgresql) manageResources(db *v1alpha1.Postgresql) error {
 	return nil
 }
 
-// ensureDepSize will ensure that the quanity of instances in the cluster for the PostgreSQL deployment is the same defined in the CR
-func (r *ReconcilePostgresql) ensureDepSize(db *v1alpha1.Postgresql, dep *v1.Deployment) error {
+// ensureDepSize will ensure that the quanity of instances in the cluster for the Database deployment is the same defined in the CR
+func (r *ReconcileDatabase) ensureDepSize(db *v1alpha1.Database, dep *v1.Deployment) error {
 	size := db.Spec.Size
 	if *dep.Spec.Replicas != size {
 		// Set the number of Replicas spec in the CR

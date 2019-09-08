@@ -1,4 +1,4 @@
-package postgresql
+package database
 
 import (
 	"reflect"
@@ -225,8 +225,8 @@ func TestUpdatePVCStatus(t *testing.T) {
 			fields: fields{
 				objs: []runtime.Object{&dbInstanceWithoutSpec, &corev1.PersistentVolumeClaim{
 					ObjectMeta: metav1.ObjectMeta{
-						Name:      "postgresql",
-						Namespace: "postgresql",
+						Name:      "database",
+						Namespace: "postgresql-operator",
 					},
 					Status: corev1.PersistentVolumeClaimStatus{
 						Phase: "test",

@@ -3,7 +3,7 @@ package backup
 import (
 	"context"
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
@@ -114,7 +114,7 @@ func (r *ReconcileBackup) insertUpdateAwsSecretStatus(aws *corev1.Secret, bkp *v
 
 // isAwsStatusEqual return true when something related to the aws status fields changed
 func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup) bool {
-	return aws.Name != bkp.Status.AWSSecretName  || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
+	return aws.Name != bkp.Status.AWSSecretName || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
 }
 
 // updateAWSSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
@@ -248,12 +248,12 @@ func (r *ReconcileBackup) insertUpdateDbServiceFoundStatus(bkp *v1alpha1.Backup)
 	return nil
 }
 
-//isDbServiceFound returns false when the database service which should be created by the PostgreSQL controller was not found
+//isDbServiceFound returns false when the database service which should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbServiceFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
 
-//isDbPodFound returns false when the database pod which should be created by the PostgreSQL controller was not found
+//isDbPodFound returns false when the database pod which should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbPodFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
@@ -263,13 +263,13 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 
 	// Check if was possible found the DB Pod
 	if !r.isDbPodFound() {
-		err := fmt.Errorf("Error: PostgreSQL Pod is missing")
+		err := fmt.Errorf("Error: Database Pod is missing")
 		return err
 	}
 
 	// Check if was possible found the DB Service
 	if !r.isDbServiceFound() {
-		err := fmt.Errorf("Error: PostgreSQL Service is missing")
+		err := fmt.Errorf("Error: Database Service is missing")
 		return err
 	}
 
@@ -282,7 +282,7 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	}
 
 	// Check if AWS secret was created
-	awsSecretName :=  utils.GetAWSSecretName(bkp)
+	awsSecretName := utils.GetAWSSecretName(bkp)
 	awsSecretNamespace := utils.GetAwsSecretNamespace(bkp)
 	_, err = service.FetchSecret(awsSecretNamespace, awsSecretName, r.client)
 	if err != nil {

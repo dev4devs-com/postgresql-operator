@@ -2,16 +2,16 @@ package v1alpha1
 
 import (
 	appsv1 "k8s.io/api/apps/v1"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// PostgresqlSpec defines the desired state of Postgresql
+// DatabaseSpec defines the desired state of Database
 // +k8s:openapi-gen=true
-type PostgresqlSpec struct {
+type DatabaseSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
@@ -136,9 +136,9 @@ type PostgresqlSpec struct {
 	ConfigMapDatabaseUserKey string `json:"configMapDatabaseUserKey,omitempty"`
 }
 
-// PostgresqlStatus defines the observed state of Postgresql
+// DatabaseStatus defines the observed state of Database
 // +k8s:openapi-gen=true
-type PostgresqlStatus struct {
+type DatabaseStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
@@ -158,30 +158,30 @@ type PostgresqlStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Postgresql represents the PostgreSQL Database in the cluster
+// Database is the Schema for the the Database Database API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
-// +operator-sdk:gen-csv:customresourcedefinitions.displayName="PostgreSQL Database"
+// +operator-sdk:gen-csv:customresourcedefinitions.displayName="Database Database"
 // +operator-sdk:gen-csv:customresourcedefinitions.resources="Deployment,v1,\"A Kubernetes Deployment\""
 // +operator-sdk:gen-csv:customresourcedefinitions.resources="Service,v1,\"A Kubernetes Service\""
 // +operator-sdk:gen-csv:customresourcedefinitions.resources="PersistentVolumeClaim,v1,\"A Kubernetes PersistentVolumeClaim\""
-type Postgresql struct {
+type Database struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   PostgresqlSpec   `json:"spec,omitempty"`
-	Status PostgresqlStatus `json:"status,omitempty"`
+	Spec   DatabaseSpec   `json:"spec,omitempty"`
+	Status DatabaseStatus `json:"status,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// PostgresqlList contains a list of Postgresql
-type PostgresqlList struct {
+// DatabaseList contains a list of Database
+type DatabaseList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Postgresql `json:"items"`
+	Items           []Database `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Postgresql{}, &PostgresqlList{})
+	SchemeBuilder.Register(&Database{}, &DatabaseList{})
 }

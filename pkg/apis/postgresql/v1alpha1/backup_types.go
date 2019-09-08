@@ -15,8 +15,8 @@ type BackupSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
-	// Name of the PostgreSQL CR applied which this backup will work with
-	PostgresqlCRName string `json:"postgresqlCRName,omitempty"`
+	// Name of the Database CR applied which this backup will work with
+	DatabaseCRName string `json:"databaseCRName,omitempty"`
 
 	// Schedule period for the CronJob.
 	// Default Value: <0 0 * * *> daily at 00:00
@@ -34,7 +34,7 @@ type BackupSpec struct {
 	// Default Value: <9.6>
 	// IMPORTANT: Just the first 2 digits should be used.
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="PostgreSQLversion"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Databaseversion"
 	DatabaseVersion string `json:"databaseVersion,omitempty"`
 
 	// Used to create the directory where the files will be stored
@@ -157,14 +157,13 @@ type BackupStatus struct {
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Backup represents the backup service in the cluster
+// Backup is the Schema for the backups API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
-// +operator-sdk:gen-csv:customresourcedefinitions.displayName="Backup"
-// +operator-sdk:gen-csv:customresourcedefinitions.resources="CronJob,v1beta1,\"A Kubernetes CronJob\""
-// +operator-sdk:gen-csv:customresourcedefinitions.resources="Secret,v1,\"A Kubernetes Secret\""
+// +operator-sdk:gen-csv:customresourcedefinitions.displayName="Database Backup"
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="CronJob,v1beta1,\"A Kubernetes Deployment\""
 // +operator-sdk:gen-csv:customresourcedefinitions.resources="Service,v1,\"A Kubernetes Service\""
-// +operator-sdk:gen-csv:customresourcedefinitions.resources="Pod,v1,\"A Kubernetes Pod\""
+// +operator-sdk:gen-csv:customresourcedefinitions.resources="PersistentVolumeClaim,v1,\"A Kubernetes PersistentVolumeClaim\""
 type Backup struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -173,8 +172,9 @@ type Backup struct {
 	Status BackupStatus `json:"status,omitempty"`
 }
 
-// BackupList contains a list of Backup
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// BackupList contains a list of Backup
 type BackupList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

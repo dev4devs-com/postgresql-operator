@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/config"
 )
 
@@ -21,8 +21,8 @@ func AddBackupMandatorySpecs(bkp *v1alpha1.Backup) {
 		bkp.Spec.Schedule = defaultBackupConfig.Schedule
 	}
 
-	if bkp.Spec.PostgresqlCRName == "" {
-		bkp.Spec.PostgresqlCRName = defaultBackupConfig.PostgresqlCRName
+	if bkp.Spec.DatabaseCRName == "" {
+		bkp.Spec.DatabaseCRName = defaultBackupConfig.DatabaseCRName
 	}
 
 	if bkp.Spec.Image == "" {

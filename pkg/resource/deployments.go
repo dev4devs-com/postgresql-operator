@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//buildDBDeployment returns the deployment object for the PostgreSQL
-func NewPostgresqlDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *appsv1.Deployment {
+//buildDBDeployment returns the deployment object for the Database
+func NewDatabaseDeployment(db *v1alpha1.Database, scheme *runtime.Scheme) *appsv1.Deployment {
 	ls := utils.GetLabels(db.Name)
 	auto := true
 	replicas := db.Spec.Size
@@ -89,8 +89,8 @@ func NewPostgresqlDeployment(db *v1alpha1.Postgresql, scheme *runtime.Scheme) *a
 						},
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
-								corev1.ResourceMemory:    resource.MustParse(db.Spec.DatabaseMemoryLimit),
-								corev1.ResourceCPU: resource.MustParse(db.Spec.DatabaseCpuLimit),
+								corev1.ResourceMemory: resource.MustParse(db.Spec.DatabaseMemoryLimit),
+								corev1.ResourceCPU:    resource.MustParse(db.Spec.DatabaseCpuLimit),
 							},
 							Requests: corev1.ResourceList{
 								corev1.ResourceMemory: resource.MustParse(db.Spec.DatabaseMemoryRequest),

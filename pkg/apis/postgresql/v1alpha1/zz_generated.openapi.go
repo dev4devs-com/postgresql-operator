@@ -11,20 +11,20 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.Backup":           schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec":       schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus":     schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.Postgresql":       schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec":   schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus": schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlStatus(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.Backup":         schema_pkg_apis_postgresql_v1alpha1_Backup(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec":     schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus":   schema_pkg_apis_postgresql_v1alpha1_BackupStatus(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.Database":       schema_pkg_apis_postgresql_v1alpha1_Database(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec":   schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref),
+		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus": schema_pkg_apis_postgresql_v1alpha1_DatabaseStatus(ref),
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_Backup(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Backup represents the backup service in the cluster",
+				Description: "Backup is the Schema for the backups API",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -47,31 +47,31 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Backup(ref common.ReferenceCal
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "BackupSpec defines the desired state of Backup",
 				Properties: map[string]spec.Schema{
-					"postgresqlCRName": {
+					"databaseCRName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the PostgreSQL CR applied which this backup will work with",
+							Description: "Name of the Database CR applied which this backup will work with",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -181,7 +181,7 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupSpec(ref common.Referenc
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_BackupStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
@@ -272,11 +272,11 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_BackupStatus(ref common.Refere
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_Database(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Postgresql represents the PostgreSQL Database in the cluster",
+				Description: "Database is the Schema for the the Database Database API",
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -299,27 +299,27 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_Postgresql(ref common.Referenc
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus"),
+							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1.PostgresqlStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PostgresqlSpec defines the desired state of Postgresql",
+				Description: "DatabaseSpec defines the desired state of Database",
 				Properties: map[string]spec.Schema{
 					"databaseName": {
 						SchemaProps: spec.SchemaProps{
@@ -468,11 +468,11 @@ func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlSpec(ref common.Refe
 	}
 }
 
-func schema_pkg_apis_postgresql_operator_v1alpha1_PostgresqlStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+func schema_pkg_apis_postgresql_v1alpha1_DatabaseStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "PostgresqlStatus defines the observed state of Postgresql",
+				Description: "DatabaseStatus defines the observed state of Database",
 				Properties: map[string]spec.Schema{
 					"pvcStatus": {
 						SchemaProps: spec.SchemaProps{

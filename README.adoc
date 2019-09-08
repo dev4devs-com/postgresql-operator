@@ -6,13 +6,13 @@ ifdef::env-github[]
 :caution-caption: :fire:
 :warning-caption: :warning:
 :table-caption!:
-:namespace: postgresql
+:namespace: postgresql-operator
 endif::[]
 
 :toc:
 :toc-placement!:
 
-== PostgreSQL Operator
+== Database Operator
 
 ifdef::status[]
 .*Project health*
@@ -27,7 +27,7 @@ toc::[]
 
 == Overview
 
-A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] in Go developed using the https://github.com/operator-framework[ Operator Framework] to package, install, configure and manage a PostgreSQL database.
+A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOperators.html[Operator] in Go developed using the https://github.com/operator-framework[ Operator Framework] to package, install, configure and manage a Database database.
 
 == Prerequisites
 
@@ -90,10 +90,10 @@ $ make install
 
 === Verifying
 
-To verify that the installation was successful completed you can check the  `Database Status` field of link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[Postgresql CRD] in the cluster. The expected result when all was installed with success is `OK`.
+To verify that the installation was successful completed you can check the  `Database Status` field of link:deploy/crds/postgresql_v1alpha1_database_crd.yaml[Database CRD] in the cluster. The expected result when all was installed with success is `OK`.
 
 ```shell
-$ oc describe Postgresql
+$ oc describe Database
 ...
 Status:
   Database Status:  OK
@@ -106,19 +106,19 @@ NOTE: Following an example of the fully expect result after run `make install`.
 ----
 $ kubectl get all
 NAME                                       READY     STATUS    RESTARTS   AGE
-pod/postgresql-6cf5f48c78-dp2cw            1/1       Running   0          1m
+pod/database-6cf5f48c78-dp2cw              1/1       Running   0          1m
 pod/postgresql-operator-7dd97d8885-v7rnf   1/1       Running   0          2m
 
 NAME                                  TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
-service/postgresql                    ClusterIP   172.30.227.3     <none>        5432/TCP            1m
+service/database                      ClusterIP   172.30.227.3     <none>        5432/TCP            1m
 service/postgresql-operator-metrics   ClusterIP   172.30.223.235   <none>        8383/TCP,8686/TCP   1m
 
 NAME                                  DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/postgresql            1         1         1            1           1m
+deployment.apps/database              1         1         1            1           1m
 deployment.apps/postgresql-operator   1         1         1            1           2m
 
 NAME                                             DESIRED   CURRENT   READY     AGE
-replicaset.apps/postgresql-6cf5f48c78            1         1         1         1m
+replicaset.apps/database-6cf5f48c78              1         1         1         1m
 replicaset.apps/postgresql-operator-7dd97d8885   1         1         1         2m
 ----
 
@@ -135,24 +135,24 @@ NOTE: To uninstall you need be logged in as a user with cluster privileges like 
 
 == OperatorHub.io
 
-This operator can be installed by the OperatorHub.io. Note that application image is deployed in https://quay.io/application/dev4devs-com/postgresql-operator-operatorhub.
+This operator can be installed by the OperatorHub.io. Note that application image is deployed in https://quay.io/application/dev4devs-com/postgresql-operator.
 
 == Configuration and Options
 
 === Using configMap to share required values
 
-By the specs in link:deploy/crds/postgresql-operator_v1alpha1_postgresql_cr.yaml[Postgresql CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the PostgreSQL should use in its required env vars.
+By the specs in link:deploy/crds/postgresql_v1alpha1_database_cr.yaml[Database CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the Database should use in its required env vars.
 
 If just the name of the configMap be informed, `configMapName`,  then it will look for the values stored with the same keys required for each env var of the image used for its database version (`databaseNameParam`, `databasePasswordParam`, `databaseUserParam`). However, you are able to customize the keys too by using the optional specs; `configMapDatabaseNameParam`, `configMapDatabasePasswordParam`, `configMapDatabaseUserParam`. In this way, this operator will be able to looking for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
 === Changing the operator namespace
 
-By using the command `make install` the default namespace `postgresql`,  defined in the link:./Makefile[Makefile] will be created and the operator will be installed in this namespace. You are able to install the operator in another namespace if you wish, however, you need to set up its roles (RBAC) in order to apply them on the namespace where the operator will be installed. The namespace name needs to be changed in the link:./deploy/role_binding.yaml[Cluster Role Binding] file. Note, that you also need to change the namespace in the link:./Makefile[Makefile] in order to use the command `make install` for another namespace.
+By using the command `make install` the default namespace `postgresql-operator`,  defined in the link:./Makefile[Makefile] will be created and the operator will be installed in this namespace. You are able to install the operator in another namespace if you wish, however, you need to set up its roles (RBAC) in order to apply them on the namespace where the operator will be installed. The namespace name needs to be changed in the link:./deploy/role_binding.yaml[Cluster Role Binding] file. Note, that you also need to change the namespace in the link:./Makefile[Makefile] in order to use the command `make install` for another namespace.
 
 [source,yaml]
 ----
   # Replace this with the namespace where the operator will be deployed.
-  namespace: postgresql
+  namespace: postgresql-operator
 ----
 
 === Configuring the Backup Service
@@ -162,7 +162,7 @@ By using the command `make install` the default namespace `postgresql`,  defined
 ===== Install
 The backup service is implemented by using  https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image]. It will do the backup of the database to be restore in the case of failures. Following the steps to enable it.
 
-. Setup the AWS in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml[Backup CR] as follows or add the name of the secret which has already this data in the cluster.
+. Setup the AWS in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresql_v1alpha1_backup_cr.yaml[Backup CR] as follows or add the name of the secret which has already this data in the cluster.
 +
 [source,yaml]
 ----
@@ -225,7 +225,7 @@ ERROR: S3 error: 403 (RequestTimeTooSkewed): The difference between the request 
 
 Following the steps required to be performed in case of be required do the restore based in the backup service.
 
-. Install the PostgreSQL by following the steps in <<Installing>>.
+. Install the Database by following the steps in <<Installing>>.
 . Restore the database with the dump which was stored in the AWS S3 bucket.
 +
 NOTE: To restore we should run `gunzip -c filename.gz | psql dbname`
@@ -240,13 +240,13 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 
 |===
 | *CustomResourceDefinition*    | *Description*
-| link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[PostgreSQL]     | Packages, manages, installs and configures the Database on the cluster.
+| link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[Database]     | Packages, manages, installs and configures the Database on the cluster.
 | link:deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
 |===
 
 === Resources managed by each CRD Controller
 
-* *link:./pkg/controller/postgresql/controller.go[Postgresql Database]*
+* *link:./pkg/controller/postgresql/controller.go[Database Database]*
 +
 |===
 | *Resource*    | *Description*
@@ -268,7 +268,7 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 === Status Definition per Types
 
 
-* link:./pkg/apis/postgresql-operator/v1alpha1/postgresql_types.go[PostgreSQL]
+* link:./pkg/apis/postgresql-operator/v1alpha1/postgresql_types.go[Database]
 +
 |===
 | *Status*    | *Description*
@@ -464,6 +464,21 @@ $ git push upstream 0.1.0
 NOTE: The image with the tag will be created and pushed to the https://quay.io/repository/dev4devs-com/postgresql-operator[postgresql-operator image hosting repository] by the CI.
 
 WARNING: Do not use letters in the tag such as `v`. It will not work.
+
+== Release OLM Catalogue
+
+Use the following command.
+
+* Generate the OLM files by running the following command, for example:
+
+[source,shell]
+----
+operator-sdk olm-catalog gen-csv --csv-version 0.1.0 --update-crds
+----
+
+* Test the changes locally as describe in https://github.com/operator-framework/community-operators/blob/master/docs/testing-operators.md[Community Operators]
+
+NOTE: See here some examples link:./deploy/olm-catalog/olm-test[/deploy/olm-catalog/olm-test] which can be used to test it.
 
 == Supportability
 

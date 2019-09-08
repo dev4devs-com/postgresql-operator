@@ -2,7 +2,7 @@ package backup
 
 import (
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
@@ -30,7 +30,7 @@ type HelperDbSecret struct {
 // NOTE: The user can:
 // - Customize the environment variables keys as values that should be used with
 // - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user, password and database name already setup for another application )
-func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (map[string][]byte, error) {
+func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Database) (map[string][]byte, error) {
 
 	dbSecret := r.newDBSecret(bkp)
 
@@ -57,6 +57,7 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 			}
 		}
 	}
+
 	return dbSecret.createMap(), nil
 }
 

@@ -1,8 +1,8 @@
-package postgresql
+package database
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"testing"
 
@@ -13,13 +13,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-func TestReconcilePostgresql(t *testing.T) {
+func TestReconcileDatabase(t *testing.T) {
 	type fields struct {
 		scheme *runtime.Scheme
 		objs   []runtime.Object
 	}
 	type args struct {
-		dbInstance v1alpha1.Postgresql
+		dbInstance v1alpha1.Database
 	}
 	tests := []struct {
 		name           string
@@ -86,28 +86,28 @@ func TestReconcilePostgresql(t *testing.T) {
 
 			res, err := r.Reconcile(req)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TestReconcilePostgresql reconcile: error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TestReconcileDatabase reconcile: error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			deployment := &appsv1.Deployment{}
 			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, deployment)
 			if (err == nil) != tt.wantDeployment {
-				t.Errorf("TestReconcilePostgresql to get deployment error = %v, wantDeployment %v", err, tt.wantDeployment)
+				t.Errorf("TestReconcileDatabase to get deployment error = %v, wantDeployment %v", err, tt.wantDeployment)
 				return
 			}
 
 			service := &corev1.Service{}
 			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, service)
 			if (err == nil) != tt.wantService {
-				t.Errorf("TestReconcilePostgresql to get service error = %v, wantService %v", err, tt.wantService)
+				t.Errorf("TestReconcileDatabase to get service error = %v, wantService %v", err, tt.wantService)
 				return
 			}
 
 			pvc := &corev1.PersistentVolumeClaim{}
 			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, pvc)
 			if (err == nil) != tt.wantPVC {
-				t.Errorf("TestReconcilePostgresql to get service error = %v, wantPVC %v", err, tt.wantPVC)
+				t.Errorf("TestReconcileDatabase to get service error = %v, wantPVC %v", err, tt.wantPVC)
 				return
 			}
 
@@ -119,7 +119,7 @@ func TestReconcilePostgresql(t *testing.T) {
 	}
 }
 
-func TestReconcilePostgresql_EnsureReplicasSizeInstance(t *testing.T) {
+func TestReconcileDatabase_EnsureReplicasSizeInstance(t *testing.T) {
 
 	// objects to track in the fake client
 	objs := []runtime.Object{

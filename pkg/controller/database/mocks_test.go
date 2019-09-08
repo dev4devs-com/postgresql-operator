@@ -1,36 +1,36 @@
-package postgresql
+package database
 
 import (
-	v1alpha1 "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	v1alpha1 "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Centralized mock objects for use in tests
 var (
-	dbInstanceWithoutSpec = v1alpha1.Postgresql{
+	dbInstanceWithoutSpec = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
 	}
 
-	dbInstanceConfigMapSameKeys = v1alpha1.Postgresql{
+	dbInstanceConfigMapSameKeys = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
-		Spec: v1alpha1.PostgresqlSpec{
+		Spec: v1alpha1.DatabaseSpec{
 			ConfigMapName: "config-samekeys",
 		},
 	}
 
-	dbInstanceConfigMapOtherKeys = v1alpha1.Postgresql{
+	dbInstanceConfigMapOtherKeys = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
-		Spec: v1alpha1.PostgresqlSpec{
+		Spec: v1alpha1.DatabaseSpec{
 			ConfigMapName:                "config-otherkeys",
 			ConfigMapDatabaseNameKey:     "PGDATABASE",
 			ConfigMapDatabasePasswordKey: "PGPASSWORD",
@@ -41,7 +41,7 @@ var (
 	configMapOtherKeyValues = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			"PGDATABASE": "dbname",
@@ -53,7 +53,7 @@ var (
 	configMapSameKeyValues = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-samekeys",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			"POSTGRESQL_DATABASE":            "dbname",

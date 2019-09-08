@@ -1,12 +1,12 @@
 package utils
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
 //BuildDatabaseNameEnvVar return the corev1.EnvVar object wth the key:value for the database name
-func BuildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+func BuildDatabaseNameEnvVar(db *v1alpha1.Database) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabaseNameKeyEnvVar,
@@ -28,7 +28,7 @@ func BuildDatabaseNameEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 }
 
 //BuildDatabaseUserEnvVar return the corev1.EnvVar object wth the key:value for the database user
-func BuildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+func BuildDatabaseUserEnvVar(db *v1alpha1.Database) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabaseUserKeyEnvVar,
@@ -50,7 +50,7 @@ func BuildDatabaseUserEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
 }
 
 //BuildDatabasePasswordEnvVar return the corev1.EnvVar object wth the key:value for the database pwd
-func BuildDatabasePasswordEnvVar(db *v1alpha1.Postgresql) corev1.EnvVar {
+func BuildDatabasePasswordEnvVar(db *v1alpha1.Database) corev1.EnvVar {
 	if len(db.Spec.ConfigMapName) > 0 {
 		return corev1.EnvVar{
 			Name: db.Spec.DatabasePasswordKeyEnvVar,
