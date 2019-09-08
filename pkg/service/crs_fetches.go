@@ -2,15 +2,15 @@ package service
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Request object not found, could have been deleted after reconcile request.
 // Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
-func FetchPostgreSQL(name, namespace string, client client.Client) (*v1alpha1.Postgresql, error) {
-	db := &v1alpha1.Postgresql{}
+func FetchDatabaseCR(name, namespace string, client client.Client) (*v1alpha1.Database, error) {
+	db := &v1alpha1.Database{}
 	err := client.Get(context.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, db)
 	return db, err
 }

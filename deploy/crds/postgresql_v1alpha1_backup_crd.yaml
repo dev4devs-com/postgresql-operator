@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: backups.postgresql-operator.dev4devs.com
+  name: backups.postgresql.dev4devs.com
 spec:
-  group: postgresql-operator.dev4devs.com
+  group: postgresql.dev4devs.com
   names:
     kind: Backup
     listKind: BackupList
@@ -65,10 +65,14 @@ spec:
                 +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
                 Secret namespace:"'
               type: string
+            databaseCRName:
+              description: Name of the Database CR applied which this backup will
+                work with
+              type: string
             databaseVersion:
               description: 'Database version. (E.g 9.6). Default Value: <9.6> IMPORTANT:
                 Just the first 2 digits should be used. +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="PostgreSQLversion"'
+                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Databaseversion"'
               type: string
             encryptKeySecretName:
               description: 'Name of the secret with the Encrypt data pre-existing
@@ -111,10 +115,6 @@ spec:
               description: 'Image:tag used to do the backup. Default Value: <quay.io/integreatly/backup-container:1.0.8>
                 More Info: https://github.com/integr8ly/backup-container-image +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
                 +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image:tag"'
-              type: string
-            postgresqlCRName:
-              description: Name of the PostgreSQL CR applied which this backup will
-                work with
               type: string
             productName:
               description: 'Used to create the directory where the files will be stored

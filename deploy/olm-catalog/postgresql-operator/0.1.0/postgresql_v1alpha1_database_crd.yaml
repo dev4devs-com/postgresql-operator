@@ -1,14 +1,14 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: postgresqls.postgresql-operator.dev4devs.com
+  name: databases.postgresql.dev4devs.com
 spec:
-  group: postgresql-operator.dev4devs.com
+  group: postgresql.dev4devs.com
   names:
-    kind: Postgresql
-    listKind: PostgresqlList
-    plural: postgresqls
-    singular: postgresql
+    kind: Database
+    listKind: DatabaseList
+    plural: databases
+    singular: database
   scope: Namespaced
   subresources:
     status: {}

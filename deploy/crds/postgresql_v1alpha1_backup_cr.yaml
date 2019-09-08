@@ -1,9 +1,8 @@
-apiVersion: postgresql-operator.dev4devs.com/v1alpha1
+apiVersion: postgresql.dev4devs.com/v1alpha1
 kind: Backup
 metadata:
   name: backup
 spec:
-
   # ---------------------------------
   # ## Backup Container
   # ----------------------------
@@ -27,31 +26,31 @@ spec:
   awsAccessKeyId: "example-awsAccessKeyId"
   awsSecretAccessKey: "example-awsSecretAccessKey"
 
-  # ---------------------------------
-  # ## Customizations Options
-  # ---------------------------------
+    # ---------------------------------
+    # ## Customizations Options
+    # ---------------------------------
 
-  # Change the following spec if you change the name of the Postgresql CR
-  # postgresqlCRName: "postgresql"
+    # Change the following spec if you change the name of the Database CR
+    # databaseCRName: "database"
 
-  # This spec allow you change the <image>:<tag> used to perform the backup
+    # This spec allow you change the <image>:<tag> used to perform the backup
+    # ---------------------------------
+    # image: "quay.io/integreatly/backup-container:1.0.8"
+
+    # This spec allow you change the "version" of the database which will be installed
+    # used to perform the backup(It needs be the same used by the Database CR)
+    # ---------------------------------
+    # databaseVersion: "9.6"
+
+    # ---------------------------------
+    # TIP: Following the steps to get the databaseVersion
+    # ---------------------------------
+    # 1. Go to the database pod terminal
+    # 2. Run the command psql as follows.
+    # //sh-4.2$ psql
+    # //psql (9.6.10)
+    # IMPORTANT: Just the first 2 digits should be used.
   # ---------------------------------
-  # image: "quay.io/integreatly/backup-container:1.0.8"
-
-  # This spec allow you change the "version" of the database which will be installed
-  # used to perform the backup(It needs be the same used by the Postgresql CR)
-  # ---------------------------------
-  # databaseVersion: "9.6"
-
-      # ---------------------------------
-      # TIP: Following the steps to get the databaseVersion
-      # ---------------------------------
-      # 1. Go to the database pod terminal
-      # 2. Run the command psql as follows.
-      # //sh-4.2$ psql
-      # //psql (9.6.10)
-      # IMPORTANT: Just the first 2 digits should be used.
-      # ---------------------------------
 
   # The following information is optional and will be used to tag the data in the AWS bucket
   # ---------------------------------
@@ -89,5 +88,3 @@ spec:
   # gpgPublicKey: "example-gpgPublicKey"
   # gpgEmail: "email@example.com"
   # gpgTrustModel: "always"
-
-

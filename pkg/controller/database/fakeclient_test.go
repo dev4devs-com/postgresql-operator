@@ -1,7 +1,7 @@
-package postgresql
+package database
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -9,14 +9,14 @@ import (
 )
 
 //buildReconcileWithFakeClientWithMocks return reconcile with fake client, schemes and mock objects
-func buildReconcileWithFakeClientWithMocks(objs []runtime.Object) *ReconcilePostgresql {
+func buildReconcileWithFakeClientWithMocks(objs []runtime.Object) *ReconcileDatabase {
 	s := scheme.Scheme
 
-	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Postgresql{})
+	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Database{})
 
 	// create a fake client to mock API calls with the mock objects
 	cl := fake.NewFakeClientWithScheme(s, objs...)
 
-	// create a PostgreSQL object with the scheme and fake client
-	return &ReconcilePostgresql{client: cl, scheme: s}
+	// create a Database object with the scheme and fake client
+	return &ReconcileDatabase{client: cl, scheme: s}
 }

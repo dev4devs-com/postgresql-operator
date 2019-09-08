@@ -1,16 +1,16 @@
 package e2e
 
 import (
-	"fmt"
 	goctx "context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"fmt"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 
-	"testing"
-	"time"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/operator-framework/operator-sdk/pkg/test/e2eutil"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"testing"
+	"time"
 )
 
 var (
@@ -20,9 +20,9 @@ var (
 	cleanupTimeout       = time.Second * 10
 )
 
-func TestPostgreSQL(t *testing.T) {
-	postgresqlList := &v1alpha1.PostgresqlList{}
-	err := framework.AddToFrameworkScheme(apis.AddToScheme, postgresqlList)
+func TestDatabase(t *testing.T) {
+	databaseList := &v1alpha1.DatabaseList{}
+	err := framework.AddToFrameworkScheme(apis.AddToScheme, databaseList)
 	if err != nil {
 		t.Fatalf("failed to add custom resource scheme to framework: %v", err)
 	}
@@ -34,7 +34,7 @@ func TestPostgreSQL(t *testing.T) {
 	}
 
 	// run subtests
-	t.Run("postgresql-group", func(t *testing.T) {
+	t.Run("database-group", func(t *testing.T) {
 		t.Run("Cluster", OperatorCluster)
 		t.Run("Cluster2", OperatorCluster)
 	})
@@ -73,22 +73,22 @@ func postgresalSQLTest(t *testing.T, f *framework.Framework, ctx *framework.Test
 		return fmt.Errorf("could not get namespace: %v", err)
 	}
 	// create memcached custom resource
-	examplePostgresql := &v1alpha1.Postgresql{
+	db := &v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "example-postgresql",
+			Name:      "database",
 			Namespace: namespace,
 		},
-		Spec: v1alpha1.PostgresqlSpec{
+		Spec: v1alpha1.DatabaseSpec{
 			Size: 1,
 		},
 	}
 	// use TestCtx's create helper to create the object and add a cleanup function for the new object
-	err = f.Client.Create(goctx.TODO(), examplePostgresql, &framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
+	err = f.Client.Create(goctx.TODO(), db, &framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
 	if err != nil {
 		return err
 	}
-	// wait for example-memcached to reach 3 replicas
-	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, "example-postgresql", 1, retryInterval, timeout)
+	// wait for database to reach 1 replica
+	err = e2eutil.WaitForDeployment(t, f.KubeClient, namespace, "database", 1, retryInterval, timeout)
 	if err != nil {
 		return err
 	}

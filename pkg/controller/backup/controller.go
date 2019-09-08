@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
@@ -36,7 +36,7 @@ func newReconciler(mgr manager.Manager) reconcile.Reconciler {
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
 func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
-	c, err := controller.New("backup-controller", mgr, controller.Options{Reconciler: r})
+	c, err := controller.New(utils.BackupControllerName, mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
@@ -57,8 +57,8 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 		return err
 	}
 
-	// Watch Service resource managed by the Postgresql
-	if err := service.Watch(c, &v1.Service{}, false, &v1alpha1.Postgresql{}); err != nil {
+	// Watch Service resource managed by the Database
+	if err := service.Watch(c, &v1.Service{}, false, &v1alpha1.Database{}); err != nil {
 		return err
 	}
 
@@ -103,7 +103,7 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	// Add const values for mandatory specs
-	reqLogger.Info( "Adding backup mandatory specs")
+	reqLogger.Info("Adding backup mandatory specs")
 	utils.AddBackupMandatorySpecs(bkp)
 
 	// Create mandatory objects for the Backup
@@ -128,20 +128,20 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 	reqLogger.Info("Creating secondary Backup resources ...")
 
 	// Check if the database instance was created
-	db, err := service.FetchPostgreSQL(bkp.Spec.PostgresqlCRName, request.Namespace, r.client)
+	db, err := service.FetchDatabaseCR(bkp.Spec.DatabaseCRName, request.Namespace, r.client)
 	if err != nil {
-		reqLogger.Error(err, "Failed to fetch PostgreSQL instance/cr")
+		reqLogger.Error(err, "Failed to fetch Database instance/cr")
 		return err
 	}
 
-	// Get the Database Pod created by the PostgreSQL Controller
+	// Get the Database Pod created by the Database Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
 	if err := r.getDatabasePod(bkp, db); err != nil {
 		reqLogger.Error(err, "Failed to get a Database pod")
 		return err
 	}
 
-	// Get the Database Service created by the PostgreSQL Controller
+	// Get the Database Service created by the Database Controller
 	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
 	if err := r.getDatabaseService(bkp, db); err != nil {
 		reqLogger.Error(err, "Failed to get a Database service")

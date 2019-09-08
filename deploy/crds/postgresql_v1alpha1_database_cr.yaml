@@ -1,9 +1,8 @@
-apiVersion: postgresql-operator.dev4devs.com/v1alpha1
-kind: Postgresql
+apiVersion: postgresql.dev4devs.com/v1alpha1
+kind: Database
 metadata:
-  name: postgresql
+  name: database
 spec:
-
   # ---------------------------------
   # IMPORTANT: In this CR you will find an example of all options and possible configurations.
   # However, by default values are applied by the operator if values are not specified below.

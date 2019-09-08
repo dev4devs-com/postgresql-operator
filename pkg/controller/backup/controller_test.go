@@ -2,7 +2,7 @@ package backup
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -295,7 +295,7 @@ func TestReconcileBackup(t *testing.T) {
 			wantCronJob:   false,
 		},
 		{
-			name: "Should fail because is missing the PostgreSQL CR",
+			name: "Should fail because is missing the Database CR",
 			fields: fields{
 				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
 			},

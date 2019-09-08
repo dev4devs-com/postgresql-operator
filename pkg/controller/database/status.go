@@ -1,9 +1,9 @@
-package postgresql
+package database
 
 import (
 	"context"
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -14,8 +14,8 @@ import (
 const statusOk = "OK"
 
 //updateDBStatus returns error when status regards the all required resource could not be updated
-func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
-	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
+func (r *ReconcileDatabase) updateDBStatus(request reconcile.Request) error {
+	db, err := service.FetchDatabaseCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func (r *ReconcilePostgresql) updateDBStatus(request reconcile.Request) error {
 }
 
 // Check if DatabaseStatus was changed, if yes update it
-func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql, statusMsgUpdate string) error {
+func (r *ReconcileDatabase) insertUpdateDatabaseStatus(db *v1alpha1.Database, statusMsgUpdate string) error {
 	if statusMsgUpdate != db.Status.DatabaseStatus {
 		db.Status.DatabaseStatus = statusMsgUpdate
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
@@ -45,8 +45,8 @@ func (r *ReconcilePostgresql) insertUpdateDatabaseStatus(db *v1alpha1.Postgresql
 }
 
 //updateDeploymentStatus returns error when status regards the deployment resource could not be updated
-func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) error {
-	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
+func (r *ReconcileDatabase) updateDeploymentStatus(request reconcile.Request) error {
+	db, err := service.FetchDatabaseCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (r *ReconcilePostgresql) updateDeploymentStatus(request reconcile.Request) 
 }
 
 // insertUpdateDeploymentStatus will check if Deployment status changed, if yes then and update it
-func (r *ReconcilePostgresql) insertUpdateDeploymentStatus(deploymentStatus *v1.Deployment, db *v1alpha1.Postgresql) error {
+func (r *ReconcileDatabase) insertUpdateDeploymentStatus(deploymentStatus *v1.Deployment, db *v1alpha1.Database) error {
 	if !reflect.DeepEqual(deploymentStatus.Status, db.Status.DeploymentStatus) {
 		db.Status.DeploymentStatus = deploymentStatus.Status
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
@@ -76,8 +76,8 @@ func (r *ReconcilePostgresql) insertUpdateDeploymentStatus(deploymentStatus *v1.
 }
 
 //updateServiceStatus returns error when status regards the service resource could not be updated
-func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) error {
-	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
+func (r *ReconcileDatabase) updateServiceStatus(request reconcile.Request) error {
+	db, err := service.FetchDatabaseCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (r *ReconcilePostgresql) updateServiceStatus(request reconcile.Request) err
 }
 
 // insertUpdateDeploymentStatus will check if Service status changed, if yes then and update it
-func (r *ReconcilePostgresql) insertUpdateServiceStatus(serviceStatus *corev1.Service, db *v1alpha1.Postgresql) error {
+func (r *ReconcileDatabase) insertUpdateServiceStatus(serviceStatus *corev1.Service, db *v1alpha1.Database) error {
 	if !reflect.DeepEqual(serviceStatus.Status, db.Status.ServiceStatus) {
 		db.Status.ServiceStatus = serviceStatus.Status
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
@@ -107,8 +107,8 @@ func (r *ReconcilePostgresql) insertUpdateServiceStatus(serviceStatus *corev1.Se
 }
 
 // updatePvcStatus returns error when status regards the PersistentVolumeClaim resource could not be updated
-func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) error {
-	db, err := service.FetchPostgreSQL(request.Name, request.Namespace, r.client)
+func (r *ReconcileDatabase) updatePvcStatus(request reconcile.Request) error {
+	db, err := service.FetchDatabaseCR(request.Name, request.Namespace, r.client)
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func (r *ReconcilePostgresql) updatePvcStatus(request reconcile.Request) error {
 }
 
 // insertUpdatePvcStatus will check if Service status changed, if yes then and update it
-func (r *ReconcilePostgresql) insertUpdatePvcStatus(pvc *corev1.PersistentVolumeClaim, db *v1alpha1.Postgresql) error {
+func (r *ReconcileDatabase) insertUpdatePvcStatus(pvc *corev1.PersistentVolumeClaim, db *v1alpha1.Database) error {
 	if !reflect.DeepEqual(pvc.Status, db.Status.PVCStatus) {
 		db.Status.PVCStatus = pvc.Status
 		if err := r.client.Status().Update(context.TODO(), db); err != nil {
@@ -134,7 +134,7 @@ func (r *ReconcilePostgresql) insertUpdatePvcStatus(pvc *corev1.PersistentVolume
 }
 
 //validateBackup returns error when some requirement is missing
-func (r *ReconcilePostgresql) isAllCreated(db *v1alpha1.Postgresql) error {
+func (r *ReconcileDatabase) isAllCreated(db *v1alpha1.Database) error {
 
 	// Check if the PersistentVolumeClaim was created
 	_, err := service.FetchPersistentVolumeClaim(db.Name, db.Namespace, r.client)

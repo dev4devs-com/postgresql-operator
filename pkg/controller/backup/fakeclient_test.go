@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -13,11 +13,11 @@ func buildReconcileWithFakeClientWithMocks(objs []runtime.Object) *ReconcileBack
 	s := scheme.Scheme
 
 	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Backup{})
-	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Postgresql{})
+	s.AddKnownTypes(v1alpha1.SchemeGroupVersion, &v1alpha1.Database{})
 
 	// create a fake client to mock API calls with the mock objects
 	cl := fake.NewFakeClientWithScheme(s, objs...)
 
-	// create a PostgreSQL object with the scheme and fake client
+	// create a Database object with the scheme and fake client
 	return &ReconcileBackup{client: cl, scheme: s, dbPod: &podDatabase, dbService: &serviceDatabase}
 }

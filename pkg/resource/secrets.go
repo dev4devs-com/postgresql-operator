@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -9,7 +9,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//Returns the buildDatabaseSecret object for the PostgreSQL Backup
+//Returns the buildDatabaseSecret object for the Database Backup
 func NewBackupSecret(bkp *v1alpha1.Backup, prefix string, secretData map[string][]byte, secretStringData map[string]string, scheme *runtime.Scheme) *corev1.Secret {
 	ls := utils.GetLabels(bkp.Name)
 

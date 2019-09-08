@@ -12,7 +12,7 @@ IMAGE_REGISTRY=quay.io
 IMAGE_LATEST_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):latest
 IMAGE_MASTER_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):master
 IMAGE_RELEASE_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):$(CIRCLE_TAG)
-NAMESPACE=postgresql
+NAMESPACE=postgresql-operator
 TEST_COMPILE_OUTPUT ?= build/_output/bin/$(APP_NAME)-test
 
 # This follows the output format for goreleaser
@@ -29,23 +29,23 @@ install:
 	@echo ....... Creating namespace ....... 
 	- kubectl create namespace ${NAMESPACE}
 	@echo ....... Applying CRDS and Operator .......
-	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
-	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql_v1alpha1_database_crd.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
 	@echo ....... Applying Rules and Service Account .......
 	- kubectl apply -f deploy/role.yaml -n ${NAMESPACE}
 	- kubectl apply -f deploy/role_binding.yaml  -n ${NAMESPACE}
 	- kubectl apply -f deploy/service_account.yaml  -n ${NAMESPACE}
-	@echo ....... Applying PostgreSQL Operator .......
+	@echo ....... Applying Database Operator .......
 	- kubectl apply -f deploy/operator.yaml -n ${NAMESPACE}
 	@echo ....... Creating the Database .......
-	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_postgresql_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql_v1alpha1_database_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall
 uninstall:
 	@echo ....... Uninstalling .......
 	@echo ....... Deleting CRDs.......
-	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
-	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql_v1alpha1_backup_crd.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql_v1alpha1_database_crd.yaml -n ${NAMESPACE}
 	@echo ....... Deleting Rules and Service Account .......
 	- kubectl delete -f deploy/role.yaml -n ${NAMESPACE}
 	- kubectl delete -f deploy/role_binding.yaml -n ${NAMESPACE}
@@ -58,12 +58,12 @@ uninstall:
 .PHONY: backup/install
 backup/install:
 	@echo Installing backup service in ${NAMESPACE} :
-	- kubectl apply -f deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 .PHONY: backup/uninstall
 backup/uninstall:
 	@echo Uninstalling backup service from ${NAMESPACE} :
-	- kubectl delete -f deploy/crds/postgresql-operator_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 ##############################
 # CI                         #
@@ -166,4 +166,5 @@ test/compile/e2e:
 
 .PHONY: test/e2e
 test/e2e:
+	  - kubectl create namespace ${NAMESPACE}
 	  operator-sdk test local ./test/e2e --up-local --namespace=${NAMESPACE}

@@ -1,14 +1,22 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  creationTimestamp: null
   name: postgresql-operator
 rules:
-- apiGroups: ['*']
-  resources: ['*']
-  verbs: ['get', 'list']
-- apiGroups: ['']
-  resources: ['pods/exec']
-  verbs: ['create']
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  verbs:
+  - create
 - apiGroups:
   - ""
   resources:
@@ -80,6 +88,13 @@ rules:
   - get
 - apiGroups:
   - postgresql-operator.dev4devs.com
+  resources:
+  - '*'
+  - backups
+  verbs:
+  - '*'
+- apiGroups:
+  - postgresql.dev4devs.com
   resources:
   - '*'
   - backups
