@@ -43,7 +43,7 @@ metadata:
     capabilities: Full Lifecycle
     categories: Database
     certified: "false"
-    containerImage: quay.io/dev4devs-com/postgresql-operator:0.1.0
+    containerImage: quay.io/dev4devs-com/postgresql-operator:0.1.1
     createdAt: "2019-09-08T08:00:00Z"
     description: Operator in Go developed using the Operator Framework to package,
       install, configure and manage a PostgreSQL database. This project includes backup
@@ -629,7 +629,7 @@ spec:
                       fieldPath: metadata.name
                 - name: OPERATOR_NAME
                   value: postgresql-operator
-                image: quay.io/dev4devs-com/postgresql-operator:0.1.0
+                image: quay.io/dev4devs-com/postgresql-operator:0.1.1
                 imagePullPolicy: Always
                 name: postgresql-operator
                 resources:
@@ -674,4 +674,4 @@ spec:
   minKubeVersion: 1.11.3
   provider:
     name: Dev4Devs.com
-  version: 0.1.0
+  version: 0.1.1
