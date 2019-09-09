@@ -88,5 +88,3 @@ spec:
   # gpgPublicKey: "example-gpgPublicKey"
   # gpgEmail: "email@example.com"
   # gpgTrustModel: "always"
-status:
-  test: ""
