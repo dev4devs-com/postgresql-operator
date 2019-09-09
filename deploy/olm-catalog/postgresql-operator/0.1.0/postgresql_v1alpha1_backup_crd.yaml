@@ -32,145 +32,117 @@ spec:
             awsAccessKeyId:
               description: 'Key ID of AWS S3 storage. Default Value: nil Required
                 to create the Secret with the data to allow send the backup files
-                to AWS S3 storage. +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                S3 accessKey/token ID"'
+                to AWS S3 storage.'
               type: string
             awsS3BucketName:
               description: 'Name of AWS S3 storage. Default Value: nil Required to
                 create the Secret with the AWS data to allow send the backup files
-                to AWS S3 storage. +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                S3 Bucket name"'
+                to AWS S3 storage. '
               type: string
             awsSecretAccessKey:
               description: 'Secret/Token of AWS S3 storage. Default Value: nil Required
                 to create the Secret with the data to allow send the backup files
-                to AWS S3 storage. +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                S3 accessKey/token"'
+                to AWS S3 storage.'
               type: string
             awsSecretName:
               description: 'Name of the secret with the AWS data credentials pre-existing
                 in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                Secret name:"'
+                '
               type: string
             awsSecretNamespace:
               description: 'Namespace of the secret with the AWS data credentials
                 pre-existing in the cluster Default Value: nil NOTE: If the namespace
                 be not informed then the operator will try to find it in the same
-                namespace where it is applied +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                Secret namespace:"'
+                namespace where it is applied '
               type: string
             databaseCRName:
-              description: Name of the Database CR applied which this backup will
-                work with
+              description: 'Name of the Database CR applied which this backup will
+                work with Default Value: database'
               type: string
             databaseVersion:
               description: 'Database version. (E.g 9.6). Default Value: <9.6> IMPORTANT:
-                Just the first 2 digits should be used. +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Databaseversion"'
+                Just the first 2 digits should be used.'
               type: string
             encryptKeySecretName:
               description: 'Name of the secret with the Encrypt data pre-existing
-                in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey
-                Secret name:"'
+                in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml'
               type: string
             encryptKeySecretNamespace:
               description: 'Namespace of the secret with the Encrypt data pre-existing
                 in the cluster Default Value: nil NOTE: If the namespace be not informed
                 then the operator will try to find it in the same namespace where
-                it is applied +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey
-                Secret namespace:"'
+                it is applied'
               type: string
             gpgEmail:
               description: 'GPG email to create the EncryptionKeySecret with this
-                data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg
-                public email:"'
+                data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key'
               type: string
             gpgPublicKey:
               description: 'GPG public key to create the EncryptionKeySecret with
-                this data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg
-                public key:"'
+                this data Default Value: nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key'
               type: string
             gpgTrustModel:
               description: 'GPG trust model to create the EncryptionKeySecret with
                 this data. the default value is true when it is empty. Default Value:
-                nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Gpg
-                trust model:"'
+                nil See here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key'
               type: string
             image:
               description: 'Image:tag used to do the backup. Default Value: <quay.io/integreatly/backup-container:1.0.8>
-                More Info: https://github.com/integr8ly/backup-container-image +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image:tag"'
+                More Info: https://github.com/integr8ly/backup-container-image'
               type: string
             productName:
               description: 'Used to create the directory where the files will be stored
-                Default Value: <postgresql> +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS
-                tag name"'
+                Default Value: <postgresql> '
               type: string
             schedule:
               description: 'Schedule period for the CronJob. Default Value: <0 0 *
-                * *> daily at 00:00 +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true'
+                * *> daily at 00:00'
               type: string
           type: object
         status:
           properties:
             awsCredentialsSecretNamespace:
-              description: Namespace  of the secret object with the Aws data to allow
-                send the backup files to the AWS storage
+              description: 'Namespace  of the secret object with the Aws data to allow
+                send the backup files to the AWS storage'
               type: string
             awsSecretName:
-              description: Name  of the secret object with the Aws data to allow send
-                the backup files to the AWS storage
+              description: 'Name  of the secret object with the Aws data to allow send
+                the backup files to the AWS storage'
               type: string
             backupStatus:
-              description: Will be as "OK when all objects are created successfully
+              description: 'Will be as "OK when all objects are created successfully'
               type: string
             cronJobName:
-              description: Name of the CronJob object created and managed by it to
-                schedule the backup job
+              description: 'Name of the CronJob object created and managed by it to
+                schedule the backup job'
               type: string
             cronJobStatus:
-              description: Status of the CronJob object
+              description: 'Status of the CronJob object'
               type: object
             dbSecretName:
-              description: Name of the secret object created with the database data
-                to allow the backup image connect to the database
+              description: 'Name of the secret object created with the database data
+                to allow the backup image connect to the database'
               type: string
             encryptKeySecretName:
-              description: Name  of the secret object with the Encryption GPG Key
+              description: 'Name  of the secret object with the Encryption GPG Key'
               type: string
             encryptKeySecretNamespace:
-              description: Namespace of the secret object with the Encryption GPG
-                Key
+              description: 'Namespace of the secret object with the Encryption GPG
+                Key'
               type: string
             hasEncryptKey:
-              description: Boolean value which has true when it has an EncryptionKey
-                to be used to send the backup files
+              description: 'Boolean value which has true when it has an EncryptionKey
+                to be used to send the backup files'
               type: boolean
             isDatabasePodFound:
-              description: Boolean value which has true when the Database Pod was
+              description: 'Boolean value which has true when the Database Pod was
                 found in order to create the secret with the database data to allow
-                the backup image connect into it.
+                the backup image connect into it. '
               type: boolean
             isDatabaseServiceFound:
-              description: Boolean value which has true when the Service Database
+              description: 'Boolean value which has true when the Service Database
                 Pod was found in order to create the secret with the database data
-                to allow the backup image connect into it.
+                to allow the backup image connect into it.'
               type: boolean
           required:
           - backupStatus

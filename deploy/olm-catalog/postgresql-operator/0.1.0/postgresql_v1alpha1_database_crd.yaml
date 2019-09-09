@@ -32,119 +32,83 @@ spec:
             configMapDatabaseNameKey:
               description: 'Name of the configMap key where the operator should looking
                 for the value for the database name for its env var Default value:
-                nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap
-                Database Key"'
+                nil'
               type: string
             configMapDatabasePasswordKey:
               description: 'Name of the configMap key where the operator should looking
                 for the value for the database user for its env var Default value:
-                nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap
-                Password Key"'
+                nil'
               type: string
             configMapDatabaseUserKey:
               description: 'Name of the configMap key where the operator should looking
                 for the value for the database password for its env var Default value:
-                nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap
-                User Key"'
+                nil'
               type: string
             configMapName:
               description: 'Name of the ConfigMap where the operator should looking
-                for the EnvVars keys and/or values only Default value: nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap
-                name"'
+                for the EnvVars keys and/or values only Default value: nil'
               type: string
             containerImagePullPolicy:
               description: 'Policy definition to pull the Database Image More info:
-                https://kubernetes.io/docs/concepts/containers/images/ Default value:
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Container
-                Image Pull Policy" +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:imagePullPolicy"'
+                https://kubernetes.io/docs/concepts/containers/images/'
               type: string
             containerName:
-              description: Name to create the Database container
+              description: 'Name to create the Database container'
               type: string
             databaseCpu:
               description: 'CPU resource request which will be available for the database
-                container Default value: 10Mi +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                CPU"'
+                container Default value: 10Mi'
               type: string
             databaseCpuLimit:
               description: 'Limit of CPU request which will be available for the database
-                container Default value: 20Mi +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                CPU Limit"'
+                container Default value: 20Mi'
               type: string
             databaseMemoryLimit:
-              description: 'Limit of Memory which will be available for the database
-                container Default value: 512Mi +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                Memory Limit"'
+              description: 'Limit of Memory which will be available for the database container Default value: 512Mi'
               type: string
             databaseMemoryRequest:
               description: 'Limit of Memory Request which will be available for the
-                database container Default value: 128Mi +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                Memory Request"'
+                database container Default value: 128Mi'
               type: string
             databaseName:
               description: 'Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).
-                Default value: example +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                Name"'
+                Default value: example'
               type: string
             databaseNameKeyEnvVar:
               description: 'Key Value for the Database Environment Variable in order
                 to inform the database mame Note that each database version/image
-                can expected a different value for it. Default value: nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EnvVar
-                Key (Database Name)"'
+                can expected a different value for it. Default value: nil'
               type: string
             databasePassword:
               description: 'Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).
-                Default value: postgres +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                Password" +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.x-descriptors="urn:alm:descriptor:com.tectonic.ui:password"'
+                Default value: postgres'
               type: string
             databasePasswordKeyEnvVar:
               description: 'Key Value for the Database Environment Variable in order
                 to inform the database password Note that each database version/image
-                can expected a different value for it. Default value: nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EnvVar
-                Key (Database Password)"'
+                can expected a different value for it. Default value: nil'
               type: string
             databasePort:
-              description: Value for the Database Environment Variable in order to
+              description: 'Value for the Database Environment Variable in order to
                 define the port which it should use. It will be used in its container
-                as well
+                as well'
               format: int32
               type: integer
             databaseStorageRequest:
               description: 'Limit of Storage Request which will be available for the
-                database container Default value: 1Gi +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                Storage Request"'
+                database container Default value: 1Gi'
               type: string
             databaseUser:
               description: 'Value for the Database Environment Variable (spec.databaseUserKeyEnvVar).
-                Default value: postgres +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database
-                User"'
+                Default value: postgres'
               type: string
             databaseUserKeyEnvVar:
               description: 'Key Value for the Database Environment Variable in order
                 to inform the database user Note that each database version/image
-                can expected a different value for it. Default value: nil +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EnvVar
-                Key (Database User)"'
+                can expected a different value for it. Default value: nil'
               type: string
             image:
-              description: 'Database image:tag Default value: centos/postgresql-96-centos7
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
-                +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Image:tag"'
+              description: 'Database image:tag Default value: centos/postgresql-96-centos7'
               type: string
             size:
               description: 'Quantity of instances Default value: 1 +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true'
@@ -154,18 +118,16 @@ spec:
         status:
           properties:
             databaseStatus:
-              description: It will be as "OK when all objects are created successfully
+              description: 'It will be as "OK when all objects are created successfully'
               type: string
             deploymentStatus:
-              description: Status of the Database Deployment created and managed by
-                it
+              description: 'Status of the Database Deployment created and managed by it'
               type: object
             pvcStatus:
-              description: Name of the PersistentVolumeClaim created and managed by
-                it
+              description: 'Name of the PersistentVolumeClaim created and managed by it'
               type: object
             serviceStatus:
-              description: Status of the Database Service created and managed by it
+              description: 'Status of the Database Service created and managed by it'
               type: object
           required:
           - pvcStatus
