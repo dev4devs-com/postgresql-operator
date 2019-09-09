@@ -11,3 +11,6 @@ scorecard:
           - "deploy/crds/postgresql_v1alpha1_database_cr.yaml"
           - "deploy/crds/postgresql_v1alpha1_backup_cr.yaml"
         csv-path: "deploy/olm-catalog/postgresql-operator/0.1.1/postgresql-operator.v0.1.1.clusterserviceversion.yaml"
+
+# Create a namespace  kubectl create namespace postgresql-operator and gon on it
+

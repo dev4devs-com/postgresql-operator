@@ -6,19 +6,6 @@ metadata:
       [
         {
           "apiVersion": "postgresql.dev4devs.com/v1alpha1",
-          "kind": "Backup",
-          "metadata": {
-            "name": "backup"
-          },
-          "spec": {
-            "awsAccessKeyId": "example-awsAccessKeyId",
-            "awsS3BucketName": "example-awsS3BucketName",
-            "awsSecretAccessKey": "example-awsSecretAccessKey",
-            "schedule": "0 0 * * *"
-          }
-        },
-        {
-          "apiVersion": "postgresql.dev4devs.com/v1alpha1",
           "kind": "Database",
           "metadata": {
             "name": "database"
@@ -38,6 +25,19 @@ metadata:
             "image": "centos/postgresql-96-centos7",
             "size": 1
           }
+        },
+        {
+          "apiVersion": "postgresql.dev4devs.com/v1alpha1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup"
+          },
+          "spec": {
+            "awsAccessKeyId": "example-awsAccessKeyId",
+            "awsS3BucketName": "example-awsS3BucketName",
+            "awsSecretAccessKey": "example-awsSecretAccessKey",
+            "schedule": "0 0 * * *"
+          }
         }
       ]
     capabilities: Full Lifecycle
@@ -50,7 +50,7 @@ metadata:
       feature.
     repository: https://github.com/dev4devs-com/postgresql-operator
     support: Dev4Devs, Inc
-  name: postgresql-operator.v0.1.0
+  name: postgresql-operator.v0.1.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -195,11 +195,11 @@ spec:
           here how to create this key : https://help.github.com/en/articles/generating-a-new-gpg-key'
         displayName: 'Gpg trust model:'
         path: gpgTrustModel
-      - description: 'Image:tag used to do the backup. Default Value: <quay.io/integreatly/backup-container:1.0.8>
-          More Info: https://github.com/integr8ly/backup-container-image'
+      - description: 'Database image:tag Default value: centos/postgresql-96-centos7'
         displayName: Image:tag
         path: image
-      - description: 'Database image:tag Default value: centos/postgresql-96-centos7'
+      - description: 'Image:tag used to do the backup. Default Value: <quay.io/integreatly/backup-container:1.0.8>
+          More Info: https://github.com/integr8ly/backup-container-image'
         displayName: Image:tag
         path: image
       - description: 'Used to create the directory where the files will be stored
