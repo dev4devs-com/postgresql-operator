@@ -629,7 +629,7 @@ spec:
                       fieldPath: metadata.name
                 - name: OPERATOR_NAME
                   value: postgresql-operator
-                image: quay.io/dev4devs-com/postgresql-operator:master
+                image: quay.io/dev4devs-com/postgresql-operator:0.1.0
                 imagePullPolicy: Always
                 name: postgresql-operator
                 resources:
