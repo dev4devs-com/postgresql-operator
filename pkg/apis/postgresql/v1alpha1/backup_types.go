@@ -16,6 +16,9 @@ type BackupSpec struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Name of the Database CR applied which this backup will work with
+	// Default Value: "database"
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Name of Database CR"
 	DatabaseCRName string `json:"databaseCRName,omitempty"`
 
 	// Schedule period for the CronJob.
@@ -122,42 +125,65 @@ type BackupStatus struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Will be as "OK when all objects are created successfully
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Backup Status"
 	BackupStatus string `json:"backupStatus"`
 
 	// Name of the CronJob object created and managed by it to schedule the backup job
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="CronJob Name"
 	CronJobName string `json:"cronJobName"`
 
 	// Name of the secret object created with the database data to allow the backup image connect to the database
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Database Secret Name"
 	DBSecretName string `json:"dbSecretName"`
 
 	// Name  of the secret object with the Aws data to allow send the backup files to the AWS storage
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="AWS Secret Name"
 	AWSSecretName string `json:"awsSecretName"`
 
 	// Namespace  of the secret object with the Aws data to allow send the backup files to the AWS storage
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="AWS Secret Namespace"
 	AwsCredentialsSecretNamespace string `json:"awsCredentialsSecretNamespace"`
 
 	// Name  of the secret object with the Encryption GPG Key
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Encryption GPG Secret Name"
 	EncryptKeySecretName string `json:"encryptKeySecretName"`
 
 	// Namespace of the secret object with the Encryption GPG Key
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Encryption GPG Secret Namespace"
 	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace"`
 
 	// Boolean value which has true when it has an EncryptionKey to be used to send the backup files
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is Encryption GPG Key configure?"
 	HasEncryptKey bool `json:"hasEncryptKey"`
 
 	// Boolean value which has true when the Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is the Database Pod found?"
 	IsDatabasePodFound bool `json:"isDatabasePodFound"`
 
 	// Boolean value which has true when the Service Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is the Database Service found?"
 	IsDatabaseServiceFound bool `json:"isDatabaseServiceFound"`
 
 	// Status of the CronJob object
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="v1beta1.CronJobStatus"
 	CronJobStatus v1beta1.CronJobStatus `json:"cronJobStatus"`
 }
 
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
 
 // Backup is the Schema for the backups API
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
 // +operator-sdk:gen-csv:customresourcedefinitions.displayName="Database Backup"

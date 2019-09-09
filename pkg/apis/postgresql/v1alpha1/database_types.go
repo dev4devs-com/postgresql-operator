@@ -144,15 +144,23 @@ type DatabaseStatus struct {
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Name of the PersistentVolumeClaim created and managed by it
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="v1.PersistentVolumeClaimStatus"
 	PVCStatus v1.PersistentVolumeClaimStatus `json:"pvcStatus"`
 
 	// Status of the Database Deployment created and managed by it
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="appsv1.DeploymentStatus"
 	DeploymentStatus appsv1.DeploymentStatus `json:"deploymentStatus"`
 
 	// Status of the Database Service created and managed by it
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="v1.ServiceStatus"
 	ServiceStatus v1.ServiceStatus `json:"serviceStatus"`
 
 	// It will be as "OK when all objects are created successfully
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Database Status"
 	DatabaseStatus string `json:"databaseStatus"`
 }
 

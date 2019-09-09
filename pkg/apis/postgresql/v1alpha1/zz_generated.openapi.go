@@ -71,7 +71,7 @@ func schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref common.ReferenceCallback
 				Properties: map[string]spec.Schema{
 					"databaseCRName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Name of the Database CR applied which this backup will work with",
+							Description: "Name of the Database CR applied which this backup will work with Default Value: \"database\"",
 							Type:        []string{"string"},
 							Format:      "",
 						},
