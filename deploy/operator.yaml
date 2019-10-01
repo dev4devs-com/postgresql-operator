@@ -16,7 +16,7 @@ spec:
       containers:
         - name: postgresql-operator
           # Replace this with the built image name
-          image: quay.io/dev4devs-com/postgresql-operator:master
+          image: cmacedo/postgresql-operator:test
           command:
           - postgresql-operator
           imagePullPolicy: Always

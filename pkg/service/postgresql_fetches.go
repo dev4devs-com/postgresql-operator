@@ -13,7 +13,7 @@ import (
 func FetchDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Pod, error) {
 	listOps := buildDatabaseCriteria(bkp, db)
 	dbPodList := &corev1.PodList{}
-	err := client.List(context.TODO(), listOps, dbPodList)
+	err := client.List(context.TODO(), dbPodList, listOps)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func FetchDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client
 func FetchDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Service, error) {
 	listOps := buildDatabaseCriteria(bkp, db)
 	dbServiceList := &corev1.ServiceList{}
-	err := client.List(context.TODO(), listOps, dbServiceList)
+	err := client.List(context.TODO(), dbServiceList, listOps)
 	if err != nil {
 		return nil, err
 	}
