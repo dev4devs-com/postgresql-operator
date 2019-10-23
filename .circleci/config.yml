@@ -17,10 +17,10 @@ jobs:
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
-    - run: make code/build/linux
+    - run: make code-build-linux
     - run: GO111MODULE=off go get github.com/mattn/goveralls
-    - run: make test/run
-    - run: make test/integration-cover
+    - run: make test
+    - run: make integration-cover
     - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
 
   image_push_master:
@@ -36,11 +36,11 @@ jobs:
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
-    - run: make code/build/linux
+    - run: make code-build-linux
     # circle ci key required for docker builds
     - setup_remote_docker
-    - run: make image/build/master
-    - run: make image/push/master
+    - run: make image-build-master
+    - run: make image-push-master
 
   image_release:
     working_directory: /go/src/github.com/dev4devs-com/postgresql-operator
@@ -55,11 +55,11 @@ jobs:
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
-    - run: make code/build/linux
+    - run: make code-build-linux
     # circle ci key required for docker builds
     - setup_remote_docker
-    - run: make image/build/release
-    - run: make image/push/release
+    - run: make image-build-release
+    - run: make image-push-release
 
 workflows:
   version: 2

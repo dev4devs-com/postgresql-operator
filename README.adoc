@@ -164,7 +164,7 @@ IMPORTANT: You can add the name of the secret which is created already in the cl
 +
 IMPORTANT: You need to create the bucket yourself
 +
-. Run the command `make backup/install` in the same namespace where the  Database is installed in order to apply the CronJob which will do this process.
+. Run the command `make install-backup` in the same namespace where the  Database is installed in order to apply the CronJob which will do this process.
 
 NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user.
 
@@ -302,7 +302,7 @@ The following command will install the operator in the cluster and run the chang
 
 [source,yaml]
 ----
-$ make code/run/local
+$ make code-run-local
 ----
 
 IMPORTANT: The local changes are applied when the command `operator-sdk up local --namespace={namespace}` is executed then it is not a hot deploy and to get the latest changes you need re-run the command.
@@ -334,7 +334,7 @@ NOTE: The code needs to be compiled/built first.
 
 [source,shell]
 ----
-$ make setup/debug
+$ make setup-debug
 $ cd cmd/manager/
 $ dlv debug --headless --listen=:2345 --api-version=2
 ----
@@ -345,7 +345,7 @@ Then, debug the project from the IDE by using the default setup of `Go Remote` o
 
 [source,shell]
 ----
-$ make setup/debug
+$ make setup-debug
 $ dlv --listen=:2345 --headless=true --api-version=2 exec ./build/_output/bin/postgresql-operator-local  --
 ----
 
@@ -383,37 +383,37 @@ debug the project using the following Visual Studio Code launch config.
 | *Command*                        | *Description*
 | `make install`                   | Creates the `{namespace}` namespace, application CRDS, cluster role and service account. Installs the operator and DB
 | `make uninstall`                 | Uninstalls the operator and DB. Deletes the `{namespace}`` namespace, application CRDS, cluster role and service account. i.e. all configuration applied by `make install`
-| `make backup/install`            | Installs the backup Service in the operator's namespace
-| `make backup/uninstall`          | Uninstalls the backup Service from the operator's namespace.
+| `make install-backup`            | Installs the backup Service in the operator's namespace
+| `make uninstall-backup`          | Uninstalls the backup Service from the operator's namespace.
 |===
 
 === Local Development
 
 |===
-| `make code/run-local`                 | Runs the operator locally for development purposes.
-| `make setup/debug`                    | Sets up environment for debugging proposes.
-| `make code/vet`                       | Examines source code and reports suspicious constructs using https://golang.org/cmd/vet/[vet].
-| `make code/fmt`                       | Formats code using https://golang.org/cmd/gofmt/[gofmt].
-| `make code/gen`                       | It will automatically generated/update the files by using the operator-sdk based on the CR status and spec definitions.
-| `make code/dev`                       | It will tun the dev commands to check, fix and generated/update the files.
+| `make code-run-local`                 | Runs the operator locally for development purposes.
+| `make setup-debug`                    | Sets up environment for debugging proposes.
+| `make vet`                       | Examines source code and reports suspicious constructs using https://golang.org/cmd/vet/[vet].
+| `make fmt`                       | Formats code using https://golang.org/cmd/gofmt/[gofmt].
+| `make gen`                       | It will automatically generated/update the files by using the operator-sdk based on the CR status and spec definitions.
+| `make dev`                       | It will tun the dev commands to check, fix and generated/update the files.
 |===
 
 === CI
 
 |===
-| `make image/build/master`              | Used by CI to build operator image from `master` branch and add `:master` tag.
-| `make image/push/master`               | Used by CI to push the `master` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
-| `make image/build/release`             | Used by CI to build operator image from a tagged commit and add `:<version>` and `latest` tag.
-| `make image/push/release`              | Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
+| `make image-build-master`              | Used by CI to build operator image from `master` branch and add `:master` tag.
+| `make image-push-master`               | Used by CI to push the `master` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
+| `make image-build-release`             | Used by CI to build operator image from a tagged commit and add `:<version>` and `latest` tag.
+| `make image-push-release`              | Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
 |===
 
 === Tests
 
 |===
-| `make test/run`                      | Runs test suite
-| `make test/integration-cover`        | Run coverage check
-| `make test/compile/e2e`              | Compile image for tests
-| `make test/e2e`                      | Run locally e2e tests (Required have cluster installed locally)
+| `make test`                      | Runs test suite
+| `make integration-cover`        | Run coverage check
+| `make compile-e2e`              | Compile image for tests
+| `make test-e2e`                      | Run locally e2e tests (Required have cluster installed locally)
 |===
 
 NOTE: The link:./Makefile[Makefile] is implemented with tasks which you should use to work with.

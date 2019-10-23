@@ -19,15 +19,18 @@ TEST_COMPILE_OUTPUT ?= build/_output/bin/$(APP_NAME)-test
 BINARY_LINUX_64 = ./dist/linux_amd64/$(BINARY)
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
+.DEFAULT_GOAL:=help
 
 export GOPROXY?=https://proxy.golang.org/
 
 ##############################
-# INSTALL/UNINSTALL          #
+# INSTALL-UNINSTALL          #
 ##############################
 
+##@ Application
+
 .PHONY: install
-install:
+install:  ## Install all resources (CR-CRD's, RBCA and Operator)
 	@echo ....... Creating namespace ....... 
 	- kubectl create namespace ${NAMESPACE}
 	@echo ....... Applying CRDS and Operator .......
@@ -43,7 +46,7 @@ install:
 	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_databases_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall
-uninstall:
+uninstall:  ## Uninstall all that all performed in the $ make install
 	@echo ....... Uninstalling .......
 	@echo ....... Deleting CRDs.......
 	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_backups_crd.yaml -n ${NAMESPACE}
@@ -57,13 +60,13 @@ uninstall:
 	@echo ....... Deleting namespace ${NAMESPACE}.......
 	- kubectl delete namespace ${NAMESPACE}
 
-.PHONY: backup/install
-backup/install:
+.PHONY: install-backup
+install-backup: ## Install backup feature ( Backup CR )
 	@echo Installing backup service in ${NAMESPACE} :
 	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_baskups_cr.yaml -n ${NAMESPACE}
 
-.PHONY: backup/uninstall
-backup/uninstall:
+.PHONY: uninstall-backup
+uninstall-backup: ## Uninstall backup feature ( Backup CR )
 	@echo Uninstalling backup service from ${NAMESPACE} :
 	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_baskups_cr.yaml -n ${NAMESPACE}
 
@@ -71,29 +74,31 @@ backup/uninstall:
 # CI                         #
 ##############################
 
-.PHONY: code/build/linux
-code/build/linux:
+##@ CI
+
+.PHONY: code-build-linux
+code-build-linux:  ## Build binary for Linux SO (amd64)
 	env GOOS=linux GOARCH=amd64 go build $(APP_FILE)
 
-.PHONY: image/build/master
-image/build/master:
+.PHONY: image-build-master
+image-build-master:  ## Build master branch image
 	@echo Building operator with the tag: $(IMAGE_MASTER_TAG)
 	operator-sdk build $(IMAGE_MASTER_TAG)
 
-.PHONY: image/build/release
-image/build/release:
+.PHONY: image-build-release
+image-build-release: ## Build release and latest tag image
 	@echo Building operator with the tag: $(IMAGE_RELEASE_TAG)
 	operator-sdk build $(IMAGE_RELEASE_TAG)
 	operator-sdk build $(IMAGE_LATEST_TAG)
 
-.PHONY: image/push/master
-image/push/master:
+.PHONY: image-push-master
+image-push-master: ## Push master branch image
 	@echo Pushing operator with tag $(IMAGE_MASTER_TAG) to $(IMAGE_REGISTRY)
 	@docker login --username $(QUAY_USERNAME) --password $(QUAY_PASSWORD) quay.io
 	docker push $(IMAGE_MASTER_TAG)
 
-.PHONY: image/push/release
-image/push/release:
+.PHONY: image-push-release
+image-push-release: ## Push release and latest tag image
 	@echo Pushing operator with tag $(IMAGE_RELEASE_TAG) to $(IMAGE_REGISTRY)
 	@docker login --username $(QUAY_USERNAME) --password $(QUAY_PASSWORD) quay.io
 	docker push $(IMAGE_RELEASE_TAG)
@@ -105,10 +110,12 @@ image/push/release:
 # Local Development          #
 ##############################
 
-.PHONY: setup/debug
-setup/debug:
+##@ Development
+
+.PHONY: setup-debug
+setup-debug:  ## Setup local env to debug. It will export env vars and install the project in the cluster
 	@echo Exporting env vars to run operator locally:
-	- . ./scripts/export_local_envvars.sh
+	- . .-scripts-export_local_envvars.sh
 	@echo Installing ...
 	- make install
 
@@ -116,33 +123,33 @@ setup/debug:
 setup:
 	go mod tidy
 
-.PHONY: code/run/local
-code/run/local:
+.PHONY: run-local
+run-local:  ## Run project locally for debbug purposes.
 	@echo Exporting env vars to run operator locally:
-	- . ./scripts/export_local_envvars.sh
+	- . .-scripts-export_local_envvars.sh
 	@echo  ....... Installing ...
 	- make install
 	@echo Starting ...
 	- operator-sdk up local
 
-.PHONY: code/vet
-code/vet:
+.PHONY: vet
+vet:  ## Run go vet for the project
 	@echo go vet
-	go vet $$(go list ./... )
+	go vet $$(go list .-... )
 
-.PHONY: code/fmt
-code/fmt:
+.PHONY: fmt
+fmt: ## Run go fmt for the project
 	@echo go fmt
-	go fmt $$(go list ./... )
+	go fmt $$(go list .-... )
 
-.PHONY: code/dev
-code/dev:
-	- make code/fmt
-	- make code/vet
-	- make code/gen
+.PHONY: dev
+dev: ## Run all required dev commands. (It should be used always before send a PR)
+	- make code-fmt
+	- make code-vet
+	- make code-gen
 
-.PHONY: code/gen
-code/gen:
+.PHONY: gen
+gen:  ## Run SDK commands to generated-upddate the project
 	operator-sdk generate k8s
 	operator-sdk generate openapi
 
@@ -150,23 +157,31 @@ code/gen:
 # Tests                      #
 ##############################
 
-.PHONY: test/run
-test/run:
+##@ Tests
+
+.PHONY: test
+test:  ## Run unit test
 	@echo Running tests:
 	go test -cover $(TEST_PKGS)
 
-.PHONY: test/integration-cover
-test/integration-cover:
+.PHONY: integration-cover
+integration-cover:  ## Run coveralls
 	echo "mode: count" > coverage-all.out
 	$(foreach pkg,$(PACKAGES),\
 		go test -failfast -tags=integration -coverprofile=coverage.out -covermode=count $(addprefix $(PKG)/,$(pkg)) || exit 1;\
 		tail -n +2 coverage.out >> coverage-all.out;)
 
-.PHONY: test/compile/e2e
-test/compile/e2e:
-	 @GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o=$(TEST_COMPILE_OUTPUT) ./test/e2e ...
+.PHONY: compile-e2e
+compile-e2e:  ## Compile binary to run integration tests
+	 @GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go test -c -o=$(TEST_COMPILE_OUTPUT) .-test-e2e ...
 
-.PHONY: test/e2e
-test/e2e:
+.PHONY: test-e2e
+test-e2e:  ## Run integration tests locally
 	  - kubectl create namespace ${NAMESPACE}
-	  operator-sdk test local ./test/e2e --up-local --namespace=${NAMESPACE}
+	  operator-sdk test local .-test-e2e --up-local --namespace=${NAMESPACE}
+
+##@ General
+
+.PHONY: help
+help:  ## Display this help
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
