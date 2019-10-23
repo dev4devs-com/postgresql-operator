@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- Upgrade project to use version 0.11.0 of SDK
+
 ## [0.1.1] - 2019-09-09
 - Add status in CSV OLM integration files 
 

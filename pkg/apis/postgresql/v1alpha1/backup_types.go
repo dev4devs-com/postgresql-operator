@@ -10,6 +10,7 @@ import (
 
 // BackupSpec defines the desired state of Backup
 // +k8s:openapi-gen=true
+// +kubebuilder:resource:path=backups,scope=Namespaced
 type BackupSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
@@ -179,8 +180,6 @@ type BackupStatus struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="v1beta1.CronJobStatus"
 	CronJobStatus v1beta1.CronJobStatus `json:"cronJobStatus"`
 }
-
-
 
 // Backup is the Schema for the backups API
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

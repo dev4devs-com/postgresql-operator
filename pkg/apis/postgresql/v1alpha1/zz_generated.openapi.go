@@ -11,12 +11,12 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.Backup":         schema_pkg_apis_postgresql_v1alpha1_Backup(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec":     schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus":   schema_pkg_apis_postgresql_v1alpha1_BackupStatus(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.Database":       schema_pkg_apis_postgresql_v1alpha1_Database(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec":   schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref),
-		"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus": schema_pkg_apis_postgresql_v1alpha1_DatabaseStatus(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.Backup":         schema_pkg_apis_postgresql_v1alpha1_Backup(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec":     schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus":   schema_pkg_apis_postgresql_v1alpha1_BackupStatus(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.Database":       schema_pkg_apis_postgresql_v1alpha1_Database(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec":   schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref),
+		"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus": schema_pkg_apis_postgresql_v1alpha1_DatabaseStatus(ref),
 	}
 }
 
@@ -25,6 +25,7 @@ func schema_pkg_apis_postgresql_v1alpha1_Backup(ref common.ReferenceCallback) co
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "Backup is the Schema for the backups API",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -47,19 +48,19 @@ func schema_pkg_apis_postgresql_v1alpha1_Backup(ref common.ReferenceCallback) co
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec"),
+							Ref: ref("github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus"),
+							Ref: ref("github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupSpec", "github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.BackupStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -68,6 +69,7 @@ func schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref common.ReferenceCallback
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "BackupSpec defines the desired state of Backup",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"databaseCRName": {
 						SchemaProps: spec.SchemaProps{
@@ -177,7 +179,6 @@ func schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref common.ReferenceCallback
 				},
 			},
 		},
-		Dependencies: []string{},
 	}
 }
 
@@ -186,6 +187,7 @@ func schema_pkg_apis_postgresql_v1alpha1_BackupStatus(ref common.ReferenceCallba
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "BackupStatus defines the observed state of Backup",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"backupStatus": {
 						SchemaProps: spec.SchemaProps{
@@ -277,6 +279,7 @@ func schema_pkg_apis_postgresql_v1alpha1_Database(ref common.ReferenceCallback) 
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "Database is the Schema for the the Database Database API",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -299,19 +302,19 @@ func schema_pkg_apis_postgresql_v1alpha1_Database(ref common.ReferenceCallback) 
 					},
 					"spec": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec"),
+							Ref: ref("github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
-							Ref: ref("github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus"),
+							Ref: ref("github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec", "github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseSpec", "github.com/dev4devs/postgresql-operator/pkg/apis/postgresql/v1alpha1.DatabaseStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -320,6 +323,7 @@ func schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref common.ReferenceCallba
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "DatabaseSpec defines the desired state of Database",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"databaseName": {
 						SchemaProps: spec.SchemaProps{
@@ -464,7 +468,6 @@ func schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref common.ReferenceCallba
 				},
 			},
 		},
-		Dependencies: []string{},
 	}
 }
 
@@ -473,6 +476,7 @@ func schema_pkg_apis_postgresql_v1alpha1_DatabaseStatus(ref common.ReferenceCall
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
 				Description: "DatabaseStatus defines the observed state of Database",
+				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"pvcStatus": {
 						SchemaProps: spec.SchemaProps{
