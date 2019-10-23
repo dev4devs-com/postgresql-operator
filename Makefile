@@ -20,6 +20,8 @@ BINARY_LINUX_64 = ./dist/linux_amd64/$(BINARY)
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
+export GOPROXY?=https://proxy.golang.org/
+
 ##############################
 # INSTALL/UNINSTALL          #
 ##############################

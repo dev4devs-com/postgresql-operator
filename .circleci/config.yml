@@ -15,6 +15,7 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+    - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code/build/linux
     - run: GO111MODULE=off go get github.com/mattn/goveralls
@@ -33,6 +34,7 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+    - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code/build/linux
     # circle ci key required for docker builds
@@ -51,6 +53,7 @@ jobs:
     - run:
         name: Install operator-sdk to run make setup
         command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+    - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code/build/linux
     # circle ci key required for docker builds
