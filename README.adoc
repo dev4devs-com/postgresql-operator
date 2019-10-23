@@ -18,7 +18,7 @@ ifdef::status[]
 .*Project health*
 image:https://circleci.com/gh/dev4devs-com/postgresql-operator.svg?style=svg[Build Status (CircleCI), link=https://circleci.com/gh/dev4devs-com/postgresql-operator]
 image:https://img.shields.io/:license-Apache2-blue.svg[License (License), link=http://www.apache.org/licenses/LICENSE-2.0]
-image:https://coveralls.io/repos/github/dev4devs-com/postgresql-operator/badge.svg?branch=master[Coverage Status (Coveralls), link=https://coveralls.io/github/dev4devs-com/postgresql-operator?branch=master]
+image:https://coveralls.io/repos/github/dev4devs-com/postgresql-operator/badge.svg?bVerifyingranch=master[Coverage Status (Coveralls), link=https://coveralls.io/github/dev4devs-com/postgresql-operator?branch=master]
 image:https://goreportcard.com/badge/github.com/dev4devs-com/postgresql-operator[Go Report Card (Go Report Card), link=https://goreportcard.com/report/github.com/dev4devs-com/postgresql-operator]
 endif::[]
 
@@ -34,10 +34,13 @@ A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOper
 The following prerequisites are just required if you would like to install it as standalone (without OLM).
 
 |===
-|https://golang.org/doc/install[Install Golang] v1.11+
+|https://golang.org/doc/install[Install Golang] v1.12+
+|Access to a Kubernetes v1.14.1+ cluster.
 |https://github.com/golang/go/wiki/SettingGOPATH[Ensure the $GOPATH environment variable is set]
 |https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl[Install kubectl]
 |===
+
+NOTE: If you haven't a access to a Kubernetes v1.14.1+ cluster. It is recommend the usage of https://kubernetes.io/docs/setup/learning-environment/minikube/[Minikube] for local tests and development purposes. You may would like to check the blog posts https://dev4devs.com/2019/10/19/how-to-getting-started-with-kubernetes/[How to getting started with Kubernetes?].
 
 The following prerequisite is just required if you would like to contribute with.
 
@@ -58,30 +61,11 @@ By the following commands you will create a local directory and clone this proje
 $ git clone git@github.com:dev4devs-com/postgresql-operator.git $GOPATH/src/github.com/dev4devs-com/postgresql-operator
 ----
 
-=== Minishift installation and setup
-
-https://docs.okd.io/latest/minishift/getting-started/installing.html[Install Minishift] then enable Operators on it by running the following commands.
-
-[source,shell]
-----
-# create a new profile to test the operator
-$ minishift profile set postgresql-operator
-
-# enable the admin-user add-on
-$ minishift addon enable admin-user
-
-# add insecure registry to download the images from docker
-$ minishift config set insecure-registry 172.30.0.0/16
-
-# start the instance
-$ minishift start
-----
-
 === Installing as standalone
 
 Use the following command to install the Operator and Database
 
-NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user.
 
 [source,shell]
 ----
@@ -90,20 +74,17 @@ $ make install
 
 === Verifying
 
-TIP: If you get an `oc: command not found` just run `eval $(minishift oc-env)` and you'll be good to give it another try
-
-To verify that the installation was successful completed you can check the  `Database Status` field of link:deploy/crds/postgresql_v1alpha1_database_crd.yaml[Database CRD] in the cluster. The expected result when all was installed with success is `OK`.
+To verify that the installation was successful completed you can check the  `Database Status` field of link:deploy/crds/postgresql.dev4devs.com_databases_crd.yaml[Database CRD] in the cluster. The expected result when all was installed with success is `OK`.
 
 ```shell
-$ oc describe Database | grep "Database Status"
+$ kubectl describe Database -n postgresql-operator | grep Status
 ...
+Status:
   Database Status:  OK
 ...
 ```
 
-TIP: If you get no output from the previous command, you may need to jump to the correct project, run `oc project postgresql-operator` before trying again
-
-Now is time to check if all the resources are available as expected, running `kubectl get all -o wide` one should see a result similar to the one below
+Now is time to check if all the resources are available as expected, running `kubectl get all -o wide -n postgresql-operator` one should see a result similar to the one below
 
 [source,shell]
 ----
@@ -133,7 +114,7 @@ Use the following command to delete the Operator, Database and Backup Service if
 $ make uninstall
 ----
 
-NOTE: To uninstall you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+NOTE: To uninstall you need be logged in as a user with cluster privileges like the `system:admin` user.
 
 == OperatorHub.io
 
@@ -145,7 +126,7 @@ Tip: If for some reason you have problems interacting with `quay.io`, go to "htt
 
 === Using configMap to share required values
 
-By the specs in link:deploy/crds/postgresql.dev4devs.com_databases_cr.yaml[Database CR] you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the Database should use in its required env vars.
+By the specs in link:deploy/crds/postgresql.dev4devs.com_databases_cr.yaml[Database CR](_deploy/crds/postgresql.dev4devs.com_databases_cr.yaml_) you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the Database should use in its required env vars.
 
 If you inform only the name of the configMap at `configMapName`,  then it will look for the values stored with the same keys required for each image env var used for its database version (`databaseName`, `databasePassword`, `databaseUser`). However, you are able to customize the keys as well by using the optional specs; `configMapDatabaseName`, `configMapDatabasePassword`, `configMapDatabaseUser`. This way, this operator will be able to look for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
@@ -166,7 +147,7 @@ By using the command `make install` as it is, the default namespace will be `pos
 ===== Install
 The backup service is implemented by using  https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image]. It will do the database backup to be restored later in case of failures. Following the steps to enable it.
 
-. Setup an AWS S3 Bucket in order to store the backup outside of the cluster. You need to add your AWS details to link:./postgresql-operator/deploy/crds/postgresql_v1alpha1_backup_cr.yaml[Backup CR](_postgresql-operator/deploy/crds/postgresql_v1alpha1_backup_cr.yaml_) as following or add the name of the secret which has already this data in the cluster.
+. Setup an AWS S3 Bucket in order to store the backup outside of the cluster. You need to add your AWS details to link:./deploy/crds/postgresql.dev4devs.com_backups_cr.yaml[Backup CR](_deploy/crds/postgresql.dev4devs.com_backups_cr.yaml_) as following or add the name of the secret which has already this data in the cluster.
 +
 [source,yaml]
 ----
@@ -185,7 +166,7 @@ IMPORTANT: You need to create the bucket yourself
 +
 . Run the command `make backup/install` in the same namespace where the  Database is installed in order to apply the CronJob which will do this process.
 
-NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user. E.g. By using: `oc login -u system:admin`.
+NOTE: To install you need be logged in as a user with cluster privileges like the `system:admin` user.
 
 ===== Verifying
 
@@ -193,16 +174,16 @@ To verify if the backup has been successfully created you can run the following 
 
 [source,shell]
 ----
-$ oc get cronjob.batch/backup
+$ kubectl get cronjob.batch/backup -n postgresql-operator
 NAME      SCHEDULE      SUSPEND   ACTIVE    LAST SCHEDULE   AGE
 backup     0 * * * *   False     0         13s             12m
 ----
 
-To check the jobs executed you can run the command `oc get jobs` in the namespace where the operator is installed as in the following example.
+To check the jobs executed you can run the command `kubectl get jobs -n postgresql-operator` in the namespace where the operator is installed as in the following example.
 
 [source,shell]
 ----
-$ oc get jobs
+$ kubectl get jobs  -n postgresql-operator
 NAME               DESIRED   SUCCESSFUL   AGE
 backup-1561588320   1         0            6m
 backup-1561588380   1         0            5m
@@ -212,11 +193,11 @@ backup-1561588500   1         0            3m
 
 NOTE: In the above example the schedule was made to run this job each minute (`*/1 * * * *`)
 
-To check the logs and troubleshooting you can run the command `oc logs $podName -f` in the namespace where the operator is installed as the following example.
+To check the logs and troubleshooting you can run the command `kubectl logs $podName -f  -n postgresql-operator` in the namespace where the operator is installed as the following example.
 
 [source,shell]
 ----
- $ oc logs job.batch/backup-1561589040 -f
+ $ kubectl logs job.batch/backup-1561589040 -f  -n postgresql-operator
 dumping postgresql
 dumping postgres
 ==> Component data dump completed
@@ -246,8 +227,8 @@ NOTE: The operator and database will be installed in the namespace `{namespace}`
 
 |===
 | *CustomResourceDefinition*    | *Description*
-| link:deploy/crds/postgresql-operator_v1alpha1_postgresql_crd.yaml[Database]     | Packages, manages, installs and configures the Database on the cluster.
-| link:deploy/crds/postgresql-operator_v1alpha1_backup_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
+| link:deploy/crds/postgresql.dev4devs.com_databases_crd.yaml[Database]     | Packages, manages, installs and configures the Database on the cluster.
+| link:deploy/crds/postgresql.dev4devs.com_backups_crd.yaml[Backup]             | Packages, manages, installs and configures the CronJob to do the backup using the image https://github.com/integr8ly/backup-container-image[backup-container-image]
 |===
 
 === Resources managed by each CRD Controller
