@@ -11,7 +11,6 @@ import (
 
 // DatabaseSpec defines the desired state of Database
 // +k8s:openapi-gen=true
-// +kubebuilder:resource:path=databases,scope=Namespaced
 type DatabaseSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
@@ -165,9 +164,9 @@ type DatabaseStatus struct {
 	DatabaseStatus string `json:"databaseStatus"`
 }
 
+// Database is the Schema for the the Database Database API
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// Database is the Schema for the the Database Database API
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
 // +operator-sdk:gen-csv:customresourcedefinitions.displayName="Database Database"

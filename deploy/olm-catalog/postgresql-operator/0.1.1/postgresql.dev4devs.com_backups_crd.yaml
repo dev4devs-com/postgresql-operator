@@ -18,16 +18,17 @@ spec:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
         spec:
+          description: BackupSpec defines the desired state of Backup
           properties:
             awsAccessKeyId:
               description: 'Key ID of AWS S3 storage. Default Value: nil Required
@@ -37,7 +38,7 @@ spec:
             awsS3BucketName:
               description: 'Name of AWS S3 storage. Default Value: nil Required to
                 create the Secret with the AWS data to allow send the backup files
-                to AWS S3 storage. '
+                to AWS S3 storage.'
               type: string
             awsSecretAccessKey:
               description: 'Secret/Token of AWS S3 storage. Default Value: nil Required
@@ -46,18 +47,17 @@ spec:
               type: string
             awsSecretName:
               description: 'Name of the secret with the AWS data credentials pre-existing
-                in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
-                '
+                in the cluster Default Value: nil See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml'
               type: string
             awsSecretNamespace:
               description: 'Namespace of the secret with the AWS data credentials
                 pre-existing in the cluster Default Value: nil NOTE: If the namespace
                 be not informed then the operator will try to find it in the same
-                namespace where it is applied '
+                namespace where it is applied'
               type: string
             databaseCRName:
               description: 'Name of the Database CR applied which this backup will
-                work with Default Value: database'
+                work with Default Value: "database"'
               type: string
             databaseVersion:
               description: 'Database version. (E.g 9.6). Default Value: <9.6> IMPORTANT:
@@ -92,7 +92,7 @@ spec:
               type: string
             productName:
               description: 'Used to create the directory where the files will be stored
-                Default Value: <postgresql> '
+                Default Value: <postgresql>'
               type: string
             schedule:
               description: 'Schedule period for the CronJob. Default Value: <0 0 *
@@ -100,63 +100,111 @@ spec:
               type: string
           type: object
         status:
+          description: BackupStatus defines the observed state of Backup
           properties:
             awsCredentialsSecretNamespace:
-              description: 'Namespace  of the secret object with the Aws data to allow
-                send the backup files to the AWS storage'
+              description: Namespace  of the secret object with the Aws data to allow
+                send the backup files to the AWS storage
               type: string
             awsSecretName:
-              description: 'Name  of the secret object with the Aws data to allow send
-                the backup files to the AWS storage'
+              description: Name  of the secret object with the Aws data to allow send
+                the backup files to the AWS storage
               type: string
             backupStatus:
-              description: 'Will be as "OK when all objects are created successfully'
+              description: Will be as "OK when all objects are created successfully
               type: string
             cronJobName:
-              description: 'Name of the CronJob object created and managed by it to
-                schedule the backup job'
+              description: Name of the CronJob object created and managed by it to
+                schedule the backup job
               type: string
             cronJobStatus:
-              description: 'Status of the CronJob object'
+              description: Status of the CronJob object
+              properties:
+                active:
+                  description: A list of pointers to currently running jobs.
+                  items:
+                    description: ObjectReference contains enough information to let
+                      you inspect or modify the referred object.
+                    properties:
+                      apiVersion:
+                        description: API version of the referent.
+                        type: string
+                      fieldPath:
+                        description: 'If referring to a piece of an object instead
+                          of an entire object, this string should contain a valid
+                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within
+                          a pod, this would take on a value like: "spec.containers{name}"
+                          (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]"
+                          (container with index 2 in this pod). This syntax is chosen
+                          only to have some well-defined way of referencing a part
+                          of an object. TODO: this design is not final and this field
+                          is subject to change in the future.'
+                        type: string
+                      kind:
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        type: string
+                      namespace:
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        type: string
+                      resourceVersion:
+                        description: 'Specific resourceVersion to which this reference
+                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        type: string
+                      uid:
+                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        type: string
+                    type: object
+                  type: array
+                lastScheduleTime:
+                  description: Information when was the last time the job was successfully
+                    scheduled.
+                  format: date-time
+                  type: string
               type: object
             dbSecretName:
-              description: 'Name of the secret object created with the database data
-                to allow the backup image connect to the database'
+              description: Name of the secret object created with the database data
+                to allow the backup image connect to the database
               type: string
             encryptKeySecretName:
-              description: 'Name  of the secret object with the Encryption GPG Key'
+              description: Name  of the secret object with the Encryption GPG Key
               type: string
             encryptKeySecretNamespace:
-              description: 'Namespace of the secret object with the Encryption GPG
-                Key'
+              description: Namespace of the secret object with the Encryption GPG
+                Key
               type: string
             hasEncryptKey:
-              description: 'Boolean value which has true when it has an EncryptionKey
-                to be used to send the backup files'
+              description: Boolean value which has true when it has an EncryptionKey
+                to be used to send the backup files
               type: boolean
             isDatabasePodFound:
-              description: 'Boolean value which has true when the Database Pod was
+              description: Boolean value which has true when the Database Pod was
                 found in order to create the secret with the database data to allow
-                the backup image connect into it. '
+                the backup image connect into it.
               type: boolean
             isDatabaseServiceFound:
-              description: 'Boolean value which has true when the Service Database
+              description: Boolean value which has true when the Service Database
                 Pod was found in order to create the secret with the database data
-                to allow the backup image connect into it.'
+                to allow the backup image connect into it.
               type: boolean
           required:
+          - awsCredentialsSecretNamespace
+          - awsSecretName
           - backupStatus
           - cronJobName
+          - cronJobStatus
           - dbSecretName
-          - awsSecretName
-          - awsCredentialsSecretNamespace
           - encryptKeySecretName
           - encryptKeySecretNamespace
           - hasEncryptKey
           - isDatabasePodFound
           - isDatabaseServiceFound
-          - cronJobStatus
           type: object
+      type: object
   version: v1alpha1
   versions:
   - name: v1alpha1

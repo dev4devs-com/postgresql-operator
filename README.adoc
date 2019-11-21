@@ -126,7 +126,7 @@ Tip: If for some reason you have problems interacting with `quay.io`, go to "htt
 
 === Using configMap to share required values
 
-By the specs in link:deploy/crds/postgresql.dev4devs.com_databases_cr.yaml[Database CR](_deploy/crds/postgresql.dev4devs.com_databases_cr.yaml_) you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the Database should use in its required env vars.
+By the specs in link:deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml[Database CR](_deploy/crds/postgresql.dev4devs.com_databases_cr.yaml_) you are able to customize the setup for this operator. Note that by the spec `configMapName` you are able to inform the name of a configMapName which has the keys and values which the Database should use in its required env vars.
 
 If you inform only the name of the configMap at `configMapName`,  then it will look for the values stored with the same keys required for each image env var used for its database version (`databaseName`, `databasePassword`, `databaseUser`). However, you are able to customize the keys as well by using the optional specs; `configMapDatabaseName`, `configMapDatabasePassword`, `configMapDatabaseUser`. This way, this operator will be able to look for the values stored in some config with keys which are not the ones used to create the environment variables used in the database deployment.
 
@@ -147,7 +147,7 @@ By using the command `make install` as it is, the default namespace will be `pos
 ===== Install
 The backup service is implemented by using  https://github.com/integr8ly/backup-container-image[integr8ly/backup-container-image]. It will do the database backup to be restored later in case of failures. Following the steps to enable it.
 
-. Setup an AWS S3 Bucket in order to store the backup outside of the cluster. You need to add your AWS details to link:./deploy/crds/postgresql.dev4devs.com_backups_cr.yaml[Backup CR](_deploy/crds/postgresql.dev4devs.com_backups_cr.yaml_) as following or add the name of the secret which has already this data in the cluster.
+. Setup an AWS S3 Bucket in order to store the backup outside of the cluster. You need to add your AWS details to link:./deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml[Backup CR](_deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml_) as following or add the name of the secret which has already this data in the cluster.
 +
 [source,yaml]
 ----

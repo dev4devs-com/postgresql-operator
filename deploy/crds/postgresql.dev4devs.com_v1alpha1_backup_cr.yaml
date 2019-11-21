@@ -49,7 +49,7 @@ spec:
     # 2. Run the command psql as follows.
     # //sh-4.2$ psql
     # //psql (9.6.10)
-    # IMPORTANT: Just the first 2 digits should be used.
+  # IMPORTANT: Just the first 2 digits should be used.
   # ---------------------------------
 
   # The following information is optional and will be used to tag the data in the AWS bucket

@@ -9,11 +9,11 @@ scorecard:
   plugins:
     - basic:
         cr-manifest:
-          - "deploy/crds/postgresql.dev4devs.com_databases_cr.yaml"
-          - "deploy/crds/postgresql.dev4devs.com_backups_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml"
         csv-path: "deploy/olm-catalog/postgresql-operator/0.1.1/postgresql-operator.v0.1.1.clusterserviceversion.yaml"
     - olm:
         cr-manifest:
-          - "deploy/crds/postgresql.dev4devs.com_databases_cr.yaml"
-          - "deploy/crds/postgresql.dev4devs.com_backups_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml"
         csv-path: "deploy/olm-catalog/postgresql-operator/0.1.1/postgresql-operator.v0.1.1.clusterserviceversion.yaml"
