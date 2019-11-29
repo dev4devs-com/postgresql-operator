@@ -43,7 +43,7 @@ install:  ## Install all resources (CR-CRD's, RBCA and Operator)
 	@echo ....... Applying Database Operator .......
 	- kubectl apply -f deploy/operator.yaml -n ${NAMESPACE}
 	@echo ....... Creating the Database .......
-	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_databases_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall
 uninstall:  ## Uninstall all that all performed in the $ make install
@@ -63,12 +63,12 @@ uninstall:  ## Uninstall all that all performed in the $ make install
 .PHONY: install-backup
 install-backup: ## Install backup feature ( Backup CR )
 	@echo Installing backup service in ${NAMESPACE} :
-	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_baskups_cr.yaml -n ${NAMESPACE}
+	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall-backup
 uninstall-backup: ## Uninstall backup feature ( Backup CR )
 	@echo Uninstalling backup service from ${NAMESPACE} :
-	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_baskups_cr.yaml -n ${NAMESPACE}
+	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 ##############################
 # CI                         #
@@ -135,18 +135,18 @@ run-local:  ## Run project locally for debbug purposes.
 .PHONY: vet
 vet:  ## Run go vet for the project
 	@echo go vet
-	go vet $$(go list .-... )
+	go vet $$(go list ./... )
 
 .PHONY: fmt
 fmt: ## Run go fmt for the project
 	@echo go fmt
-	go fmt $$(go list .-... )
+	go fmt $$(go list ./... )
 
 .PHONY: dev
 dev: ## Run all required dev commands. (It should be used always before send a PR)
-	- make code-fmt
-	- make code-vet
-	- make code-gen
+	- make fmt
+	- make vet
+	- make gen
 
 .PHONY: gen
 gen:  ## Run SDK commands to generated-upddate the project
