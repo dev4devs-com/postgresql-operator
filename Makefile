@@ -178,7 +178,7 @@ compile-e2e:  ## Compile binary to run integration tests
 .PHONY: test-e2e
 test-e2e:  ## Run integration tests locally
 	  - kubectl create namespace ${NAMESPACE}
-	  operator-sdk test local .-test-e2e --up-local --namespace=${NAMESPACE}
+	  operator-sdk test local ./test/e2e --up-local --namespace=${NAMESPACE}
 
 ##@ General
 
