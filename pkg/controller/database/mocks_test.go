@@ -25,31 +25,6 @@ var (
 		},
 	}
 
-	dbInstanceConfigMapOtherKeys = v1alpha1.Database{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "database",
-			Namespace: "postgresql-operator",
-		},
-		Spec: v1alpha1.DatabaseSpec{
-			ConfigMapName:                "config-otherkeys",
-			ConfigMapDatabaseNameKey:     "PGDATABASE",
-			ConfigMapDatabasePasswordKey: "PGPASSWORD",
-			ConfigMapDatabaseUserKey:     "PGUSER",
-		},
-	}
-
-	configMapOtherKeyValues = corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "config-otherkeys",
-			Namespace: "postgresql-operator",
-		},
-		Data: map[string]string{
-			"PGDATABASE": "dbname",
-			"PGPASSWORD": "root",
-			"PGUSER":     "root",
-		},
-	}
-
 	configMapSameKeyValues = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-samekeys",

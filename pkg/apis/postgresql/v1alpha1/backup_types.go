@@ -58,7 +58,7 @@ type BackupSpec struct {
 	// Required to create the Secret with the data to allow send the backup files to AWS S3 storage.
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS S3 accessKey/token ID"
-	AwsAccessKeyId string `json:"awsAccessKeyId,omitempty"`
+	AwsAccessKeyID string `json:"awsAccessKeyID,omitempty"`
 
 	// Secret/Token of AWS S3 storage.
 	// Default Value: nil

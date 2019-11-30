@@ -23,7 +23,7 @@ spec:
 
   # The following specs are required to send the data to your AWS S3 storage
   awsS3BucketName: "example-awsS3BucketName"
-  awsAccessKeyId: "example-awsAccessKeyId"
+  awsAccessKeyID: "example-awsAccessKeyID"
   awsSecretAccessKey: "example-awsSecretAccessKey"
 
     # ---------------------------------

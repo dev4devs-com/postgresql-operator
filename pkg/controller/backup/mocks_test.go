@@ -286,18 +286,6 @@ var (
 		},
 	}
 
-	configMapOtherKeyValues = corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "config-otherkeys",
-			Namespace: "postgresql-operator",
-		},
-		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar:     "dbname",
-			dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar: "root",
-			dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar:     "root",
-		},
-	}
-
 	configMapInvalidDatabaseKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",

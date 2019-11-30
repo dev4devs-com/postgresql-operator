@@ -95,13 +95,13 @@ type DatabaseSpec struct {
 	// Default value: 10Mi
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database CPU"
-	DatabaseCpu string `json:"databaseCpu,omitempty"`
+	DatabaseCPU string `json:"databaseCPU,omitempty"`
 
 	// Limit of CPU request which will be available for the database container
 	// Default value: 20Mi
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database CPU Limit"
-	DatabaseCpuLimit string `json:"databaseCpuLimit,omitempty"`
+	DatabaseCPULimit string `json:"databaseCPULimit,omitempty"`
 
 	// Policy definition to pull the Database Image
 	// More info: https://kubernetes.io/docs/concepts/containers/images/

@@ -12,7 +12,7 @@ import (
 )
 
 //Returns the NewBackupCronJob object for the Database Backup
-func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob {
+func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) (*v1beta1.CronJob, error) {
 	cron := &v1beta1.CronJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      bkp.Name,
@@ -70,6 +70,8 @@ func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.Cro
 			},
 		},
 	}
-	controllerutil.SetControllerReference(bkp, cron, scheme)
-	return cron
+	if err := controllerutil.SetControllerReference(bkp, cron, scheme); err != nil {
+		return nil, err
+	}
+	return cron, nil
 }

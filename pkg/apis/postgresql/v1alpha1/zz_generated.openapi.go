@@ -112,7 +112,7 @@ func schema_pkg_apis_postgresql_v1alpha1_BackupSpec(ref common.ReferenceCallback
 							Format:      "",
 						},
 					},
-					"awsAccessKeyId": {
+					"awsAccessKeyID": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Key ID of AWS S3 storage. Default Value: nil Required to create the Secret with the data to allow send the backup files to AWS S3 storage.",
 							Type:        []string{"string"},
@@ -414,14 +414,14 @@ func schema_pkg_apis_postgresql_v1alpha1_DatabaseSpec(ref common.ReferenceCallba
 							Format:      "",
 						},
 					},
-					"databaseCpu": {
+					"databaseCPU": {
 						SchemaProps: spec.SchemaProps{
 							Description: "CPU resource request which will be available for the database container Default value: 10Mi",
 							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
-					"databaseCpuLimit": {
+					"databaseCPULimit": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Limit of CPU request which will be available for the database container Default value: 20Mi",
 							Type:        []string{"string"},

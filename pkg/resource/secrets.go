@@ -10,7 +10,10 @@ import (
 )
 
 //Returns the buildDatabaseSecret object for the Database Backup
-func NewBackupSecret(bkp *v1alpha1.Backup, prefix string, secretData map[string][]byte, secretStringData map[string]string, scheme *runtime.Scheme) *corev1.Secret {
+func NewBackupSecret(bkp *v1alpha1.Backup,
+	prefix string,
+	secretData map[string][]byte,
+	secretStringData map[string]string, scheme *runtime.Scheme) (*corev1.Secret, error) {
 	ls := utils.GetLabels(bkp.Name)
 
 	secret := &corev1.Secret{
@@ -27,6 +30,8 @@ func NewBackupSecret(bkp *v1alpha1.Backup, prefix string, secretData map[string]
 		secret.StringData = secretStringData
 	}
 
-	controllerutil.SetControllerReference(bkp, secret, scheme)
-	return secret
+	if err := controllerutil.SetControllerReference(bkp, secret, scheme); err != nil {
+		return nil, err
+	}
+	return secret, nil
 }

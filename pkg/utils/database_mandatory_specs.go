@@ -76,12 +76,12 @@ func AddDatabaseMandatorySpecs(db *v1alpha1.Database) {
 		db.Spec.DatabaseStorageRequest = defaulDatabaseConfig.DatabaseStorageRequest
 	}
 
-	if db.Spec.DatabaseCpu == "" {
-		db.Spec.DatabaseCpu = defaulDatabaseConfig.DatabaseCpu
+	if db.Spec.DatabaseCPU == "" {
+		db.Spec.DatabaseCPU = defaulDatabaseConfig.DatabaseCPU
 	}
 
-	if db.Spec.DatabaseCpuLimit == "" {
-		db.Spec.DatabaseCpuLimit = defaulDatabaseConfig.DatabaseCpuLimit
+	if db.Spec.DatabaseCPULimit == "" {
+		db.Spec.DatabaseCPULimit = defaulDatabaseConfig.DatabaseCPULimit
 	}
 
 	if db.Spec.DatabasePort == 0 {

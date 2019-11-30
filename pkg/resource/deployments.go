@@ -12,7 +12,7 @@ import (
 )
 
 //buildDBDeployment returns the deployment object for the Database
-func NewDatabaseDeployment(db *v1alpha1.Database, scheme *runtime.Scheme) *appsv1.Deployment {
+func NewDatabaseDeployment(db *v1alpha1.Database, scheme *runtime.Scheme) (*appsv1.Deployment, error) {
 	ls := utils.GetLabels(db.Name)
 	auto := true
 	replicas := db.Spec.Size
@@ -90,11 +90,11 @@ func NewDatabaseDeployment(db *v1alpha1.Database, scheme *runtime.Scheme) *appsv
 						Resources: corev1.ResourceRequirements{
 							Limits: corev1.ResourceList{
 								corev1.ResourceMemory: resource.MustParse(db.Spec.DatabaseMemoryLimit),
-								corev1.ResourceCPU:    resource.MustParse(db.Spec.DatabaseCpuLimit),
+								corev1.ResourceCPU:    resource.MustParse(db.Spec.DatabaseCPU),
 							},
 							Requests: corev1.ResourceList{
 								corev1.ResourceMemory: resource.MustParse(db.Spec.DatabaseMemoryRequest),
-								corev1.ResourceCPU:    resource.MustParse(db.Spec.DatabaseCpu),
+								corev1.ResourceCPU:    resource.MustParse(db.Spec.DatabaseCPU),
 							},
 						},
 						TerminationMessagePath: "/dev/termination-log",
@@ -116,6 +116,8 @@ func NewDatabaseDeployment(db *v1alpha1.Database, scheme *runtime.Scheme) *appsv
 			},
 		},
 	}
-	controllerutil.SetControllerReference(db, dep, scheme)
-	return dep
+	if err := controllerutil.SetControllerReference(db, dep, scheme); err != nil {
+		return nil, err
+	}
+	return dep, nil
 }

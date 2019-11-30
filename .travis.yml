@@ -25,14 +25,15 @@ before_script:
 
 jobs:
   include:
-    - stage: Run unit tests and coverage
+    - stage: Run unit tests, coverage and lint
       before_script:
         - go get github.com/mattn/goveralls
       script:
+        - make lint
         - make test
         - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out -repotoken=$COVERALLS_TOKEN
       after_success: echo 'Unit Test and coverage finished successfully'
-      after_failure: echo 'Failure to built or push master image'
+      after_failure: echo 'Failure to run unit tests, coverage and lint'
 
     - stage: Run e2e tests
       before_script:
@@ -52,18 +53,17 @@ jobs:
     - stage: Master Image
       if: type != pull_request AND ( tag IS present OR branch = master )
       script:
-        - run: make code-build-linux
-        - run: make image-build-master
-        - run: make image-push-master
+        - make code-build-linux
+        - make image-build-master
+        - make image-push-master
       after_success: echo 'Master image built and pushed with success'
       after_failure: echo 'Failure to built or push master image'
 
     - stage: Release Image
       if: type != pull_request AND tag IS present
       script:
-        - run: make code-build-linux
-        - run: make image-build-release
-        - run: make image-push-release
+        - make code-build-linux
+        - make image-build-release
+        - make image-push-release
       after_success: echo 'Imagee Released with success'
       after_failure: echo 'Failure to release image'
-

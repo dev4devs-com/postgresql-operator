@@ -56,11 +56,11 @@ spec:
             containerName:
               description: Name to create the Database container
               type: string
-            databaseCpu:
+            databaseCPU:
               description: 'CPU resource request which will be available for the database
                 container Default value: 10Mi'
               type: string
-            databaseCpuLimit:
+            databaseCPULimit:
               description: 'Limit of CPU request which will be available for the database
                 container Default value: 20Mi'
               type: string
