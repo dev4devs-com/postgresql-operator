@@ -11,6 +11,7 @@ BINARY ?= postgresql-operator
 IMAGE_REGISTRY=quay.io
 IMAGE_LATEST_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):latest
 IMAGE_MASTER_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):master
+IMAGE_CI_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):ci
 IMAGE_RELEASE_TAG=$(IMAGE_REGISTRY)/$(ORG_NAME)/$(APP_NAME):$(CIRCLE_TAG)
 NAMESPACE=postgresql-operator
 TEST_COMPILE_OUTPUT ?= build/_output/bin/$(APP_NAME)-test
@@ -79,6 +80,11 @@ uninstall-backup: ## Uninstall backup feature ( Backup CR )
 .PHONY: code-build-linux
 code-build-linux:  ## Build binary for Linux SO (amd64)
 	env GOOS=linux GOARCH=amd64 go build $(APP_FILE)
+
+.PHONY: image-build-ci
+image-build-master:  ## Build master branch image
+	@echo Building operator with the tag: $(IMAGE_CI_TAG)
+	operator-sdk build $(IMAGE_CI_TAG)
 
 .PHONY: image-build-master
 image-build-master:  ## Build master branch image
