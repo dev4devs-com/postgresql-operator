@@ -38,17 +38,10 @@ jobs:
     - stage: Run e2e tests
       before_script:
       script:
-        - echo 'todo'
-        # todo
-      after_success: echo 'E2E Tests finished successfully'
-      after_failure: echo 'Failure to run e2e tests'
-
-    - stage: Build Operator with SDK
-      script:
         - make setup
         - make image-build-ci
-      after_success: echo 'Build with SDK finished successfully'
-      after_failure: echo 'Error to built project with SDK'
+      after_success: echo 'E2E Tests finished successfully'
+      after_failure: echo 'Failure to run e2e tests'
 
     - stage: Master Image
       if: type != pull_request AND ( tag IS present OR branch = master )
@@ -58,6 +51,8 @@ jobs:
         - make image-push-master
       after_success: echo 'Master image built and pushed with success'
       after_failure: echo 'Failure to built or push master image'
+      services:
+        - docker
 
     - stage: Release Image
       if: type != pull_request AND tag IS present
@@ -67,3 +62,5 @@ jobs:
         - make image-push-release
       after_success: echo 'Imagee Released with success'
       after_failure: echo 'Failure to release image'
+      services:
+        - docker
