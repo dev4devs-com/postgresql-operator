@@ -1,4 +1,6 @@
 language: go
+go_import_path: github.com/dev4devs-com/postgresql-operator
+sudo: required
 
 cache:
   directories:
@@ -7,8 +9,14 @@ cache:
 services:
   - docker
 
+os:
+  - linux
+
 go:
   - "1.13"
+
+env:
+  - RELEASE_VERSION="v0.12.0"
 
 jobs:
   include:
@@ -22,4 +30,31 @@ jobs:
         - make test
         - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage-all.out -repotoken=$COVERALLS_TOKEN
 
-    # todo: and job for e2e tests
+    - stage: Master Image
+      if: type != pull_request AND ( tag IS present OR branch = master )
+      before_script:
+        # Install operator-sdk using binary. More info: https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md#download-the-release-binary
+        - curl -LO operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        - chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+      script:
+        - run: make setup
+        - run: make code-build-linux
+        - run: make image-build-master
+        - run: make image-push-master
+      after_success: echo 'Master image built and pushed with success'
+      after_failure: echo 'Failure to built or push master image'
+
+    - stage: Release Image
+      if: type != pull_request AND tag IS present
+      before_script:
+        # Install operator-sdk using binary. More info: https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md#download-the-release-binary
+        - curl -LO operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        - chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+      script:
+        - run: make setup
+        - run: make code-build-linux
+        - run: make image-build-release
+        - run: make image-push-release
+      after_success: echo 'Imagee Released with success'
+      after_failure: echo 'Failure to release image'
+
