@@ -20,7 +20,6 @@ jobs:
     - run: make code-build-linux
     - run: GO111MODULE=off go get github.com/mattn/goveralls
     - run: make test
-    - run: make integration-cover
     - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=jFmmyeYiX3zI1sj2jDCsR1QYwIrL33Xij
 
   image_push_master:
