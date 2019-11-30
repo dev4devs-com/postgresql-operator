@@ -1,0 +1,25 @@
+language: go
+
+cache:
+  directories:
+    - $HOME/.cache/go-build
+
+services:
+  - docker
+
+go:
+  - "1.13"
+
+jobs:
+  include:
+    - stage: Run unit tests and coverage
+      before_script:
+        # The following module is used to integrate the projct with coveralls.io. It allow us to easily sent the data.
+        # More info: https://github.com/mattn/goveralls
+        - make setup
+        - go get github.com/mattn/goveralls
+      script:
+        - make test
+        - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage-all.out -repotoken=$COVERALLS_TOKEN
+
+    # todo: and job for e2e tests
