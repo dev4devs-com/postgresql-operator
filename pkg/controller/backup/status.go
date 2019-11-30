@@ -117,7 +117,8 @@ func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup) bool {
 	return aws.Name != bkp.Status.AWSSecretName || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
 }
 
-// updateAWSSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
+// updateAWSSecretStatus returns error when was not possible update the
+// EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -148,7 +149,8 @@ func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error
 	return nil
 }
 
-// insertUpdateEncKeyStatus will check and update the EncryptionKey Secret status if the Secret with the AWS data was changed
+// insertUpdateEncKeyStatus will check and update the EncryptionKey
+// Secret status if the Secret with the AWS data was changed
 func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v1alpha1.Backup) error {
 	if isEncryptKeyStatusEquals(secret, bkp) {
 
@@ -167,7 +169,8 @@ func isEncryptKeyStatusEquals(secret *corev1.Secret, bkp *v1alpha1.Backup) bool 
 	return secret.Name != bkp.Status.EncryptKeySecretName || secret.Namespace != bkp.Status.EncryptKeySecretNamespace
 }
 
-// updateDBSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
+// updateDBSecretStatus returns error when was not possible
+// update the EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateDBSecretStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -197,7 +200,8 @@ func (r *ReconcileBackup) insertUpdateDBSecretStatus(dbSecret *corev1.Secret, bk
 	return nil
 }
 
-// updatePodDatabaseFoundStatus returns error when was not possible update the DB Pod Found status field in the CR successfully
+// updatePodDatabaseFoundStatus returns error when was not possible
+// update the DB Pod Found status field in the CR successfully
 func (r *ReconcileBackup) updatePodDatabaseFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -223,7 +227,8 @@ func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) err
 	return nil
 }
 
-// updateDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
+// updateDbServiceFoundStatus returns error when was not possible
+// update the DB Service Found status field in the CR successfully
 func (r *ReconcileBackup) updateDbServiceFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -248,12 +253,14 @@ func (r *ReconcileBackup) insertUpdateDbServiceFoundStatus(bkp *v1alpha1.Backup)
 	return nil
 }
 
-//isDbServiceFound returns false when the database service which should be created by the Database controller was not found
+//isDbServiceFound returns false when the database service
+// which should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbServiceFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
 
-//isDbPodFound returns false when the database pod which should be created by the Database controller was not found
+//isDbPodFound returns false when the database pod which
+// should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbPodFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
@@ -286,7 +293,9 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	awsSecretNamespace := utils.GetAwsSecretNamespace(bkp)
 	_, err = service.FetchSecret(awsSecretNamespace, awsSecretName, r.client)
 	if err != nil {
-		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)", awsSecretName, awsSecretNamespace)
+		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)",
+			awsSecretName,
+			awsSecretNamespace)
 		return err
 	}
 
@@ -296,7 +305,9 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 		encSecretNamespace := utils.GetEncSecretNamespace(bkp)
 		_, err := service.FetchSecret(encSecretNamespace, encSecretName, r.client)
 		if err != nil {
-			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace)
+			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)",
+				encSecretName,
+				encSecretNamespace)
 			return err
 		}
 	}

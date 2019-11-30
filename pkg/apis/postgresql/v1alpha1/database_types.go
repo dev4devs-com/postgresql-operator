@@ -14,7 +14,8 @@ import (
 type DatabaseSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	// Add custom validation using kubebuilder tags:
+	// https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Value for the Database Environment Variable (spec.databaseNameKeyEnvVar).
 	// Default value: example
@@ -22,6 +23,7 @@ type DatabaseSpec struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database Name"
 	DatabaseName string `json:"databaseName,omitempty"`
 
+	//nolint:lll
 	// Value for the Database Environment Variable (spec.databasePasswordKeyEnvVar).
 	// Default value: postgres
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
@@ -56,7 +58,8 @@ type DatabaseSpec struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EnvVar Key (Database User)"
 	DatabaseUserKeyEnvVar string `json:"databaseUserKeyEnvVar,omitempty"`
 
-	// Value for the Database Environment Variable in order to define the port which it should use. It will be used in its container as well
+	// Value for the Database Environment Variable in order to define the port which it should use.
+	// It will be used in its container as well
 	DatabasePort int32 `json:"databasePort,omitempty"`
 
 	// Quantity of instances
@@ -103,6 +106,7 @@ type DatabaseSpec struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="Database CPU Limit"
 	DatabaseCPULimit string `json:"databaseCPULimit,omitempty"`
 
+	//nolint:lll
 	// Policy definition to pull the Database Image
 	// More info: https://kubernetes.io/docs/concepts/containers/images/
 	// Default value:
@@ -141,7 +145,8 @@ type DatabaseSpec struct {
 type DatabaseStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	// Add custom validation using kubebuilder tags:
+	// https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Name of the PersistentVolumeClaim created and managed by it
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
@@ -167,6 +172,7 @@ type DatabaseStatus struct {
 // Database is the Schema for the the Database Database API
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
+//nolint:lll
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
 // +operator-sdk:gen-csv:customresourcedefinitions.displayName="Database Database"

@@ -116,7 +116,8 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 	return reconcile.Result{}, nil
 }
 
-//createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
+//createResources will create the secondary resource which are required
+// in order to make works successfully the primary resource(CR)
 func (r *ReconcileDatabase) createResources(db *v1alpha1.Database, request reconcile.Request) error {
 	reqLogger := utils.GetLoggerByRequestAndController(request, utils.DatabaseControllerName)
 	reqLogger.Info("Creating secondary Databaase resources ...")

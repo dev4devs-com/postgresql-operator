@@ -53,13 +53,18 @@ func (r *ReconcileBackup) createCronJob(bkp *v1alpha1.Backup) error {
 // NOTE: The user can config in the CR to use a pre-existing one by informing the name
 func (r *ReconcileBackup) createEncryptionKey(bkp *v1alpha1.Backup) error {
 	if utils.IsEncryptionKeyOptionConfig(bkp) {
-		if _, err := service.FetchSecret(utils.GetEncSecretNamespace(bkp), utils.GetEncSecretName(bkp), r.client); err != nil {
+		if _, err := service.FetchSecret(utils.GetEncSecretNamespace(bkp),
+			utils.GetEncSecretName(bkp), r.client); err != nil {
 			// The user can just inform the name of the Secret which is already applied in the cluster
 			if utils.IsEncKeySetupByName(bkp) {
 				return err
 			}
 			secretData, secretStringData := createEncDataMaps(bkp)
-			encSecret, err := resource.NewBackupSecret(bkp, utils.EncSecretPrefix, secretData, secretStringData, r.scheme)
+			encSecret, err := resource.NewBackupSecret(bkp,
+				utils.EncSecretPrefix,
+				secretData,
+				secretStringData,
+				r.scheme)
 			if err != nil {
 				return err
 			}
@@ -74,11 +79,17 @@ func (r *ReconcileBackup) createEncryptionKey(bkp *v1alpha1.Backup) error {
 // createAwsSecret checks if the secret with the aws data is created, if not create one
 // NOTE: The user can config in the CR to use a pre-existing one by informing the name
 func (r *ReconcileBackup) createAwsSecret(bkp *v1alpha1.Backup) error {
-	if _, err := service.FetchSecret(utils.GetAwsSecretNamespace(bkp), utils.GetAWSSecretName(bkp), r.client); err != nil {
+	if _, err := service.FetchSecret(utils.GetAwsSecretNamespace(bkp),
+		utils.GetAWSSecretName(bkp),
+		r.client); err != nil {
 		// The user can just inform the name of the Secret which is already applied in the cluster
 		if !utils.IsAwsKeySetupByName(bkp) {
 			secretData := createAwsDataByteMap(bkp)
-			awsSecret, err := resource.NewBackupSecret(bkp, utils.AwsSecretPrefix, secretData, nil, r.scheme)
+			awsSecret, err := resource.NewBackupSecret(bkp,
+				utils.AwsSecretPrefix,
+				secretData,
+				nil,
+				r.scheme)
 			if err != nil {
 				return err
 			}

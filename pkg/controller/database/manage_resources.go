@@ -19,7 +19,8 @@ func (r *ReconcileDatabase) manageResources(db *v1alpha1.Database) error {
 	return r.ensureDepSize(db, dep)
 }
 
-// ensureDepSize will ensure that the quanity of instances in the cluster for the Database deployment is the same defined in the CR
+// ensureDepSize will ensure that the quanity of instances in the cluster
+// for the Database deployment is the same defined in the CR
 func (r *ReconcileDatabase) ensureDepSize(db *v1alpha1.Database, dep *v1.Deployment) error {
 	size := db.Spec.Size
 	if *dep.Spec.Replicas != size {

@@ -90,28 +90,38 @@ func TestReconcileDatabase(t *testing.T) {
 			}
 
 			deployment := &appsv1.Deployment{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, deployment)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name,
+				Namespace: tt.args.dbInstance.Namespace},
+				deployment)
 			if (err == nil) != tt.wantDeployment {
-				t.Errorf("TestReconcileDatabase to get deployment error = %v, wantDeployment %v", err, tt.wantDeployment)
+				t.Errorf("TestReconcileDatabase to get deployment error = %v, wantDeployment %v",
+					err,
+					tt.wantDeployment)
 				return
 			}
 
 			service := &corev1.Service{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, service)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name,
+				Namespace: tt.args.dbInstance.Namespace},
+				service)
 			if (err == nil) != tt.wantService {
 				t.Errorf("TestReconcileDatabase to get service error = %v, wantService %v", err, tt.wantService)
 				return
 			}
 
 			pvc := &corev1.PersistentVolumeClaim{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name, Namespace: tt.args.dbInstance.Namespace}, pvc)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.dbInstance.Name,
+				Namespace: tt.args.dbInstance.Namespace},
+				pvc)
 			if (err == nil) != tt.wantPVC {
 				t.Errorf("TestReconcileDatabase to get service error = %v, wantPVC %v", err, tt.wantPVC)
 				return
 			}
 
 			if (res.Requeue) != tt.wantRequeue {
-				t.Errorf("TestReconcileBackup expect request to requeue res.Requeue = %v, wantRequeue %v", res.Requeue, tt.wantRequeue)
+				t.Errorf("TestReconcileBackup expect request to requeue res.Requeue = %v, wantRequeue %v",
+					res.Requeue,
+					tt.wantRequeue)
 				return
 			}
 		})
