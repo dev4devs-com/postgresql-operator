@@ -25,7 +25,7 @@ before_script:
 
 jobs:
   include:
-    - stage: Run unit tests, coverage and liny
+    - stage: Run unit tests, coverage and lint
       before_script:
         - go get github.com/mattn/goveralls
       script:
