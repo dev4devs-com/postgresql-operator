@@ -33,7 +33,7 @@ jobs:
         - make test
         - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out -repotoken=$COVERALLS_TOKEN
       after_success: echo 'Unit Test and coverage finished successfully'
-      after_failure: echo 'Failure run unit tests, coverage and lint'
+      after_failure: echo 'Failure to run unit tests, coverage and lint'
 
     - stage: Run e2e tests
       before_script:
@@ -67,4 +67,3 @@ jobs:
         - make image-push-release
       after_success: echo 'Imagee Released with success'
       after_failure: echo 'Failure to release image'
-
