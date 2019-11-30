@@ -41,17 +41,17 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.D
 
 		switch helper.envVarName {
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameKey, db.Spec.DatabaseNameKeyEnvVar):
-			dbSecret.databaseName, err = r.getEnvVarValue(dbSecret.databaseName, dbSecret, helper)
+			dbSecret.databaseName, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserKey, db.Spec.DatabaseUserKeyEnvVar):
-			dbSecret.user, err = r.getEnvVarValue(dbSecret.user, dbSecret, helper)
+			dbSecret.user, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordKey, db.Spec.DatabasePasswordKeyEnvVar):
-			dbSecret.pwd, err = r.getEnvVarValue(dbSecret.pwd, dbSecret, helper)
+			dbSecret.pwd, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
@@ -62,8 +62,8 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.D
 }
 
 // getEnvVarValue will return the value that should be used for the Key informed
-func (r *ReconcileBackup) getEnvVarValue(value string, dbSecret *DbSecret, helper *HelperDbSecret) (string, error) {
-	value = helper.envVarValue
+func (r *ReconcileBackup) getEnvVarValue(helper *HelperDbSecret) (string, error) {
+	value := helper.envVarValue
 	if value == "" {
 		value = r.getKeyValueFromConfigMap(helper)
 		if value == "" {
@@ -128,7 +128,7 @@ func (data *DbSecret) createMap() map[string][]byte {
 func createAwsDataByteMap(bkp *v1alpha1.Backup) map[string][]byte {
 	dataByte := map[string][]byte{
 		"AWS_S3_BUCKET_NAME":    []byte(bkp.Spec.AwsS3BucketName),
-		"AWS_ACCESS_KEY_ID":     []byte(bkp.Spec.AwsAccessKeyId),
+		"AWS_ACCESS_KEY_ID":     []byte(bkp.Spec.AwsAccessKeyID),
 		"AWS_SECRET_ACCESS_KEY": []byte(bkp.Spec.AwsSecretAccessKey),
 	}
 	return dataByte

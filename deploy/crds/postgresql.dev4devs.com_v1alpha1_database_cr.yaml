@@ -15,8 +15,8 @@ spec:
   size: 1
   databaseMemoryLimit: "512Mi"
   databaseMemoryRequest: "128Mi"
-  databaseCpuLimit: "60m"
-  databaseCpu: "30m"
+  databaseCPULimit: "60m"
+  databaseCPU: "30m"
   databaseStorageRequest: "1Gi"
 
   # The imaged used in this project is from Red Hat. See more in https://docs.okd.io/latest/using_images/db_images/postgresql.html

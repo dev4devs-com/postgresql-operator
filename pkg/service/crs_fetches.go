@@ -1,7 +1,7 @@
 package service
 
 import (
-	"context"
+	goctx "context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -11,12 +11,12 @@ import (
 // Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 func FetchDatabaseCR(name, namespace string, client client.Client) (*v1alpha1.Database, error) {
 	db := &v1alpha1.Database{}
-	err := client.Get(context.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, db)
+	err := client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, db)
 	return db, err
 }
 
 func FetchBackupCR(name, namespace string, client client.Client) (*v1alpha1.Backup, error) {
 	bkp := &v1alpha1.Backup{}
-	err := client.Get(context.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, bkp)
+	err := client.Get(goctx.TODO(), types.NamespacedName{Name: name, Namespace: namespace}, bkp)
 	return bkp, err
 }

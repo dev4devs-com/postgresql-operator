@@ -38,7 +38,11 @@ func (r *ReconcileBackup) getDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.
 // Check if the cronJob is created, if not create one
 func (r *ReconcileBackup) createCronJob(bkp *v1alpha1.Backup) error {
 	if _, err := service.FetchCronJob(bkp.Name, bkp.Namespace, r.client); err != nil {
-		if err := r.client.Create(context.TODO(), resource.NewBackupCronJob(bkp, r.scheme)); err != nil {
+		cron, err := resource.NewBackupCronJob(bkp, r.scheme)
+		if err != nil {
+			return err
+		}
+		if err := r.client.Create(context.TODO(), cron); err != nil {
 			return err
 		}
 	}
@@ -53,12 +57,14 @@ func (r *ReconcileBackup) createEncryptionKey(bkp *v1alpha1.Backup) error {
 			// The user can just inform the name of the Secret which is already applied in the cluster
 			if utils.IsEncKeySetupByName(bkp) {
 				return err
-			} else {
-				secretData, secretStringData := createEncDataMaps(bkp)
-				encSecret := resource.NewBackupSecret(bkp, utils.EncSecretPrefix, secretData, secretStringData, r.scheme)
-				if err := r.client.Create(context.TODO(), encSecret); err != nil {
-					return err
-				}
+			}
+			secretData, secretStringData := createEncDataMaps(bkp)
+			encSecret, err := resource.NewBackupSecret(bkp, utils.EncSecretPrefix, secretData, secretStringData, r.scheme)
+			if err != nil {
+				return err
+			}
+			if err := r.client.Create(context.TODO(), encSecret); err != nil {
+				return err
 			}
 		}
 	}
@@ -72,7 +78,10 @@ func (r *ReconcileBackup) createAwsSecret(bkp *v1alpha1.Backup) error {
 		// The user can just inform the name of the Secret which is already applied in the cluster
 		if !utils.IsAwsKeySetupByName(bkp) {
 			secretData := createAwsDataByteMap(bkp)
-			awsSecret := resource.NewBackupSecret(bkp, utils.AwsSecretPrefix, secretData, nil, r.scheme)
+			awsSecret, err := resource.NewBackupSecret(bkp, utils.AwsSecretPrefix, secretData, nil, r.scheme)
+			if err != nil {
+				return err
+			}
 			if err := r.client.Create(context.TODO(), awsSecret); err != nil {
 				return err
 			}
@@ -89,7 +98,10 @@ func (r *ReconcileBackup) createDatabaseSecret(bkp *v1alpha1.Backup, db *v1alpha
 		if err != nil {
 			return err
 		}
-		dbSecret := resource.NewBackupSecret(bkp, utils.DbSecretPrefix, secretData, nil, r.scheme)
+		dbSecret, err := resource.NewBackupSecret(bkp, utils.DbSecretPrefix, secretData, nil, r.scheme)
+		if err != nil {
+			return err
+		}
 		if err := r.client.Create(context.TODO(), dbSecret); err != nil {
 			return err
 		}

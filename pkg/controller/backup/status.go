@@ -277,7 +277,7 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	dbSecretName := utils.DbSecretPrefix + bkp.Name
 	_, err := service.FetchSecret(bkp.Namespace, dbSecretName, r.client)
 	if err != nil {
-		err = fmt.Errorf("Error: DB Secret is missing. (%v)", dbSecretName)
+		err = fmt.Errorf("error: DB Secret is missing. (%v)", dbSecretName)
 		return err
 	}
 

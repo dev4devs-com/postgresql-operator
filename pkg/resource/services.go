@@ -12,7 +12,7 @@ import (
 )
 
 // Returns the service object for the Database
-func NewDatabaseService(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.Service {
+func NewDatabaseService(db *v1alpha1.Database, scheme *runtime.Scheme) (*corev1.Service, error) {
 	ls := utils.GetLabels(db.Name)
 	ser := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
@@ -37,6 +37,8 @@ func NewDatabaseService(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.S
 		},
 	}
 	// Set Database db as the owner and controller
-	controllerutil.SetControllerReference(db, ser, scheme)
-	return ser
+	if err := controllerutil.SetControllerReference(db, ser, scheme); err != nil {
+		return nil, err
+	}
+	return ser, nil
 }

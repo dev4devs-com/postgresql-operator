@@ -118,8 +118,7 @@ func (r *ReconcileDatabase) updatePvcStatus(request reconcile.Request) error {
 		return err
 	}
 
-	r.insertUpdatePvcStatus(pvc, db)
-	return nil
+	return r.insertUpdatePvcStatus(pvc, db)
 }
 
 // insertUpdatePvcStatus will check if Service status changed, if yes then and update it
@@ -139,19 +138,19 @@ func (r *ReconcileDatabase) isAllCreated(db *v1alpha1.Database) error {
 	// Check if the PersistentVolumeClaim was created
 	_, err := service.FetchPersistentVolumeClaim(db.Name, db.Namespace, r.client)
 	if err != nil {
-		err = fmt.Errorf("Error: PersistentVolumeClaim is missing.")
+		return fmt.Errorf("persistentVolumeClaim is missing")
 	}
 
 	// Check if the Deployment was created
 	_, err = service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
-		err = fmt.Errorf("Error: Deployment is missing.")
+		return fmt.Errorf("deployment is missing")
 	}
 
 	// Check if the Service was created
 	_, err = service.FetchService(db.Name, db.Namespace, r.client)
 	if err != nil {
-		err = fmt.Errorf("Error: Service is missing.")
+		return fmt.Errorf("service is missing")
 	}
 
 	return nil

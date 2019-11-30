@@ -156,7 +156,7 @@ The backup service is implemented by using  https://github.com/integr8ly/backup-
   # ----------------------------
 
   awsS3BucketName: "example-awsS3BucketName"
-  awsAccessKeyId: "example-awsAccessKeyId"
+  awsAccessKeyID: "example-awsAccessKeyID"
   awsSecretAccessKey: "example-awsSecretAccessKey"
 ----
 +

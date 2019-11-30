@@ -2,7 +2,6 @@ package backup
 
 import (
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
-	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -19,8 +18,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 		scheme *runtime.Scheme
 	}
 	type args struct {
-		cronJobStatus *v1beta1.CronJob
-		request       reconcile.Request
+		request reconcile.Request
 	}
 	tests := []struct {
 		name    string

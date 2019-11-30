@@ -1,7 +1,7 @@
 package service
 
 import (
-	"context"
+	goctx "context"
 	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
@@ -11,9 +11,9 @@ import (
 
 // FetchDatabasePod search in the cluster for 1 Pod managed by the Database Controller
 func FetchDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Pod, error) {
-	listOps := buildDatabaseCriteria(bkp, db)
+	listOps := buildDatabaseCriteria(db)
 	dbPodList := &corev1.PodList{}
-	err := client.List(context.TODO(), dbPodList, listOps)
+	err := client.List(goctx.TODO(), dbPodList, listOps)
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +28,9 @@ func FetchDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client
 
 //FetchDatabaseService search in the cluster for 1 Service managed by the Database Controller
 func FetchDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Service, error) {
-	listOps := buildDatabaseCriteria(bkp, db)
+	listOps := buildDatabaseCriteria(db)
 	dbServiceList := &corev1.ServiceList{}
-	err := client.List(context.TODO(), dbServiceList, listOps)
+	err := client.List(goctx.TODO(), dbServiceList, listOps)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func FetchDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Database, client cl
 }
 
 //buildDatabaseCreteria returns client.ListOptions required to fetch the secondary resource created by
-func buildDatabaseCriteria(bkp *v1alpha1.Backup, db *v1alpha1.Database) *client.ListOptions {
+func buildDatabaseCriteria(db *v1alpha1.Database) *client.ListOptions {
 	labelSelector := labels.SelectorFromSet(utils.GetLabels(db.Name))
 	listOps := &client.ListOptions{Namespace: db.Namespace, LabelSelector: labelSelector}
 	return listOps

@@ -82,7 +82,7 @@ code-build-linux:  ## Build binary for Linux SO (amd64)
 	env GOOS=linux GOARCH=amd64 go build $(APP_FILE)
 
 .PHONY: image-build-ci
-image-build-master:  ## Build master branch image
+image-build-ci:  ## Build master branch image
 	@echo Building operator with the tag: $(IMAGE_CI_TAG)
 	operator-sdk build $(IMAGE_CI_TAG)
 
@@ -149,15 +149,16 @@ fmt: ## Run go fmt for the project
 	go fmt $$(go list ./... )
 
 .PHONY: dev
-dev: ## Run all required dev commands. (It should be used always before send a PR)
-	- make fmt
-	- make vet
-	- make gen
+dev: fmt vet gen lint ## Run all required dev commands. (It should be used always before send a PR)
 
 .PHONY: gen
 gen:  ## Run SDK commands to generated-upddate the project
 	operator-sdk generate k8s
 	operator-sdk generate openapi
+
+.PHONY: lint
+lint: ## Run golangci-lint for the project
+	./scripts/check-lint.sh
 
 ##############################
 # Tests                      #

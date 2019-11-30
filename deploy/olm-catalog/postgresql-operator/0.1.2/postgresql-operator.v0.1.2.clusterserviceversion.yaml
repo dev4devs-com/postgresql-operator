@@ -1,3 +1,6 @@
+#####
+# It is in WIP - Not use it yet
+#####
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
@@ -12,7 +15,7 @@ metadata:
             "name": "backup"
           },
           "spec": {
-            "awsAccessKeyId": "example-awsAccessKeyId",
+            "awsAccessKeyID": "example-awsAccessKeyID",
             "awsS3BucketName": "example-awsS3BucketName",
             "awsSecretAccessKey": "example-awsSecretAccessKey",
             "schedule": "0 0 * * *"
@@ -25,8 +28,8 @@ metadata:
             "name": "database"
           },
           "spec": {
-            "databaseCpu": "30m",
-            "databaseCpuLimit": "60m",
+            "databaseCPU": "30m",
+            "databaseCPULimit": "60m",
             "databaseMemoryLimit": "512Mi",
             "databaseMemoryRequest": "128Mi",
             "databaseName": "example",
@@ -75,7 +78,7 @@ spec:
       - description: 'Key ID of AWS S3 storage. Default Value: nil Required to create
           the Secret with the data to allow send the backup files to AWS S3 storage.'
         displayName: AWS S3 accessKey/token ID
-        path: awsAccessKeyId
+        path: awsAccessKeyID
       - description: 'Name of AWS S3 storage. Default Value: nil Required to create
           the Secret with the AWS data to allow send the backup files to AWS S3 storage.'
         displayName: AWS S3 Bucket name
@@ -124,11 +127,11 @@ spec:
       - description: 'CPU resource request which will be available for the database
           container Default value: 10Mi'
         displayName: Database CPU
-        path: databaseCpu
+        path: databaseCPU
       - description: 'Limit of CPU request which will be available for the database
           container Default value: 20Mi'
         displayName: Database CPU Limit
-        path: databaseCpuLimit
+        path: databaseCPULimit
       - description: 'Limit of Memory which will be available for the database container
           Default value: 512Mi'
         displayName: Database Memory Limit
@@ -290,7 +293,7 @@ spec:
       - description: 'Key ID of AWS S3 storage. Default Value: nil Required to create
           the Secret with the data to allow send the backup files to AWS S3 storage.'
         displayName: AWS S3 accessKey/token ID
-        path: awsAccessKeyId
+        path: awsAccessKeyID
       - description: 'Name of AWS S3 storage. Default Value: nil Required to create
           the Secret with the AWS data to allow send the backup files to AWS S3 storage.'
         displayName: AWS S3 Bucket name
@@ -339,11 +342,11 @@ spec:
       - description: 'CPU resource request which will be available for the database
           container Default value: 10Mi'
         displayName: Database CPU
-        path: databaseCpu
+        path: databaseCPU
       - description: 'Limit of CPU request which will be available for the database
           container Default value: 20Mi'
         displayName: Database CPU Limit
-        path: databaseCpuLimit
+        path: databaseCPULimit
       - description: 'Limit of Memory which will be available for the database container
           Default value: 512Mi'
         displayName: Database Memory Limit

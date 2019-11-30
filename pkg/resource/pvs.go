@@ -11,7 +11,7 @@ import (
 )
 
 //Returns the deployment object for the Database
-func NewDatabasePvc(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.PersistentVolumeClaim {
+func NewDatabasePvc(db *v1alpha1.Database, scheme *runtime.Scheme) (*corev1.PersistentVolumeClaim, error) {
 	ls := utils.GetLabels(db.Name)
 	pv := &corev1.PersistentVolumeClaim{
 		ObjectMeta: v1.ObjectMeta{
@@ -30,6 +30,8 @@ func NewDatabasePvc(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.Persi
 			},
 		},
 	}
-	controllerutil.SetControllerReference(db, pv, scheme)
-	return pv
+	if err := controllerutil.SetControllerReference(db, pv, scheme); err != nil {
+		return nil, err
+	}
+	return pv, nil
 }

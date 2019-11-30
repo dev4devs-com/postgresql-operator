@@ -25,14 +25,15 @@ before_script:
 
 jobs:
   include:
-    - stage: Run unit tests and coverage
+    - stage: Run unit tests, coverage and liny
       before_script:
         - go get github.com/mattn/goveralls
       script:
+        - make lint
         - make test
         - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out -repotoken=$COVERALLS_TOKEN
       after_success: echo 'Unit Test and coverage finished successfully'
-      after_failure: echo 'Failure to built or push master image'
+      after_failure: echo 'Failure run unit tests, coverage and lint'
 
     - stage: Run e2e tests
       before_script:

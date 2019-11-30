@@ -1,7 +1,7 @@
 package e2e
 
 import (
-	"github.com/operator-framework/operator-sdk/pkg/test"
+	"github.com/operator-framework/operator-sdk/pkg/test" //nolint:goimports
 	"testing"
 )
 

@@ -15,8 +15,7 @@ import (
 
 func TestReconcileDatabase(t *testing.T) {
 	type fields struct {
-		scheme *runtime.Scheme
-		objs   []runtime.Object
+		objs []runtime.Object
 	}
 	type args struct {
 		dbInstance v1alpha1.Database

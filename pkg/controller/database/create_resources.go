@@ -10,7 +10,11 @@ import (
 // Check if PersistentVolumeClaim for the app exist, if not create one
 func (r *ReconcileDatabase) createPvc(db *v1alpha1.Database) error {
 	if _, err := service.FetchPersistentVolumeClaim(db.Name, db.Namespace, r.client); err != nil {
-		if err := r.client.Create(context.TODO(), resource.NewDatabasePvc(db, r.scheme)); err != nil {
+		pvc, err := resource.NewDatabasePvc(db, r.scheme)
+		if err != nil {
+			return err
+		}
+		if err := r.client.Create(context.TODO(), pvc); err != nil {
 			return err
 		}
 	}
@@ -20,7 +24,11 @@ func (r *ReconcileDatabase) createPvc(db *v1alpha1.Database) error {
 // Check if Service for the app exist, if not create one
 func (r *ReconcileDatabase) createService(db *v1alpha1.Database) error {
 	if _, err := service.FetchService(db.Name, db.Namespace, r.client); err != nil {
-		if err := r.client.Create(context.TODO(), resource.NewDatabaseService(db, r.scheme)); err != nil {
+		ser, err := resource.NewDatabaseService(db, r.scheme)
+		if err != nil {
+			return err
+		}
+		if err := r.client.Create(context.TODO(), ser); err != nil {
 			return err
 		}
 	}
@@ -31,7 +39,11 @@ func (r *ReconcileDatabase) createService(db *v1alpha1.Database) error {
 func (r *ReconcileDatabase) createDeployment(db *v1alpha1.Database) error {
 	_, err := service.FetchDeployment(db.Name, db.Namespace, r.client)
 	if err != nil {
-		if err := r.client.Create(context.TODO(), resource.NewDatabaseDeployment(db, r.scheme)); err != nil {
+		dep, err := resource.NewDatabaseDeployment(db, r.scheme)
+		if err != nil {
+			return err
+		}
+		if err := r.client.Create(context.TODO(), dep); err != nil {
 			return err
 		}
 	}
