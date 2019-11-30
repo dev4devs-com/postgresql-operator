@@ -16,7 +16,7 @@ endif::[]
 
 ifdef::status[]
 .*Project health*
-image:https://circleci.com/gh/dev4devs-com/postgresql-operator.svg?style=svg[Build Status (CircleCI), link=https://circleci.com/gh/dev4devs-com/postgresql-operator]
+https://travis-ci.org/dev4devs-com/postgresql-operator.svg?branch=master[Build Status (TravisCI), link=https://travis-ci.org/dev4devs-com/postgresql-operator]
 image:https://img.shields.io/:license-Apache2-blue.svg[License (License), link=http://www.apache.org/licenses/LICENSE-2.0]
 image:https://coveralls.io/repos/github/dev4devs-com/postgresql-operator/badge.svg?bVerifyingranch=master[Coverage Status (Coveralls), link=https://coveralls.io/github/dev4devs-com/postgresql-operator?branch=master]
 image:https://goreportcard.com/badge/github.com/dev4devs-com/postgresql-operator[Go Report Card (Go Report Card), link=https://goreportcard.com/report/github.com/dev4devs-com/postgresql-operator]
