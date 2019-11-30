@@ -52,8 +52,6 @@ jobs:
         - make image-push-master
       after_success: echo 'Master image built and pushed with success'
       after_failure: echo 'Failure to built or push master image'
-      services:
-        - docker
 
     - stage: Release Image
       if: type != pull_request AND tag IS present
@@ -63,5 +61,3 @@ jobs:
         - make image-push-release
       after_success: echo 'Imagee Released with success'
       after_failure: echo 'Failure to release image'
-      services:
-        - docker
