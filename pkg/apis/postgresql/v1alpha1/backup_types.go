@@ -69,28 +69,32 @@ type BackupSpec struct {
 
 	// Name of the secret with the AWS data credentials pre-existing in the cluster
 	// Default Value: nil
-	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
+	// See here the template:
+	// https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/s3-secret.yaml
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS Secret name:"
 	AwsSecretName string `json:"awsSecretName,omitempty"`
 
 	// Namespace of the secret with the AWS data credentials pre-existing in the cluster
 	// Default Value: nil
-	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+	// NOTE: If the namespace be not informed then the operator will try to
+	// find it in the same namespace where it is applied
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="AWS Secret namespace:"
 	AwsSecretNamespace string `json:"awsSecretNamespace,omitempty"`
 
 	// Name of the secret with the Encrypt data pre-existing in the cluster
 	// Default Value: nil
-	// See here the template: https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
+	// See here the template:
+	// https://github.com/integr8ly/backup-container-image/blob/master/templates/openshift/sample-config/gpg-secret.yaml
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey Secret name:"
 	EncryptKeySecretName string `json:"encryptKeySecretName,omitempty"`
 
 	// Namespace of the secret with the Encrypt data pre-existing in the cluster
 	// Default Value: nil
-	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is applied
+	// NOTE: If the namespace be not informed then the operator will try to find it in the same namespace where it is
+	// applied
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="EncryptKey Secret namespace:"
 	EncryptKeySecretNamespace string `json:"encryptKeySecretNamespace,omitempty"`
@@ -122,7 +126,8 @@ type BackupSpec struct {
 type BackupStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
-	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
+	// Add custom validation using kubebuilder tags:
+	// https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	// Will be as "OK when all objects are created successfully
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
@@ -164,12 +169,14 @@ type BackupStatus struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is Encryption GPG Key configure?"
 	HasEncryptKey bool `json:"hasEncryptKey"`
 
-	// Boolean value which has true when the Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
+	// Boolean value which has true when the Database Pod was found in order to create the secret with the database
+	// data to allow the backup image connect into it.
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is the Database Pod found?"
 	IsDatabasePodFound bool `json:"isDatabasePodFound"`
 
-	// Boolean value which has true when the Service Database Pod was found in order to create the secret with the database data to allow the backup image connect into it.
+	// Boolean value which has true when the Service Database Pod was found in order to create the secret with the
+	// database data to allow the backup image connect into it.
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.statusDescriptors.displayName="Is the Database Service found?"
 	IsDatabaseServiceFound bool `json:"isDatabaseServiceFound"`
@@ -183,6 +190,7 @@ type BackupStatus struct {
 // Backup is the Schema for the backups API
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
+//nolint:lll
 // +k8s:openapi-gen=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=backups,scope=Namespaced

@@ -28,9 +28,17 @@ func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) (*v1beta1.Cr
 							ServiceAccountName: "postgresql-operator",
 							Containers: []corev1.Container{
 								{
-									Name:    bkp.Name,
-									Image:   bkp.Spec.Image,
-									Command: []string{"/opt/intly/tools/entrypoint.sh", "-c", "postgres", "-n", bkp.Namespace, "-b", "s3", "-e", ""},
+									Name:  bkp.Name,
+									Image: bkp.Spec.Image,
+									Command: []string{
+										"/opt/intly/tools/entrypoint.sh",
+										"-c", "postgres",
+										"-n",
+										bkp.Namespace,
+										"-b",
+										"s3",
+										"-e",
+										""},
 									Env: []corev1.EnvVar{
 										{
 											Name:  "BACKEND_SECRET_NAME",

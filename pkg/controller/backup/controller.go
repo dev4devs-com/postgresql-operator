@@ -122,7 +122,8 @@ func (r *ReconcileBackup) Reconcile(request reconcile.Request) (reconcile.Result
 	return reconcile.Result{}, nil
 }
 
-//createResources will create and update the secondary resource which are required in order to make works successfully the primary resource(CR)
+//createResources will create and update the secondary resource which are required
+// in order to make works successfully the primary resource(CR)
 func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcile.Request) error {
 	reqLogger := utils.GetLoggerByRequestAndController(request, utils.BackupControllerName)
 	reqLogger.Info("Creating secondary Backup resources ...")
@@ -135,14 +136,16 @@ func (r *ReconcileBackup) createResources(bkp *v1alpha1.Backup, request reconcil
 	}
 
 	// Get the Database Pod created by the Database Controller
-	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
+	// NOTE: This data is required in order to create the secrets which
+	// will access the database container to do the backup
 	if err := r.getDatabasePod(bkp, db); err != nil {
 		reqLogger.Error(err, "Failed to get a Database pod")
 		return err
 	}
 
 	// Get the Database Service created by the Database Controller
-	// NOTE: This data is required in order to create the secrets which will access the database container to do the backup
+	// NOTE: This data is required in order to create the secrets which will
+	// access the database container to do the backup
 	if err := r.getDatabaseService(bkp, db); err != nil {
 		reqLogger.Error(err, "Failed to get a Database service")
 		return err

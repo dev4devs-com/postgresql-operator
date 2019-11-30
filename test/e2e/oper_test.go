@@ -43,7 +43,10 @@ func TestDatabase(t *testing.T) {
 func FullTest(t *testing.T) {
 	ctx := framework.NewTestCtx(t)
 	defer ctx.Cleanup()
-	err := ctx.InitializeClusterResources(&framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
+	err := ctx.InitializeClusterResources(&framework.CleanupOptions{
+		TestContext:   ctx,
+		Timeout:       cleanupTimeout,
+		RetryInterval: cleanupRetryInterval})
 	if err != nil {
 		t.Fatalf("failed to initialize cluster resource: %v", err)
 	}
@@ -73,7 +76,10 @@ func FullTest(t *testing.T) {
 	utils.AddDatabaseMandatorySpecs(db)
 
 	// use TestCtx's create helper to create the object and add a cleanup function for the new object
-	err = f.Client.Create(goctx.TODO(), db, &framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
+	err = f.Client.Create(goctx.TODO(), db, &framework.CleanupOptions{
+		TestContext:   ctx,
+		Timeout:       cleanupTimeout,
+		RetryInterval: cleanupRetryInterval})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -117,7 +123,10 @@ func FullTest(t *testing.T) {
 	utils.AddBackupMandatorySpecs(bkp)
 
 	// use TestCtx's create helper to create the object and add a cleanup function for the new object
-	err = f.Client.Create(goctx.TODO(), bkp, &framework.CleanupOptions{TestContext: ctx, Timeout: cleanupTimeout, RetryInterval: cleanupRetryInterval})
+	err = f.Client.Create(goctx.TODO(), bkp, &framework.CleanupOptions{
+		TestContext:   ctx,
+		Timeout:       cleanupTimeout,
+		RetryInterval: cleanupRetryInterval})
 	if err != nil {
 		t.Fatal(err)
 	}

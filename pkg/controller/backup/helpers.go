@@ -29,7 +29,8 @@ type HelperDbSecret struct {
 // buildDBSecretData will returns the data required to create the database secret according to the configuration
 // NOTE: The user can:
 // - Customize the environment variables keys as values that should be used with
-// - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user, password and database name already setup for another application )
+// - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user,
+// password and database name already setup for another application )
 func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Database) (map[string][]byte, error) {
 
 	dbSecret := r.newDBSecret(bkp)
@@ -73,7 +74,8 @@ func (r *ReconcileBackup) getEnvVarValue(helper *HelperDbSecret) (string, error)
 	return value, nil
 }
 
-// newHelperDbSecret is a strtuct to keep the data in the loop in order to help fid the key and values which should be used
+// newHelperDbSecret is a strtuct to keep the data in the loop in order
+// to help fid the key and values which should be used
 func (r *ReconcileBackup) newHelperDbSecret(i int, bkp *v1alpha1.Backup) *HelperDbSecret {
 	dt := new(HelperDbSecret)
 	dt.envVarName = r.dbPod.Spec.Containers[0].Env[i].Name
@@ -95,10 +97,12 @@ func (r *ReconcileBackup) newDBSecret(bkp *v1alpha1.Backup) *DbSecret {
 	return db
 }
 
-// newErrorUnableToGetKeyFrom returns an error when is not possible find the key into the configMap and namespace in order
+// newErrorUnableToGetKeyFrom returns an error when is not possible
+// find the key into the configMap and namespace in order
 // to create the mandatory envvar for the database
 func (dt *HelperDbSecret) newErrorUnableToGetKeyFrom() error {
-	return fmt.Errorf("Unable to get the key (%v) in the configMap (%v) in the namespace (%v) to create the secret",
+	return fmt.Errorf("Unable to get the key (%v) in the configMap"+
+		" (%v) in the namespace (%v) to create the secret",
 		dt.cfgKey, dt.cfgName, dt.cfgNamespace)
 }
 

@@ -22,6 +22,7 @@ golangci-lint run --disable-all \
     --enable=varcheck \
     --enable=structcheck \
     --enable=unparam \
+    --enable=lll \
 
 # todo: enable
 # --enable=goimports

@@ -195,7 +195,9 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameKey, dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar),
+								Key: utils.GetEnvVarKey(
+									dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameKey,
+									dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar),
 							},
 						},
 					},
@@ -206,7 +208,8 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserKey, dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserKey,
+									dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar),
 							},
 						},
 					},
@@ -217,7 +220,8 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordKey, dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordKey,
+									dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar),
 							},
 						},
 					},
