@@ -105,9 +105,9 @@ image-push-master: ## Used by CI to push the `master` image to https://quay.io/r
 
 .PHONY: image-push-ci
 image-push-ci: ## Used by CI to push the `ci` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
-	@echo Pushing operator with tag $(IMAGE_MASTER_TAG) to $(IMAGE_REGISTRY)
+	@echo Pushing operator with tag $(IMAGE_CI_TAG) to $(IMAGE_REGISTRY)
 	@docker login --username $(DOCKER_USERNAME) --password $(DOCKER_PASSWORD) quay.io
-	docker push $(IMAGE_MASTER_TAG)
+	docker push $(IMAGE_CI_TAG)
 
 .PHONY: image-push-release
 image-push-release: ## Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
