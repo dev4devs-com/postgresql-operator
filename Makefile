@@ -31,7 +31,7 @@ export GOPROXY?=https://proxy.golang.org/
 ##@ Application
 
 .PHONY: install
-install:  ## Install all resources (CR-CRD's, RBCA and Operator)
+install:  ## Creates the `{namespace}` namespace, application CRDS, cluster role and service account. Installs the operator and DB
 	@echo ....... Creating namespace ....... 
 	- kubectl create namespace ${NAMESPACE}
 	@echo ....... Applying CRDS and Operator .......
@@ -47,7 +47,7 @@ install:  ## Install all resources (CR-CRD's, RBCA and Operator)
 	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall
-uninstall:  ## Uninstall all that all performed in the $ make install
+uninstall:  ## Uninstalls the operator and DB. Deletes the `{namespace}`` namespace, application CRDS, cluster role and service account. i.e. all configuration applied by `make install`
 	@echo ....... Uninstalling .......
 	@echo ....... Deleting CRDs.......
 	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_backups_crd.yaml -n ${NAMESPACE}
@@ -62,12 +62,12 @@ uninstall:  ## Uninstall all that all performed in the $ make install
 	- kubectl delete namespace ${NAMESPACE}
 
 .PHONY: install-backup
-install-backup: ## Install backup feature ( Backup CR )
+install-backup: ## Installs the backup Service in the operator's namespace
 	@echo Installing backup service in ${NAMESPACE} :
 	- kubectl apply -f deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
 .PHONY: uninstall-backup
-uninstall-backup: ## Uninstall backup feature ( Backup CR )
+uninstall-backup: ## Uninstalls the backup Service from the operator's namespace.
 	@echo Uninstalling backup service from ${NAMESPACE} :
 	- kubectl delete -f deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml -n ${NAMESPACE}
 
@@ -82,31 +82,37 @@ code-build-linux:  ## Build binary for Linux SO (amd64)
 	env GOOS=linux GOARCH=amd64 go build $(APP_FILE)
 
 .PHONY: image-build-ci
-image-build-ci:  ## Build master branch image
+image-build-ci:  ## Used by CI to build operator image from pr source code branch and add `:ci` tag.
 	@echo Building operator with the tag: $(IMAGE_CI_TAG)
 	operator-sdk build $(IMAGE_CI_TAG)
 
 .PHONY: image-build-master
-image-build-master:  ## Build master branch image
+image-build-master:  ## Used by CI to build operator image from `master` branch and add `:master` tag.
 	@echo Building operator with the tag: $(IMAGE_MASTER_TAG)
 	operator-sdk build $(IMAGE_MASTER_TAG)
 
 .PHONY: image-build-release
-image-build-release: ## Build release and latest tag image
+image-build-release: ## Used by CI to build operator image for relase tags
 	@echo Building operator with the tag: $(IMAGE_RELEASE_TAG)
 	operator-sdk build $(IMAGE_RELEASE_TAG)
 	operator-sdk build $(IMAGE_LATEST_TAG)
 
 .PHONY: image-push-master
-image-push-master: ## Push master branch image
+image-push-master: ## Used by CI to push the `master` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
 	@echo Pushing operator with tag $(IMAGE_MASTER_TAG) to $(IMAGE_REGISTRY)
-	@docker login --username $(QUAY_USERNAME) --password $(QUAY_PASSWORD) quay.io
+	@docker login --username $(DOCKER_USERNAME) --password $(DOCKER_PASSWORD) quay.io
+	docker push $(IMAGE_MASTER_TAG)
+
+.PHONY: image-push-ci
+image-push-ci: ## Used by CI to push the `ci` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
+	@echo Pushing operator with tag $(IMAGE_MASTER_TAG) to $(IMAGE_REGISTRY)
+	@docker login --username $(DOCKER_USERNAME) --password $(DOCKER_PASSWORD) quay.io
 	docker push $(IMAGE_MASTER_TAG)
 
 .PHONY: image-push-release
-image-push-release: ## Push release and latest tag image
+image-push-release: ## Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
 	@echo Pushing operator with tag $(IMAGE_RELEASE_TAG) to $(IMAGE_REGISTRY)
-	@docker login --username $(QUAY_USERNAME) --password $(QUAY_PASSWORD) quay.io
+	@docker login --username $(DOCKER_USERNAME) --password $(DOCKER_PASSWORD) quay.io
 	docker push $(IMAGE_RELEASE_TAG)
 	@echo Pushing operator with tag $(IMAGE_LATEST_TAG) to $(IMAGE_REGISTRY)
 	docker push $(IMAGE_LATEST_TAG)
@@ -130,7 +136,7 @@ setup:
 	go mod tidy
 
 .PHONY: run-local
-run-local:  ## Run project locally for debbug purposes.
+run-local:  ## Runs the operator locally for development purposes.
 	@echo Exporting env vars to run operator locally:
 	- . .-scripts-export_local_envvars.sh
 	@echo  ....... Installing ...
@@ -139,20 +145,20 @@ run-local:  ## Run project locally for debbug purposes.
 	- operator-sdk up local
 
 .PHONY: vet
-vet:  ## Run go vet for the project
+vet:  ## Examines source code and reports suspicious constructs using https://golang.org/cmd/vet/[vet].
 	@echo go vet
 	go vet $$(go list ./... )
 
 .PHONY: fmt
-fmt: ## Run go fmt for the project
+fmt: ## Formats code using https://golang.org/cmd/gofmt/[gofmt].
 	@echo go fmt
 	go fmt $$(go list ./... )
 
 .PHONY: dev
-dev: fmt vet gen lint ## Run all required dev commands. (It should be used always before send a PR)
+dev: fmt vet gen lint ##  It will tun the dev commands to check, fix and generated/update the files. (It should be used always before send a PR)
 
 .PHONY: gen
-gen:  ## Run SDK commands to generated-upddate the project
+gen:  ## It will automatically generated/update the files by using the operator-sdk based on the CR status and spec definitions.
 	operator-sdk generate k8s
 	operator-sdk generate openapi
 

@@ -375,49 +375,6 @@ debug the project using the following Visual Studio Code launch config.
 }
 ----
 
-== Makefile command reference
-
-=== Application Commands
-
-|===
-| *Command*                        | *Description*
-| `make install`                   | Creates the `{namespace}` namespace, application CRDS, cluster role and service account. Installs the operator and DB
-| `make uninstall`                 | Uninstalls the operator and DB. Deletes the `{namespace}`` namespace, application CRDS, cluster role and service account. i.e. all configuration applied by `make install`
-| `make install-backup`            | Installs the backup Service in the operator's namespace
-| `make uninstall-backup`          | Uninstalls the backup Service from the operator's namespace.
-|===
-
-=== Local Development
-
-|===
-| `make code-run-local`                 | Runs the operator locally for development purposes.
-| `make setup-debug`                    | Sets up environment for debugging proposes.
-| `make vet`                       | Examines source code and reports suspicious constructs using https://golang.org/cmd/vet/[vet].
-| `make fmt`                       | Formats code using https://golang.org/cmd/gofmt/[gofmt].
-| `make gen`                       | It will automatically generated/update the files by using the operator-sdk based on the CR status and spec definitions.
-| `make dev`                       | It will tun the dev commands to check, fix and generated/update the files.
-|===
-
-=== CI
-
-|===
-| `make image-build-master`              | Used by CI to build operator image from `master` branch and add `:master` tag.
-| `make image-push-master`               | Used by CI to push the `master` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
-| `make image-build-release`             | Used by CI to build operator image from a tagged commit and add `:<version>` and `latest` tag.
-| `make image-push-release`              | Used by CI to push the `release` and `latest` image to https://quay.io/repository/dev4devs-com/postgresql-operator[quay.io registry].
-|===
-
-=== Tests
-
-|===
-| `make test`                      | Runs test suite
-| `make integration-cover`        | Run coverage check
-| `make compile-e2e`              | Compile image for tests
-| `make test-e2e`                      | Run locally e2e tests (Required have cluster installed locally)
-|===
-
-NOTE: The link:./Makefile[Makefile] is implemented with tasks which you should use to work with.
-
 == Publishing images
 
 Images are automatically built and pushed to our https://quay.io/repository/dev4devs-com/postgresql-operator[image repository] in the following cases:
