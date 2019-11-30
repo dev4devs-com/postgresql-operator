@@ -158,11 +158,10 @@ gen:  ## Run SDK commands to generated-upddate the project
 ##############################
 
 ##@ Tests
-
 .PHONY: test
 test:  ## Run unit test
 	@echo Running tests:
-	go test -cover $(TEST_PKGS)
+	go test -coverprofile=coverage.out -covermode=count -count=1 -short ./cmd/... ./pkg/...
 
 .PHONY: integration-cover
 integration-cover:  ## Run coveralls
