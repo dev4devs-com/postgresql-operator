@@ -16,7 +16,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
-// Add creates a new Databaase Controller and adds it to the Manager. The Manager will set fields on the Controller
+// Add creates a new Database Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
 func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
@@ -63,7 +63,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 // blank assignment to verify that ReconcileDatabase implements reconcile.Reconciler
 var _ reconcile.Reconciler = &ReconcileDatabase{}
 
-// ReconcileDatabase reconciles a Databaase object
+// ReconcileDatabase reconciles a Database object
 type ReconcileDatabase struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
@@ -86,11 +86,11 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			reqLogger.Info("Databaase resource not found. Ignoring since object must be deleted.")
+			reqLogger.Info("Database resource not found. Ignoring since object must be deleted.")
 			return reconcile.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
-		reqLogger.Error(err, "Failed to get Databaase.")
+		reqLogger.Error(err, "Failed to get Database.")
 		return reconcile.Result{}, err
 	}
 
@@ -98,17 +98,17 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 	utils.AddDatabaseMandatorySpecs(db)
 
 	if err := r.createResources(db, request); err != nil {
-		reqLogger.Error(err, "Failed to create the secondary resource required for the Databaase CR")
+		reqLogger.Error(err, "Failed to create the secondary resource required for the Database CR")
 		return reconcile.Result{}, err
 	}
 
 	if err := r.manageResources(db); err != nil {
-		reqLogger.Error(err, "Failed to manage resource required for the Databaase CR")
+		reqLogger.Error(err, "Failed to manage resource required for the Database CR")
 		return reconcile.Result{}, err
 	}
 
 	if err := r.createUpdateCRStatus(request); err != nil {
-		reqLogger.Error(err, "Failed to create and update the status in the Databaase CR")
+		reqLogger.Error(err, "Failed to create and update the status in the Database CR")
 		return reconcile.Result{}, err
 	}
 
@@ -119,7 +119,7 @@ func (r *ReconcileDatabase) Reconcile(request reconcile.Request) (reconcile.Resu
 //createResources will create the secondary resource which are required in order to make works successfully the primary resource(CR)
 func (r *ReconcileDatabase) createResources(db *v1alpha1.Database, request reconcile.Request) error {
 	reqLogger := utils.GetLoggerByRequestAndController(request, utils.DatabaseControllerName)
-	reqLogger.Info("Creating secondary Databaase resources ...")
+	reqLogger.Info("Creating secondary Database resources ...")
 
 	// Check if deployment for the app exist, if not create one
 	if err := r.createDeployment(db); err != nil {
@@ -145,7 +145,7 @@ func (r *ReconcileDatabase) createResources(db *v1alpha1.Database, request recon
 //createUpdateCRStatus will create and update the status in the CR applied in the cluster
 func (r *ReconcileDatabase) createUpdateCRStatus(request reconcile.Request) error {
 	reqLogger := utils.GetLoggerByRequestAndController(request, utils.DatabaseControllerName)
-	reqLogger.Info("Create/Update Databaase status ...")
+	reqLogger.Info("Create/Update Database status ...")
 
 	if err := r.updateDeploymentStatus(request); err != nil {
 		reqLogger.Error(err, "Failed to create Deployment Status")

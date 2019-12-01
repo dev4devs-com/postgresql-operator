@@ -1,0 +1,78 @@
+language: go
+go_import_path: github.com/dev4devs-com/postgresql-operator
+sudo: required
+
+cache:
+  directories:
+    - $HOME/.cache/go-build
+
+services:
+  - docker
+
+os:
+  - linux
+
+go:
+  - 1.13
+
+jobs:
+  include:
+    - stage: Run unit tests, coverage and lint
+      before_script:
+        - go get github.com/mattn/goveralls
+      script:
+        - # todo: make lint
+        - make test
+        - $GOPATH/bin/goveralls -service=travis-ci -coverprofile=coverage.out -repotoken=$COVERALLS_TOKEN
+      after_success: echo 'Unit Test and coverage finished successfully'
+      after_failure: echo 'Failure to run unit tests, coverage and lint'
+
+    - stage: Run e2e tests
+      env:
+        - RELEASE_VERSION="v0.12.0"
+        - K8S_VERSION="v1.16.3"
+      before_script:
+        # Install operator-sdk using binary. More info: https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md#download-the-release-binary
+        - curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        - chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+      script:
+        - make setup
+        - make image-build-ci
+        - make image-push-ci
+        - ./scripts/install-k8s-ci.sh
+        - make test-e2e
+        - ./scripts/run-e2e-tests.sh
+      after_success: echo 'E2E Tests finished successfully'
+      after_failure: echo 'Failure to run e2e tests'
+
+    - stage: Master Image
+      if: type != pull_request AND ( tag IS present OR branch = master )
+      env:
+        - RELEASE_VERSION="v0.12.0"
+        - K8S_VERSION="v1.16.3"
+      before_script:
+        # Install operator-sdk using binary. More info: https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md#download-the-release-binary
+        - curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        - chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gn
+      script:
+        - make code-build-linux
+        - make image-build-master
+        - make image-push-master
+      after_success: echo 'Master image built and pushed with success'
+      after_failure: echo 'Failure to built or push master image'
+
+    - stage: Release Image
+      if: type != pull_request AND tag IS present
+      env:
+        - RELEASE_VERSION="v0.12.0"
+        - K8S_VERSION="v1.16.3"
+      before_script:
+        # Install operator-sdk using binary. More info: https://github.com/operator-framework/operator-sdk/blob/master/doc/user/install-operator-sdk.md#download-the-release-binary
+        - curl -LO https://github.com/operator-framework/operator-sdk/releases/download/${RELEASE_VERSION}/operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+        - chmod +x operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu && sudo mkdir -p /usr/local/bin/ && sudo cp operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu /usr/local/bin/operator-sdk && rm operator-sdk-${RELEASE_VERSION}-x86_64-linux-gnu
+      script:
+        - make code-build-linux
+        - make image-build-release
+        - make image-push-release
+      after_success: echo 'Imagee Released with success'
+      after_failure: echo 'Failure to release image'
