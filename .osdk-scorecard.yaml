@@ -1,0 +1,19 @@
+##
+# It is used to call the scorecard test/feature of the operatr-sdk tool
+# Following the tests to use it:
+# 1. Create the role_binding namespace ` kubectl create namespace postgresql-operator`
+# 2. Run `operator-sdk scorecard`
+##
+scorecard:
+  output: json
+  plugins:
+    - basic:
+        cr-manifest:
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml"
+        csv-path: "deploy/olm-catalog/postgresql-operator/0.1.2/postgresql-operator.v0.1.2.clusterserviceversion.yaml"
+    - olm:
+        cr-manifest:
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_database_cr.yaml"
+          - "deploy/crds/postgresql.dev4devs.com_v1alpha1_backup_cr.yaml"
+        csv-path: "deploy/olm-catalog/postgresql-operator/0.1.2/postgresql-operator.v0.1.2.clusterserviceversion.yaml"

@@ -2,7 +2,7 @@ package backup
 
 import (
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 )
@@ -29,8 +29,9 @@ type HelperDbSecret struct {
 // buildDBSecretData will returns the data required to create the database secret according to the configuration
 // NOTE: The user can:
 // - Customize the environment variables keys as values that should be used with
-// - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user, password and database name already setup for another application )
-func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) (map[string][]byte, error) {
+// - Inform the name and namespace of an Config Map as the keys which has the values which should be used (E.g. user,
+// password and database name already setup for another application )
+func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.Database) (map[string][]byte, error) {
 
 	dbSecret := r.newDBSecret(bkp)
 
@@ -41,28 +42,29 @@ func (r *ReconcileBackup) buildDBSecretData(bkp *v1alpha1.Backup, db *v1alpha1.P
 
 		switch helper.envVarName {
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseNameKey, db.Spec.DatabaseNameKeyEnvVar):
-			dbSecret.databaseName, err = r.getEnvVarValue(dbSecret.databaseName, dbSecret, helper)
+			dbSecret.databaseName, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabaseUserKey, db.Spec.DatabaseUserKeyEnvVar):
-			dbSecret.user, err = r.getEnvVarValue(dbSecret.user, dbSecret, helper)
+			dbSecret.user, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
 		case utils.GetEnvVarKey(db.Spec.ConfigMapDatabasePasswordKey, db.Spec.DatabasePasswordKeyEnvVar):
-			dbSecret.pwd, err = r.getEnvVarValue(dbSecret.pwd, dbSecret, helper)
+			dbSecret.pwd, err = r.getEnvVarValue(helper)
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
+
 	return dbSecret.createMap(), nil
 }
 
 // getEnvVarValue will return the value that should be used for the Key informed
-func (r *ReconcileBackup) getEnvVarValue(value string, dbSecret *DbSecret, helper *HelperDbSecret) (string, error) {
-	value = helper.envVarValue
+func (r *ReconcileBackup) getEnvVarValue(helper *HelperDbSecret) (string, error) {
+	value := helper.envVarValue
 	if value == "" {
 		value = r.getKeyValueFromConfigMap(helper)
 		if value == "" {
@@ -72,7 +74,8 @@ func (r *ReconcileBackup) getEnvVarValue(value string, dbSecret *DbSecret, helpe
 	return value, nil
 }
 
-// newHelperDbSecret is a strtuct to keep the data in the loop in order to help fid the key and values which should be used
+// newHelperDbSecret is a strtuct to keep the data in the loop in order
+// to help fid the key and values which should be used
 func (r *ReconcileBackup) newHelperDbSecret(i int, bkp *v1alpha1.Backup) *HelperDbSecret {
 	dt := new(HelperDbSecret)
 	dt.envVarName = r.dbPod.Spec.Containers[0].Env[i].Name
@@ -94,10 +97,12 @@ func (r *ReconcileBackup) newDBSecret(bkp *v1alpha1.Backup) *DbSecret {
 	return db
 }
 
-// newErrorUnableToGetKeyFrom returns an error when is not possible find the key into the configMap and namespace in order
+// newErrorUnableToGetKeyFrom returns an error when is not possible
+// find the key into the configMap and namespace in order
 // to create the mandatory envvar for the database
 func (dt *HelperDbSecret) newErrorUnableToGetKeyFrom() error {
-	return fmt.Errorf("Unable to get the key (%v) in the configMap (%v) in the namespace (%v) to create the secret",
+	return fmt.Errorf("Unable to get the key (%v) in the configMap"+
+		" (%v) in the namespace (%v) to create the secret",
 		dt.cfgKey, dt.cfgName, dt.cfgNamespace)
 }
 
@@ -127,7 +132,7 @@ func (data *DbSecret) createMap() map[string][]byte {
 func createAwsDataByteMap(bkp *v1alpha1.Backup) map[string][]byte {
 	dataByte := map[string][]byte{
 		"AWS_S3_BUCKET_NAME":    []byte(bkp.Spec.AwsS3BucketName),
-		"AWS_ACCESS_KEY_ID":     []byte(bkp.Spec.AwsAccessKeyId),
+		"AWS_ACCESS_KEY_ID":     []byte(bkp.Spec.AwsAccessKeyID),
 		"AWS_SECRET_ACCESS_KEY": []byte(bkp.Spec.AwsSecretAccessKey),
 	}
 	return dataByte

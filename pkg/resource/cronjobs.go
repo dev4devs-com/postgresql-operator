@@ -1,7 +1,7 @@
 package resource
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/api/batch/v1beta1"
@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
-//Returns the NewBackupCronJob object for the PostgreSQL Backup
-func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.CronJob {
+//Returns the NewBackupCronJob object for the Database Backup
+func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) (*v1beta1.CronJob, error) {
 	cron := &v1beta1.CronJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      bkp.Name,
@@ -28,9 +28,17 @@ func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.Cro
 							ServiceAccountName: "postgresql-operator",
 							Containers: []corev1.Container{
 								{
-									Name:    bkp.Name,
-									Image:   bkp.Spec.Image,
-									Command: []string{"/opt/intly/tools/entrypoint.sh", "-c", "postgres", "-n", bkp.Namespace, "-b", "s3", "-e", ""},
+									Name:  bkp.Name,
+									Image: bkp.Spec.Image,
+									Command: []string{
+										"/opt/intly/tools/entrypoint.sh",
+										"-c", "postgres",
+										"-n",
+										bkp.Namespace,
+										"-b",
+										"s3",
+										"-e",
+										""},
 									Env: []corev1.EnvVar{
 										{
 											Name:  "BACKEND_SECRET_NAME",
@@ -70,6 +78,8 @@ func NewBackupCronJob(bkp *v1alpha1.Backup, scheme *runtime.Scheme) *v1beta1.Cro
 			},
 		},
 	}
-	controllerutil.SetControllerReference(bkp, cron, scheme)
-	return cron
+	if err := controllerutil.SetControllerReference(bkp, cron, scheme); err != nil {
+		return nil, err
+	}
+	return cron, nil
 }

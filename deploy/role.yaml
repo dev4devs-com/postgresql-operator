@@ -3,12 +3,19 @@ kind: ClusterRole
 metadata:
   name: postgresql-operator
 rules:
-- apiGroups: ['*']
-  resources: ['*']
-  verbs: ['get', 'list']
-- apiGroups: ['']
-  resources: ['pods/exec']
-  verbs: ['create']
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  verbs:
+  - create
 - apiGroups:
   - ""
   resources:
@@ -83,5 +90,13 @@ rules:
   resources:
   - '*'
   - backups
+  verbs:
+  - '*'
+- apiGroups:
+  - postgresql.dev4devs.com
+  resources:
+  - '*'
+  - backups
+  - databases
   verbs:
   - '*'

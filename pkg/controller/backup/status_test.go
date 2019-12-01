@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"k8s.io/api/batch/v1beta1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,8 +18,7 @@ func TestUpdateBackupStatus(t *testing.T) {
 		scheme *runtime.Scheme
 	}
 	type args struct {
-		cronJobStatus *v1beta1.CronJob
-		request       reconcile.Request
+		request reconcile.Request
 	}
 	tests := []struct {
 		name    string
@@ -375,7 +374,7 @@ func TestUpdateDBSecretStatus(t *testing.T) {
 				scheme: scheme.Scheme,
 				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &corev1.Secret{
 					ObjectMeta: v1.ObjectMeta{
-						Name:      "db-postgresql-backup",
+						Name:      utils.DbSecretPrefix + bkpInstanceWithMandatorySpec.Name,
 						Namespace: bkpInstanceWithMandatorySpec.Namespace,
 					},
 				}},
@@ -438,8 +437,8 @@ func TestUpdatePodDatabaseFoundStatus(t *testing.T) {
 			fields: fields{
 				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &corev1.Pod{
 					ObjectMeta: v1.ObjectMeta{
-						Name:      "postgresql",
-						Namespace: "postgresql",
+						Name:      "database",
+						Namespace: "postgresql-operator",
 					},
 				}},
 			},
@@ -507,8 +506,8 @@ func TestUpdateServiceDatabaseFoundStatus(t *testing.T) {
 				scheme: scheme.Scheme,
 				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &corev1.Service{
 					ObjectMeta: v1.ObjectMeta{
-						Name:      "postgresql",
-						Namespace: "postgresql",
+						Name:      "database",
+						Namespace: "postgresql-operator",
 					},
 				}},
 			},

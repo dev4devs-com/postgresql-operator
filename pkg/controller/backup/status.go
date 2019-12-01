@@ -3,7 +3,7 @@ package backup
 import (
 	"context"
 	"fmt"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/service"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
@@ -114,10 +114,11 @@ func (r *ReconcileBackup) insertUpdateAwsSecretStatus(aws *corev1.Secret, bkp *v
 
 // isAwsStatusEqual return true when something related to the aws status fields changed
 func isAwsStatusEqual(aws *corev1.Secret, bkp *v1alpha1.Backup) bool {
-	return aws.Name != bkp.Status.AWSSecretName  || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
+	return aws.Name != bkp.Status.AWSSecretName || aws.Namespace != bkp.Status.AwsCredentialsSecretNamespace
 }
 
-// updateAWSSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
+// updateAWSSecretStatus returns error when was not possible update the
+// EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -148,7 +149,8 @@ func (r *ReconcileBackup) updateEncSecretStatus(request reconcile.Request) error
 	return nil
 }
 
-// insertUpdateEncKeyStatus will check and update the EncryptionKey Secret status if the Secret with the AWS data was changed
+// insertUpdateEncKeyStatus will check and update the EncryptionKey
+// Secret status if the Secret with the AWS data was changed
 func (r *ReconcileBackup) insertUpdateEncKeyStatus(secret *corev1.Secret, bkp *v1alpha1.Backup) error {
 	if isEncryptKeyStatusEquals(secret, bkp) {
 
@@ -167,7 +169,8 @@ func isEncryptKeyStatusEquals(secret *corev1.Secret, bkp *v1alpha1.Backup) bool 
 	return secret.Name != bkp.Status.EncryptKeySecretName || secret.Namespace != bkp.Status.EncryptKeySecretNamespace
 }
 
-// updateDBSecretStatus returns error when was not possible update the EncryptionKey status fields in the CR successfully
+// updateDBSecretStatus returns error when was not possible
+// update the EncryptionKey status fields in the CR successfully
 func (r *ReconcileBackup) updateDBSecretStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -197,7 +200,8 @@ func (r *ReconcileBackup) insertUpdateDBSecretStatus(dbSecret *corev1.Secret, bk
 	return nil
 }
 
-// updatePodDatabaseFoundStatus returns error when was not possible update the DB Pod Found status field in the CR successfully
+// updatePodDatabaseFoundStatus returns error when was not possible
+// update the DB Pod Found status field in the CR successfully
 func (r *ReconcileBackup) updatePodDatabaseFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -223,7 +227,8 @@ func (r *ReconcileBackup) insertUpdatePodDbFoundStatus(bkp *v1alpha1.Backup) err
 	return nil
 }
 
-// updateDbServiceFoundStatus returns error when was not possible update the DB Service Found status field in the CR successfully
+// updateDbServiceFoundStatus returns error when was not possible
+// update the DB Service Found status field in the CR successfully
 func (r *ReconcileBackup) updateDbServiceFoundStatus(request reconcile.Request) error {
 	bkp, err := service.FetchBackupCR(request.Name, request.Namespace, r.client)
 	if err != nil {
@@ -248,12 +253,14 @@ func (r *ReconcileBackup) insertUpdateDbServiceFoundStatus(bkp *v1alpha1.Backup)
 	return nil
 }
 
-//isDbServiceFound returns false when the database service which should be created by the PostgreSQL controller was not found
+//isDbServiceFound returns false when the database service
+// which should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbServiceFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
 
-//isDbPodFound returns false when the database pod which should be created by the PostgreSQL controller was not found
+//isDbPodFound returns false when the database pod which
+// should be created by the Database controller was not found
 func (r *ReconcileBackup) isDbPodFound() bool {
 	return &r.dbService != nil && len(r.dbService.Name) > 0
 }
@@ -263,13 +270,13 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 
 	// Check if was possible found the DB Pod
 	if !r.isDbPodFound() {
-		err := fmt.Errorf("Error: PostgreSQL Pod is missing")
+		err := fmt.Errorf("Error: Database Pod is missing")
 		return err
 	}
 
 	// Check if was possible found the DB Service
 	if !r.isDbServiceFound() {
-		err := fmt.Errorf("Error: PostgreSQL Service is missing")
+		err := fmt.Errorf("Error: Database Service is missing")
 		return err
 	}
 
@@ -277,16 +284,18 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 	dbSecretName := utils.DbSecretPrefix + bkp.Name
 	_, err := service.FetchSecret(bkp.Namespace, dbSecretName, r.client)
 	if err != nil {
-		err = fmt.Errorf("Error: DB Secret is missing. (%v)", dbSecretName)
+		err = fmt.Errorf("error: DB Secret is missing. (%v)", dbSecretName)
 		return err
 	}
 
 	// Check if AWS secret was created
-	awsSecretName :=  utils.GetAWSSecretName(bkp)
+	awsSecretName := utils.GetAWSSecretName(bkp)
 	awsSecretNamespace := utils.GetAwsSecretNamespace(bkp)
 	_, err = service.FetchSecret(awsSecretNamespace, awsSecretName, r.client)
 	if err != nil {
-		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)", awsSecretName, awsSecretNamespace)
+		err := fmt.Errorf("Error: AWS Secret is missing. (name:%v,namespace:%v)",
+			awsSecretName,
+			awsSecretNamespace)
 		return err
 	}
 
@@ -296,7 +305,9 @@ func (r *ReconcileBackup) isAllCreated(bkp *v1alpha1.Backup) error {
 		encSecretNamespace := utils.GetEncSecretNamespace(bkp)
 		_, err := service.FetchSecret(encSecretNamespace, encSecretName, r.client)
 		if err != nil {
-			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)", encSecretName, encSecretNamespace)
+			err := fmt.Errorf("Error: Encript Key Secret is missing. (name:%v,namespace:%v)",
+				encSecretName,
+				encSecretNamespace)
 			return err
 		}
 	}

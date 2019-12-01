@@ -1,19 +1,19 @@
 package service
 
 import (
-	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	goctx "context"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// FetchPostgreSQLPod search in the cluster for 1 Pod managed by the Postgresql Controller
-func FetchPostgreSQLPod(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, client client.Client) (*corev1.Pod, error) {
-	listOps := buildPostgreSQLCriteria(bkp, db)
+// FetchDatabasePod search in the cluster for 1 Pod managed by the Database Controller
+func FetchDatabasePod(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Pod, error) {
+	listOps := buildDatabaseCriteria(db)
 	dbPodList := &corev1.PodList{}
-	err := client.List(context.TODO(), listOps, dbPodList)
+	err := client.List(goctx.TODO(), dbPodList, listOps)
 	if err != nil {
 		return nil, err
 	}
@@ -26,11 +26,11 @@ func FetchPostgreSQLPod(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, client cl
 	return &pod, nil
 }
 
-//FetchPostgreSQLService search in the cluster for 1 Service managed by the Postgresql Controller
-func FetchPostgreSQLService(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, client client.Client) (*corev1.Service, error) {
-	listOps := buildPostgreSQLCriteria(bkp, db)
+//FetchDatabaseService search in the cluster for 1 Service managed by the Database Controller
+func FetchDatabaseService(bkp *v1alpha1.Backup, db *v1alpha1.Database, client client.Client) (*corev1.Service, error) {
+	listOps := buildDatabaseCriteria(db)
 	dbServiceList := &corev1.ServiceList{}
-	err := client.List(context.TODO(), listOps, dbServiceList)
+	err := client.List(goctx.TODO(), dbServiceList, listOps)
 	if err != nil {
 		return nil, err
 	}
@@ -43,8 +43,8 @@ func FetchPostgreSQLService(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql, clien
 	return &srv, nil
 }
 
-//buildPostgreSQLCreteria returns client.ListOptions required to fetch the secondary resource created by
-func buildPostgreSQLCriteria(bkp *v1alpha1.Backup, db *v1alpha1.Postgresql) *client.ListOptions {
+//buildDatabaseCreteria returns client.ListOptions required to fetch the secondary resource created by
+func buildDatabaseCriteria(db *v1alpha1.Database) *client.ListOptions {
 	labelSelector := labels.SelectorFromSet(utils.GetLabels(db.Name))
 	listOps := &client.ListOptions{Namespace: db.Namespace, LabelSelector: labelSelector}
 	return listOps

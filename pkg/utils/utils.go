@@ -1,12 +1,10 @@
 package utils
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/go-logr/logr"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
-
-
 )
 
 func GetLabels(name string) map[string]string {
@@ -83,5 +81,3 @@ func GetLoggerByRequestAndController(request reconcile.Request, controllerName s
 	var log = logf.Log.WithName(controllerName)
 	return log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
 }
-
-

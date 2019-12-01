@@ -2,7 +2,7 @@ package backup
 
 import (
 	"context"
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -33,7 +33,12 @@ func TestReconcileBackup(t *testing.T) {
 		{
 			name: "Should work with default values as key of env vars variables",
 			fields: fields{
-				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &dbInstanceWithConfigMap, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
+				objs: []runtime.Object{
+					&bkpInstanceWithMandatorySpec,
+					&dbInstanceWithConfigMap,
+					&podDatabaseConfigMap,
+					&serviceDatabase,
+					&configMapDefault},
 			},
 			args: args{
 				bkpInstance: bkpInstanceWithMandatorySpec,
@@ -295,7 +300,7 @@ func TestReconcileBackup(t *testing.T) {
 			wantCronJob:   false,
 		},
 		{
-			name: "Should fail because is missing the PostgreSQL CR",
+			name: "Should fail because is missing the Database CR",
 			fields: fields{
 				objs: []runtime.Object{&bkpInstanceWithMandatorySpec, &podDatabaseConfigMap, &serviceDatabase, &configMapDefault},
 			},
@@ -342,35 +347,48 @@ func TestReconcileBackup(t *testing.T) {
 			}
 
 			awsSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetAWSSecretName(&tt.args.bkpInstance), Namespace: utils.GetAwsSecretNamespace(&tt.args.bkpInstance)}, awsSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetAWSSecretName(
+				&tt.args.bkpInstance),
+				Namespace: utils.GetAwsSecretNamespace(&tt.args.bkpInstance)},
+				awsSecret)
 			if (err == nil) != tt.wantAwsSecret {
 				t.Errorf("TestReconcileBackup to get aws secret error = %v, wantErr %v", err, tt.wantAwsSecret)
 				return
 			}
 
 			dbSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.DbSecretPrefix + tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, dbSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{
+				Name:      utils.DbSecretPrefix + tt.args.bkpInstance.Name,
+				Namespace: tt.args.bkpInstance.Namespace},
+				dbSecret)
 			if (err == nil) != tt.wantDBSecret {
 				t.Errorf("TestReconcileBackup to get db secret error = %v, wantErr %v", err, tt.wantDBSecret)
 				return
 			}
 
 			encSecret := &corev1.Secret{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetEncSecretName(&tt.args.bkpInstance), Namespace: utils.GetEncSecretNamespace(&tt.args.bkpInstance)}, encSecret)
+			err = r.client.Get(context.TODO(), types.NamespacedName{Name: utils.GetEncSecretName(
+				&tt.args.bkpInstance),
+				Namespace: utils.GetEncSecretNamespace(&tt.args.bkpInstance)},
+				encSecret)
 			if (err == nil) != tt.wantEncSecret {
 				t.Errorf("TestReconcileBackup to get enc secret error = %v, wantErr %v", err, tt.wantEncSecret)
 				return
 			}
 
 			cronJob := &v1beta1.CronJob{}
-			err = r.client.Get(context.TODO(), types.NamespacedName{Name: tt.args.bkpInstance.Name, Namespace: tt.args.bkpInstance.Namespace}, cronJob)
+			err = r.client.Get(context.TODO(), types.NamespacedName{
+				Name:      tt.args.bkpInstance.Name,
+				Namespace: tt.args.bkpInstance.Namespace},
+				cronJob)
 			if (err == nil) != tt.wantCronJob {
 				t.Errorf("TestReconcileBackup to get cronjob error = %v, wantErr %v", err, tt.wantCronJob)
 				return
 			}
 
 			if (res.Requeue) != tt.wantRequeue {
-				t.Errorf("TestReconcileBackup expect request to requeue res.Requeue = %v, wantRequeue %v", res.Requeue, tt.wantRequeue)
+				t.Errorf("TestReconcileBackup expect request to requeue "+
+					"res.Requeue = %v, wantRequeue %v", res.Requeue, tt.wantRequeue)
 				return
 			}
 		})

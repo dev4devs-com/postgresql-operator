@@ -1,7 +1,7 @@
 package backup
 
 import (
-	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql-operator/v1alpha1"
+	"github.com/dev4devs-com/postgresql-operator/pkg/apis/postgresql/v1alpha1"
 	"github.com/dev4devs-com/postgresql-operator/pkg/utils"
 	"k8s.io/api/batch/v1beta1"
 	corev1 "k8s.io/api/core/v1"
@@ -16,8 +16,8 @@ var (
 	*/
 	bkpInstanceWithMandatorySpec = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-backup",
-			Namespace: "postgresql",
+			Name:      "backup",
+			Namespace: "postgresql-operator",
 		},
 	}
 
@@ -48,14 +48,14 @@ var (
 
 	bkpInstanceWithSecretNames = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-backup",
-			Namespace: "postgresql",
+			Name:      "backup",
+			Namespace: "postgresql-operator",
 		},
 		Spec: v1alpha1.BackupSpec{
 			EncryptKeySecretName:      "enc-secret-test",
-			EncryptKeySecretNamespace: "postgresql",
+			EncryptKeySecretNamespace: "postgresql-operator",
 			AwsSecretName:             "aws-secret-test",
-			AwsSecretNamespace:        "postgresql",
+			AwsSecretNamespace:        "postgresql-operator",
 		},
 	}
 
@@ -93,8 +93,8 @@ var (
 
 	bkpInstanceWithEncSecretData = v1alpha1.Backup{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-backup",
-			Namespace: "postgresql",
+			Name:      "backup",
+			Namespace: "postgresql-operator",
 		},
 		Spec: v1alpha1.BackupSpec{
 			GpgPublicKey:  "example-gpgPublicKey",
@@ -104,20 +104,20 @@ var (
 	}
 
 	/**
-	Mock of PostgreSQL resource
+	Mock of Database resource
 	*/
 
-	dbInstanceWithoutSpec = v1alpha1.Postgresql{
+	dbInstanceWithoutSpec = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
 	}
 
 	podDatabase = corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-test",
-			Namespace: "postgresql",
+			Name:      "database-test",
+			Namespace: "postgresql-operator",
 			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 		Spec: corev1.PodSpec{
@@ -156,12 +156,12 @@ var (
 		},
 	}
 
-	dbInstanceWithConfigMap = v1alpha1.Postgresql{
+	dbInstanceWithConfigMap = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
-		Spec: v1alpha1.PostgresqlSpec{
+		Spec: v1alpha1.DatabaseSpec{
 			ConfigMapName:             "config-map-test",
 			DatabaseNameKeyEnvVar:     "POSTGRESQL_DATABASE",
 			DatabasePasswordKeyEnvVar: "POSTGRESQL_PASSWORD",
@@ -174,8 +174,8 @@ var (
 
 	podDatabaseConfigMap = corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql-test",
-			Namespace: "postgresql",
+			Name:      "database-test",
+			Namespace: "postgresql-operator",
 			Labels:    utils.GetLabels(dbInstanceWithConfigMap.Name),
 		},
 		Spec: corev1.PodSpec{
@@ -195,7 +195,9 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameKey, dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar),
+								Key: utils.GetEnvVarKey(
+									dbInstanceWithConfigMap.Spec.ConfigMapDatabaseNameKey,
+									dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar),
 							},
 						},
 					},
@@ -206,7 +208,8 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserKey, dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabaseUserKey,
+									dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar),
 							},
 						},
 					},
@@ -217,7 +220,8 @@ var (
 								LocalObjectReference: corev1.LocalObjectReference{
 									Name: dbInstanceWithConfigMap.Spec.ConfigMapName,
 								},
-								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordKey, dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar),
+								Key: utils.GetEnvVarKey(dbInstanceWithConfigMap.Spec.ConfigMapDatabasePasswordKey,
+									dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar),
 							},
 						},
 					},
@@ -268,8 +272,8 @@ var (
 
 	serviceDatabase = corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 			Labels:    utils.GetLabels(dbInstanceWithoutSpec.Name),
 		},
 	}
@@ -277,7 +281,7 @@ var (
 	configMapDefault = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-map-test",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			"POSTGRESQL_DATABASE": "solution-database-name",
@@ -286,22 +290,10 @@ var (
 		},
 	}
 
-	configMapOtherKeyValues = corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "config-otherkeys",
-			Namespace: "postgresql",
-		},
-		Data: map[string]string{
-			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar:     "dbname",
-			dbInstanceWithConfigMap.Spec.DatabasePasswordKeyEnvVar: "root",
-			dbInstanceWithConfigMap.Spec.DatabaseUserKeyEnvVar:     "root",
-		},
-	}
-
 	configMapInvalidDatabaseKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			"invalid": "dbname",
@@ -313,7 +305,7 @@ var (
 	configMapInvalidUserKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar: "dbname",
@@ -325,7 +317,7 @@ var (
 	configMapInvalidPwdKey = corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "config-otherkeys",
-			Namespace: "postgresql",
+			Namespace: "postgresql-operator",
 		},
 		Data: map[string]string{
 			dbInstanceWithConfigMap.Spec.DatabaseNameKeyEnvVar: "dbname",
@@ -334,12 +326,12 @@ var (
 		},
 	}
 
-	dbInstanceWithConfigMapAndCustomizeKeys = v1alpha1.Postgresql{
+	dbInstanceWithConfigMapAndCustomizeKeys = v1alpha1.Database{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      "postgresql",
-			Namespace: "postgresql",
+			Name:      "database",
+			Namespace: "postgresql-operator",
 		},
-		Spec: v1alpha1.PostgresqlSpec{
+		Spec: v1alpha1.DatabaseSpec{
 			ConfigMapName:                "config-otherkeys",
 			ConfigMapDatabaseNameKey:     "PGDATABASE",
 			ConfigMapDatabasePasswordKey: "PGPASSWORD",
