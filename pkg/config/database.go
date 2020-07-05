@@ -14,7 +14,7 @@ const (
 	databaseMemoryLimit       = "512Mi"
 	databaseMemoryRequest     = "128Mi"
 	databaseStorageRequest    = "1Gi"
-	databaseStorageClassName  = "slow"
+	databaseStorageClassName  = "standard"
 	databaseCpuLimit          = "60m"
 	databaseCpu               = "30m"
 )
