@@ -34,13 +34,13 @@ A very flexible and customizable https://commons.openshift.org/sig/OpenshiftOper
 The following prerequisites are just required if you would like to install it as standalone (without OLM).
 
 |===
-|https://golang.org/doc/install[Install Golang] v1.12+
-|Access to a Kubernetes v1.14.1+ cluster.
+|https://golang.org/doc/install[Install Golang] v1.13+
+|Access to a Kubernetes v1.16.0+ cluster.
 |https://github.com/golang/go/wiki/SettingGOPATH[Ensure the $GOPATH environment variable is set]
 |https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl[Install kubectl]
 |===
 
-NOTE: If you haven't a access to a Kubernetes v1.14.1+ cluster. It is recommend the usage of https://kubernetes.io/docs/setup/learning-environment/minikube/[Minikube] for local tests and development purposes. You may would like to check the blog posts https://dev4devs.com/2019/10/19/how-to-getting-started-with-kubernetes/[How to getting started with Kubernetes?].
+NOTE: If you haven't a access to a Kubernetes v1.16.0+ cluster. It is recommend the usage of https://kubernetes.io/docs/setup/learning-environment/minikube/[Minikube] for local tests and development purposes. You may would like to check the blog posts https://dev4devs.com/2019/10/19/how-to-getting-started-with-kubernetes/[How to getting started with Kubernetes?].
 
 The following prerequisite is just required if you would like to contribute with.
 
