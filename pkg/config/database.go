@@ -14,6 +14,7 @@ const (
 	databaseMemoryLimit       = "512Mi"
 	databaseMemoryRequest     = "128Mi"
 	databaseStorageRequest    = "1Gi"
+	databaseStorageClassName  = "slow"
 	databaseCpuLimit          = "60m"
 	databaseCpu               = "30m"
 )
@@ -34,6 +35,7 @@ type DefaultDatabaseConfig struct {
 	DatabaseCpuLimit          string `json:"databaseCpuLimit"`
 	DatabaseCpu               string `json:"databaseCpu"`
 	DatabaseStorageRequest    string `json:"databaseStorageRequest"`
+	DatabaseStorageClassName  string `json:"databaseStorageClassName"`
 }
 
 func NewDatabaseConfig() *DefaultDatabaseConfig {
@@ -53,5 +55,6 @@ func NewDatabaseConfig() *DefaultDatabaseConfig {
 		DatabaseCpu:               databaseCpu,
 		DatabaseCpuLimit:          databaseCpuLimit,
 		DatabaseStorageRequest:    databaseStorageRequest,
+		DatabaseStorageClassName:  databaseStorageClassName,
 	}
 }

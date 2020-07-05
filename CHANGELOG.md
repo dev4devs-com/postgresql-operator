@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
-- Upgrade project to use version 0.11.0 of SDK
+- Allow define the Storage Class of the PVC used for the database
+- Start to use CRDs version v1 instead of v1beta1
+- Remove the support for k8s clusters < 1.16.0
+- Upgrade project to use version 0.18.1 of SDK
 - Update the title of the project in the CVS file
 
 ## [0.1.1] - 2019-09-09
