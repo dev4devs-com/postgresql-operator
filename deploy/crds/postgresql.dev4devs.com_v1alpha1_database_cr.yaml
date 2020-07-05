@@ -62,7 +62,10 @@ spec:
   # ConfigMap which pre-exist in the cluster
   # configMapName: "cfgmap-name"
 
-  # The following specs allow you customiza the name of the keys which the operator should look for the env vars in the configMap.
+  # The following specs allow you customize the name of the keys which the operator should look for the env vars in the configMap.
   # configMapDatabaseNameKey: "POSTGRESQL_DATABASE"
   # configMapDatabasePasswordKey: "POSTGRESQL_PASSWORD"
   # configMapDatabaseUserKey: "POSTGRESQL_USER"
+
+  # The following allow you customize the name of the Storage Class that should be used
+  # databaseStorageClassName: "standard"

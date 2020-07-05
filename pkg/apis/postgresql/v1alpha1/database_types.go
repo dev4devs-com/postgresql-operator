@@ -119,7 +119,7 @@ type DatabaseSpec struct {
 
 	// Name the Storage Class name of the PVC which will be created for the Database
 	// More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
-	// Default value: slow
+	// Default value: standard
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap name"
 	DatabaseStorageClassName string `json:"databaseStorageClassName,omitempty"`
