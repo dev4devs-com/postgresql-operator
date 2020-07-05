@@ -14,7 +14,7 @@ jobs:
     - checkout
     - run:
         name: Install operator-sdk to run make setup
-        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.18.1/operator-sdk-v0.18.1-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code-build-linux
@@ -32,7 +32,7 @@ jobs:
     - checkout
     - run:
         name: Install operator-sdk to run make setup
-        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.18.1/operator-sdk-v0.18.1-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code-build-linux
@@ -51,7 +51,7 @@ jobs:
     - checkout
     - run:
         name: Install operator-sdk to run make setup
-        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.10.0/operator-sdk-v0.10.0-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
+        command: curl -Lo operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v0.18.1/operator-sdk-v0.18.1-x86_64-linux-gnu && chmod +x operator-sdk && sudo mv operator-sdk /usr/local/bin
     - run: export GOPROXY=https://proxy.golang.org/
     - run: make setup
     - run: make code-build-linux
