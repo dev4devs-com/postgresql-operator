@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"
 	"os"
 	"runtime"
 	"strings"
@@ -19,6 +18,7 @@ import (
 	"github.com/dev4devs-com/postgresql-operator/version"
 
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
+	kubemetrics "github.com/operator-framework/operator-sdk/pkg/kube-metrics"
 	"github.com/operator-framework/operator-sdk/pkg/leader"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	"github.com/operator-framework/operator-sdk/pkg/metrics"
@@ -94,7 +94,7 @@ func main() {
 
 	// Set default manager options
 	options := manager.Options{
-		Namespace:         namespace,
+		Namespace:          namespace,
 		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
 	}
 
@@ -195,8 +195,8 @@ func serveCRMetrics(cfg *rest.Config, operatorNs string) error {
 		return err
 	}
 
-	//The metrics will be generated from the namespaces which are returned here.
-	//NOTE that passing nil or an empty list of namespaces in GenerateAndServeCRMetrics will result in an error.
+	// The metrics will be generated from the namespaces which are returned here.
+	// NOTE that passing nil or an empty list of namespaces in GenerateAndServeCRMetrics will result in an error.
 	ns, err := kubemetrics.GetNamespacesForMetrics(operatorNs)
 	if err != nil {
 		return err

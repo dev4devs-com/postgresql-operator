@@ -27,7 +27,7 @@ rules:
   - rolebindings
   - pods
   - services
-  - service/finalizers
+  - services/finalizers
   - endpoints
   - persistentvolumeclaims
   - events
@@ -42,6 +42,8 @@ rules:
   verbs:
   - get
   - list
+  - patch
+  - update
   - watch
   - create
   - update
@@ -55,7 +57,13 @@ rules:
   - replicasets
   - statefulsets
   verbs:
-  - '*'
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - monitoring.coreos.com
   resources:
@@ -83,6 +91,7 @@ rules:
   - apps
   resources:
   - replicasets
+  - deployments
   verbs:
   - get
 - apiGroups:
