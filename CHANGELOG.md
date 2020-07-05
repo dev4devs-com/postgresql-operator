@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- Create new dir `deploy/olm-catalog/postgresql-operator/manifests` which the latest version which is point out for the next release version 0.2.0
 - Allow define the Storage Class of the PVC used for the database
 - Start to use CRDs version v1 instead of v1beta1
 - Remove the support for k8s clusters < 1.16.0
