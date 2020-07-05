@@ -151,7 +151,6 @@ dev: ## Run all required dev commands. (It should be used always before send a P
 .PHONY: gen
 gen:  ## Run SDK commands to generated-upddate the project
 	operator-sdk generate k8s
-	operator-sdk generate openapi
 
 ##############################
 # Tests                      #
