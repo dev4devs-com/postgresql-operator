@@ -28,6 +28,7 @@ func NewDatabasePvc(db *v1alpha1.Database, scheme *runtime.Scheme) *corev1.Persi
 					corev1.ResourceStorage: resource.MustParse(db.Spec.DatabaseStorageRequest),
 				},
 			},
+			StorageClassName: &db.Spec.DatabaseStorageClassName,
 		},
 	}
 	controllerutil.SetControllerReference(db, pv, scheme)

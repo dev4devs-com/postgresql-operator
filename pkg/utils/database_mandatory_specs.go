@@ -87,4 +87,8 @@ func AddDatabaseMandatorySpecs(db *v1alpha1.Database) {
 	if db.Spec.DatabasePort == 0 {
 		db.Spec.DatabasePort = defaulDatabaseConfig.DatabasePort
 	}
+
+	if len(db.Spec.DatabaseStorageClassName) < 1 {
+		db.Spec.DatabaseStorageClassName = defaulDatabaseConfig.DatabaseStorageClassName
+	}
 }

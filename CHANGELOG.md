@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+- Allow define the Storage Class of the PVC used for the database
 - Upgrade project to use version 0.18.1 of SDK
 - Update the title of the project in the CVS file
 

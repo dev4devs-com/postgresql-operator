@@ -117,6 +117,13 @@ type DatabaseSpec struct {
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap name"
 	ConfigMapName string `json:"configMapName,omitempty"`
 
+	// Name the Storage Class name of the PVC which will be created for the Database
+	// More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
+	// Default value: slow
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
+	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors.displayName="ConfigMap name"
+	DatabaseStorageClassName string `json:"databaseStorageClassName,omitempty"`
+
 	// Name of the configMap key where the operator should looking for the value for the database name for its env var
 	// Default value: nil
 	// +operator-sdk:gen-csv:customresourcedefinitions.specDescriptors=true
