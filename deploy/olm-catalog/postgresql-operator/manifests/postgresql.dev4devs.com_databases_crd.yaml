@@ -99,7 +99,7 @@ spec:
               databaseStorageClassName:
                 description: 'Name the Storage Class name of the PVC which will be
                   created for the Database More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims
-                  Default value: slow'
+                  Default value: standard'
                 type: string
               databaseStorageRequest:
                 description: 'Limit of Storage Request which will be available for
