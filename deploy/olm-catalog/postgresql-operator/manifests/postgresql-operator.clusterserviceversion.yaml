@@ -33,6 +33,7 @@ metadata:
             "databasePassword": "postgres",
             "databasePasswordKeyEnvVar": "POSTGRESQL_PASSWORD",
             "databaseStorageRequest": "1Gi",
+            "databaseStorageClassName": "standard",
             "databaseUser": "postgres",
             "databaseUserKeyEnvVar": "POSTGRESQL_USER",
             "image": "centos/postgresql-96-centos7",
@@ -40,7 +41,7 @@ metadata:
           }
         }
       ]
-    capabilities: Full Lifecycle
+    capabilities: Basic install
     categories: Database
     certified: "false"
     containerImage: quay.io/dev4devs-com/postgresql-operator:0.2.0
